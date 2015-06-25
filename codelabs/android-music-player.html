@@ -1,0 +1,474 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Playing music on cars and wearables"
+      feedback_link="https://github.com/googlesamples/io2015­codelabs/issues"
+        category="Android Auto, Android Wear"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p><img src="../img/android-music-player/img-1.png" style="max-width: 624px"></p><p>In this codelab, you&#8217;ll&#160;learn how to adapt a music player app to work seamlessly on Android Auto and Android Wear, using the latest Android media APIs.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Play music on a service</li>
+<li>Use a MediaStyle notification to keep your service running in the background</li>
+<li>Expose media and playback controls to external consumers, such as Android Auto and Android Wear</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>
+<a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>&#160;version 1.0+</li>
+<li>The sample code</li>
+<li>A test device with Android&#160;Lollipop (5+)</li>
+<li>To test on Android Auto: an Android Auto compatible head unit or the <a href="https://developer.android.com/training/auto/start/index.html?utm_campaign=android-auto-315#test-it">Android Auto Media Simulator</a>
+</li>
+<li>To test on Android Wear: an Android Wear device or the <a href="https://developer.android.com/training/wearables/apps/creating.html#SetupEmulator">Android Wear Emulator</a>
+</li>
+</ul><codelab-survey><h4>How&#160;would you rate your experience with building Android apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="1:30">
+        
+          <h1></h1><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/googlesamples/io2015-codelabs.git</pre><aside class="special"><p>The io15-codelabs repository contains many projects. For this codelab, you will only need one: musicplayer-auto-wear</p></aside>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Run the sample app" 
+        duration="5:00">
+        
+          <h1></h1><p>First, we will bootstrap with a very basic music player that plays predefined music in an activity. This is not the recommended way of playing music on Android. Let's try it to understand why.</p><ol start="1">
+<li>Open Android Studo</li>
+<li>Select the <img src="../img/android-music-player/img-2.png" style="max-width: 20px"><code>musicplayer-auto-wear/base</code>&#160;directory from the code folder (<strong>File</strong>&#160;&gt; &#160;<strong>Import Project&#8230; </strong>&gt; <code>musicplayer-auto-wear/base</code>).</li>
+<li>
+<a href="http://developer.android.com/tools/device.html">Enable USB debugging</a>&#160;and plug in your Android device.</li>
+<li>Click the Android Studio <img src="../img/android-music-player/img-3.png" style="max-width: 20px"><strong>Run</strong>&#160;button (or press shift+F10).</li>
+<li>After a few seconds, you should see the music player app similar to the screenshot below:</li>
+</ol><p><img src="../img/android-music-player/img-4.png" style="max-width: 198px"></p><p>Now, play with it. In particular, try these things:</p><ol start="1">
+<li>While playing a song, go back to the Android home</li>
+<li>While playing a song, lock the phone (press the power button)</li>
+</ol><aside class="special"><p><strong>For beginners: </strong>You may have noticed that the music stops playing when you leave the app. The reason is that the MediaPlayer is running in an Activity, and an Activity will be stopped whenever it is not visible. For a more in-depth view of the Activity lifecycle, <a href="http://developer.android.com/training/basics/activity-lifecycle/starting.html">read this</a>.</p></aside><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="https://developer.android.com/sdk/installing/studio.html">How do I install Android Studio?</a></li>
+<li><a href="http://developer.android.com/tools/device.html">How do I enable USB debugging?</a></li>
+<li><a href="http://stackoverflow.com/a/16598454">Why doesn't Android Studio see my device?</a></li>
+<li><a href="http://stackoverflow.com/a/4786299">Android error: Failed to install *.apk on device *: timeout?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Play music from a Service" 
+        duration="15:00">
+        
+          <h1></h1><p>In general, a user expects that music keeps playing in the background while they do other things. To support background playing, we need to refactor our music player to play from a service, instead of doing it from an Activity as it is now.</p><p>In Android Lollipop, we introduced a special abstract service, the MediaBrowserService, that simplifies exposing media content and playback controls to consumers. These consumers can be different parts of the same application, or external consumers. By exporting a service that extends MediaBrowserService, you get (almost for) free compatibility with Android Auto and Android Wear. Let's see how to do it!</p><h2>Create a MediaBrowserService</h2><ol start="1"><li>In Android Studio, right click on your project and select New -&gt; Service -&gt; Service<br>
+</li></ol><p><img src="../img/android-music-player/img-5.png" style="max-width: 513px"></p><ol start="2"><li>Fill the dialog with</li></ol><p>Name: MusicService, Exported=true, Enabled=true</p><p><img src="../img/android-music-player/img-6.png" style="max-width: 471px"></p><ol start="3"><li>Replace the contents of the just created MusicService.java with the code below:</li></ol><p>MusicService.java</p><codelab-snippet>package com.example.android.musicplayercodelab;
+
+import android.media.MediaMetadata;
+import android.media.browse.MediaBrowser.MediaItem;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+import android.os.Bundle;
+import android.service.media.MediaBrowserService;
+
+import java.util.List;
+
+public class MusicService extends MediaBrowserService {
+
+    private MediaSession mSession;
+    private PlaybackManager mPlayback;
+
+    final MediaSession.Callback mCallback = new MediaSession.Callback() {
+        @Override
+        public void onPlayFromMediaId(String mediaId, Bundle extras) {
+            mSession.setActive(true);
+            MediaMetadata metadata = MusicLibrary.getMetadata(MusicService.this, mediaId);
+            mSession.setMetadata(metadata);
+            mPlayback.play(metadata);
+        }
+
+        @Override
+        public void onPlay() {
+            if (mPlayback.getCurrentMediaId() != null) {
+                onPlayFromMediaId(mPlayback.getCurrentMediaId(), null);
+            }
+        }
+
+        @Override
+        public void onPause() {
+            mPlayback.pause();
+        }
+
+        @Override
+        public void onStop() {
+            stopSelf();
+        }
+
+        @Override
+        public void onSkipToNext() {
+            onPlayFromMediaId(MusicLibrary.getNextSong(mPlayback.getCurrentMediaId()), null);
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            onPlayFromMediaId(MusicLibrary.getPreviousSong(mPlayback.getCurrentMediaId()), null);
+        }
+    };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Start a new MediaSession
+        mSession = new MediaSession(this, "MusicService");
+        mSession.setCallback(mCallback);
+        mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        setSessionToken(mSession.getSessionToken());
+
+        // ------------ CHANGE 7 - UNCOMMENT THE FOLLOWING LINE TO USE A NOTIFICATION
+        // final MediaNotificationManager mediaNotificationManager = new MediaNotificationManager(this);
+        // ------------ CHANGE 7 - END OF CHANGE
+
+        mPlayback = new PlaybackManager(this, new PlaybackManager.Callback() {
+            @Override
+            public void onPlaybackStatusChanged(PlaybackState state) {
+                mSession.setPlaybackState(state);
+                // ------------ CHANGE 8 - UNCOMMENT THE FOLLOWING LINE TO USE A NOTIFICATION
+                // mediaNotificationManager.update(mPlayback.getCurrentMedia(), state, getSessionToken());
+                // ------------ CHANGE 8 - END OF CHANGE
+            }
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        mPlayback.stop();
+        mSession.release();
+    }
+
+    @Override
+    public BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints) {
+        return new BrowserRoot(MusicLibrary.getRoot(), null);
+    }
+
+    @Override
+    public void onLoadChildren(final String parentMediaId, final Result&lt;List&lt;MediaItem&gt;&gt; result) {
+        result.sendResult(MusicLibrary.getMediaItems());
+    }
+}</codelab-snippet><ol start="4"><li>Open AndroidManifest.xml and add an &lt;intent-filter&gt; with action "android.media.browse.MediaBrowserService" to the &lt;service&gt; tag associated with MusicService. Make sure it looks like this:<br>
+</li></ol><h3>        <a href="https://github.com/googlesamples/io2015-codelabs/tree/master/musicplayer-auto-wear/final/mobile/src/main/AndroidManifest.xml">AndroidManifest.xml</a></h3><codelab-snippet>&lt;service
+     android:name=".MusicService"
+     android:enabled="true"
+     android:exported="true" &gt;
+     &lt;intent-filter&gt;
+          &lt;action android:name="android.media.browse.MediaBrowserService" /&gt;
+     &lt;/intent-filter&gt;
+&lt;/service&gt;</codelab-snippet><aside class="special"><p><strong>Understand what you are doing: What goes into a MediaBrowserService?</strong></p>
+<ul>
+<li>
+<strong>onGetRoot</strong>&#160;serves two purposes: authorization and content entry-point. It is the first method called by the system when a client tries to consume your media. If you return <code>null</code>, the system will not allow that specific consumer to connect to your service. &#160;Whatever you return will be used as an entry point by the client to fetch your content. It is the recommended way to provide different entry points to different clients, like a simplified music catalog to Android Auto, for example.</li>
+<li>
+<strong>onLoadChildren</strong>&#160;returns the actual hierarchical structure of media items that a client will use to browse your content.</li>
+<li>a linked <strong>MediaSession</strong>&#160;is what ties browsing to playback. MediaBrowserService itself only provides media browsing, but it links, through a MediaSession token you set, to a MediaSession that can be remotely controlled. </li>
+</ul></aside><h2>Update the Activity to connect to the service</h2><p>We now have a service that provides content and handles playback, but the activity is still playing on its own. We need to change the Activity to connect to the service instead.</p><ol start="1"><li>Open MusicPlayerActivity</li></ol><ol start="2"><li>There are 6 places in this class with special comments, something like "---------- CHANGE 1". Locate these comments and follow the instructions in the source code: remove the lines right below the initial comment and uncomment the second block of code.</li></ol><p><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;For example, if you have this:</p><codelab-snippet>// ------------ CHANGE 6 - REMOVE FOLLOWING LINES FOR PLAYBACK ON A SERVICE
+mPlaybackManager.pause();
+
+/* ------------ CHANGE 6 - UNCOMMENT FOLLOWING LINES FOR PLAYBACK ON A SERVICE
+getMediaController().getTransportControls().pause();
+// ------------ CHANGE 6 - END OF PLAYBACK ON A SERVICE SNIPPET */</codelab-snippet><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;after following the instructions, you should have this:</p><codelab-snippet>getMediaController().getTransportControls().pause();</codelab-snippet><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Repeat it for all the 6 changes.</p><ol start="3"><li>If necessary, fix the missing import statements (android.media.session.MediaController and android.content.ComponentName)</li></ol><p>Now your activity is using the MediaBrowserService to play music. Run and test again. </p><p>Surprisingly, the music still eventually stops when you lock the phone screen or start doing something else. In the next section we will understand why.</p><aside class="special"><p><strong>Understand what you are doing: Media browsing</strong></p>
+<ul>
+<li>Any client that wants to connect to a MediaBrowserService should instantiate a MediaBrowser object and call the method connect.</li>
+<li>When the connection is established and authorized, &#160;the MediaBrowser is ready to browse media content. This is done by subscribing to parents of media items, starting with the root (imagine a hierarchical structure, like a tree).</li>
+</ul></aside><aside class="special"><p><strong>Understand what you are doing: Media playback controls</strong></p>
+<ul>
+<li>As seen in the previous section, on the service side the MediaBrowserService links to a MediaSession, the object that handles the playback and exposes playback controls. On the client side, the consumer who wants to access the playback state, must instantiate a MediaController by using the MediaSession token returned by the MediaBrowser:<br><br>new MediaController(ctx, mediaBrowser.getSessionToken())</li>
+<li>A MediaController provides callbacks when the currently playing media changes (onMetadataChanged) and when the playback state changes (onPlaybackStatusChanged). Also, it allows a client to send commands, like play, pause, skip to next, etc.<br><br>mediaController.getTransportControls().playFromMediaId(mediaId);<br>mediaController.getTransportControls().skipToNext();</li>
+</ul></aside><h2>Takeaways</h2><ul>
+<li>Just running a service is not enough to get proper background playing. You also need to tell the system that the service should not be killed while playing.</li>
+<li>If you want to <strong>expose playback controls</strong>&#160;(play, pause, skip, etc) to external components, like Android Auto and Android Wear, <strong>use a MediaSession</strong>&#160;(or MediaSessionCompat for pre-Lollipop versions)</li>
+<li>If you want to <strong>expose your media content for browsing</strong>&#160;by external components, like Android Auto and Android Wear, <strong>use a MediaBrowserService</strong>
+</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Attach a MediaStyle notification to the service" 
+        duration="5:00">
+        
+          <h1></h1><p>Just handling playback on a service is not enough to keep it running. The reason is that a normal service can be killed when no one is connected to it. We need to tell Android that this service needs to be kept up and running while the music is playing.</p><p>We do this by creating a notification linked to the service, in this case, a MediaStyle notification, which is a special kind of notification with a link to the MediaSession.</p><ol start="1"><li>Create a new Java file called MediaNotificationManager in the same directory/package as the other classes:</li></ol><ul>
+<li>Right click on the path module (com.example.android.musicplayercodelab) in the java folder</li>
+<li>Select New &gt; Java Class</li>
+<li>Name the file MediaNotificationManager.java</li>
+</ul><ol start="2"><li>Paste the following code:</li></ol><h3><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<a href="https://github.com/googlesamples/io2015-codelabs/tree/master/musicplayer-auto-wear/final/mobile/src/main/java/com/example/android/musicplayercodelab/MediaNotificationManager.java">MediaNotificationManager.java</a></h3><codelab-snippet>package com.example.android.musicplayercodelab;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.MediaDescription;
+import android.media.MediaMetadata;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+
+/**
+ * Keeps track of a notification and updates it automatically for a given
+ * MediaSession. This is required so that the music service
+ * doesn't get killed during playback.
+ */
+public class MediaNotificationManager extends BroadcastReceiver {
+    private static final int NOTIFICATION_ID = 412;
+    private static final int REQUEST_CODE = 100;
+
+    private static final String ACTION_PAUSE = "com.example.android.musicplayercodelab.pause";
+    private static final String ACTION_PLAY = "com.example.android.musicplayercodelab.play";
+    private static final String ACTION_NEXT = "com.example.android.musicplayercodelab.next";
+    private static final String ACTION_PREV = "com.example.android.musicplayercodelab.prev";
+
+    private final MusicService mService;
+
+    private final NotificationManager mNotificationManager;
+
+    private final Notification.Action mPlayAction;
+    private final Notification.Action mPauseAction;
+    private final Notification.Action mNextAction;
+    private final Notification.Action mPrevAction;
+
+    private boolean mStarted;
+
+    public MediaNotificationManager(MusicService service) {
+        mService = service;
+
+        String pkg = mService.getPackageName();
+        PendingIntent playIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE,
+                new Intent(ACTION_PLAY).setPackage(pkg), PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pauseIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE,
+                new Intent(ACTION_PAUSE).setPackage(pkg), PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent nextIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE,
+                new Intent(ACTION_NEXT).setPackage(pkg), PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent prevIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE,
+                new Intent(ACTION_PREV).setPackage(pkg), PendingIntent.FLAG_CANCEL_CURRENT);
+
+        mPlayAction = new Notification.Action(R.drawable.ic_play_arrow_white_24dp,
+                mService.getString(R.string.label_play), playIntent);
+        mPauseAction = new Notification.Action(R.drawable.ic_pause_white_24dp,
+                mService.getString(R.string.label_pause), pauseIntent);
+        mNextAction = new Notification.Action(R.drawable.ic_skip_next_white_24dp,
+                mService.getString(R.string.label_next), nextIntent);
+        mPrevAction = new Notification.Action(R.drawable.ic_skip_previous_white_24dp,
+                mService.getString(R.string.label_previous), prevIntent);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_NEXT);
+        filter.addAction(ACTION_PAUSE);
+        filter.addAction(ACTION_PLAY);
+        filter.addAction(ACTION_PREV);
+
+        mService.registerReceiver(this, filter);
+
+        mNotificationManager = (NotificationManager) mService
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Cancel all notifications to handle the case where the Service was killed and
+        // restarted by the system.
+        mNotificationManager.cancelAll();
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        final String action = intent.getAction();
+        switch (action) {
+            case ACTION_PAUSE:
+                mService.mCallback.onPause();
+                break;
+            case ACTION_PLAY:
+                mService.mCallback.onPlay();
+                break;
+            case ACTION_NEXT:
+                mService.mCallback.onSkipToNext();
+                break;
+            case ACTION_PREV:
+                mService.mCallback.onSkipToPrevious();
+                break;
+        }
+    }
+
+    public void update(MediaMetadata metadata, PlaybackState state, MediaSession.Token token) {
+        if (state == null || state.getState() == PlaybackState.STATE_STOPPED ||
+                state.getState() == PlaybackState.STATE_NONE) {
+            mService.stopForeground(true);
+            try {
+                mService.unregisterReceiver(this);
+            } catch (IllegalArgumentException ex) {
+                // ignore receiver not registered
+            }
+            mService.stopSelf();
+            return;
+        }
+        if (metadata == null) {
+            return;
+        }
+        boolean isPlaying = state.getState() == PlaybackState.STATE_PLAYING;
+        Notification.Builder notificationBuilder = new Notification.Builder(mService);
+        MediaDescription description = metadata.getDescription();
+
+        notificationBuilder
+                .setStyle(new Notification.MediaStyle()
+                        .setMediaSession(token)
+                        .setShowActionsInCompactView(0, 1, 2))
+                .setColor(mService.getApplication().getResources().getColor(R.color.notification_bg))
+                .setSmallIcon(R.drawable.ic_notification)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setContentIntent(createContentIntent())
+                .setContentTitle(description.getTitle())
+                .setContentText(description.getSubtitle())
+                .setLargeIcon(MusicLibrary.getAlbumBitmap(mService, description.getMediaId()))
+                .setOngoing(isPlaying)
+                .setWhen(isPlaying ? System.currentTimeMillis() - state.getPosition() : 0)
+                .setShowWhen(isPlaying)
+                .setUsesChronometer(isPlaying);
+
+        // If skip to next action is enabled
+        if ((state.getActions() &amp; PlaybackState.ACTION_SKIP_TO_PREVIOUS) != 0) {
+            notificationBuilder.addAction(mPrevAction);
+        }
+
+        notificationBuilder.addAction(isPlaying ? mPauseAction : mPlayAction);
+
+        // If skip to prev action is enabled
+        if ((state.getActions() &amp; PlaybackState.ACTION_SKIP_TO_NEXT) != 0) {
+            notificationBuilder.addAction(mNextAction);
+        }
+
+        Notification notification = notificationBuilder.build();
+
+        if (isPlaying &amp;&amp; !mStarted) {
+            mService.startService(new Intent(mService.getApplicationContext(), MusicService.class));
+            mService.startForeground(NOTIFICATION_ID, notification);
+            mStarted = true;
+        } else {
+            if (!isPlaying) {
+                mService.stopForeground(false);
+                mStarted = false;
+            }
+            mNotificationManager.notify(NOTIFICATION_ID, notification);
+        }
+    }
+
+    private PendingIntent createContentIntent() {
+        Intent openUI = new Intent(mService, MusicPlayerActivity.class);
+        openUI.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        return PendingIntent.getActivity(mService, REQUEST_CODE, openUI,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
+}</codelab-snippet><ol start="3"><li>In MusicService, there are two places with special comments (CHANGE 7 and CHANGE 8). Locate these two comments and follow the instructions in the source code: remove the lines right below the initial comment and uncomment the second block of code.<br>For example, if you have this:<br>
+</li></ol><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/musicplayer-auto-wear/final/mobile/src/main/java/com/example/android/musicplayercodelab/MusicService.java">MusicService.java</a></h3><codelab-snippet>// ------------ CHANGE 7 - UNCOMMENT THE FOLLOWING LINE TO USE A NOTIFICATION
+// final MediaNotificationManager mediaNotificationManager = new MediaNotificationManager(this);
+// ------------ CHANGE 7 - END OF CHANGE</codelab-snippet><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;you will end up having this:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/musicplayer-auto-wear/final/mobile/src/main/java/com/example/android/musicplayercodelab/MusicService.java">MusicService.java</a></h3><codelab-snippet>final MediaNotificationManager mediaNotificationManager = new MediaNotificationManager(this);</codelab-snippet><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;repeat it for both changes.</p><h2>Run!</h2><p>Repeat the same tests you did before: start playing, do something else, open another application, lock the screen. The music continues to play in the background.</p><p>Also, because you've used a MediaStyle notification, the album art of the current song should be set as the background of the lock screen:</p><p><img src="../img/android-music-player/img-7.png" style="max-width: 216px"></p><h2>Takeaways</h2><ul>
+<li>Use a notification to keep your service running in the background while playing</li>
+<li>Use a MediaStyle notification to associate the MediaSession to the notification</li>
+</ul><h2></h2><h2></h2>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run on Android Wear" 
+        duration="5:00">
+        
+          <h1></h1><p>Look at a paired Android Wear watch while a song is playing. You should see a special media notification that allows you to control playback and browse media content.</p><p><img src="../img/android-music-player/img-8.png.gif" style="max-width: 202px"></p><p>There is not a single line of Wear specific code. Android Wear automatically connects to the MediaSession linked by a MediaStyle notification. The latest version of Android Wear also connects to the MediaBrowserService for browsing content.</p><h3></h3><h2>Takeaways</h2><ul><li>If you use the media APIs, your user will be able to control playback and browse songs on their Android Wear devices without any extra code.</li></ul>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Run on Android Auto" 
+        duration="10:00">
+        
+          <h1></h1><p><img src="../img/android-music-player/img-9.png" style="max-width: 624px"></p><p>Adapting your codelab music player to run on Android Auto is very simple. Android Auto, like Android Wear, relies on the standard MediaBrowserService and MediaSession APIs. The only additional requirement is to declare in your manifest that your app is compatible with Android Auto:</p><ol start="1"><li>Create a new file "res/xml/automotive_app_desc.xml":</li></ol><p>Right click in the "res" folder and select File -&gt; New -&gt; Android Resource File</p><p><img src="../img/android-music-player/img-10.png" style="max-width: 526px"><br></p><p>Then fill the dialog with the following info:</p><p>File name: <strong>automotive_app_desc</strong><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Resource type: <strong>XML</strong><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Root element: <strong>automotiveApp</strong></p><p><img src="../img/android-music-player/img-11.png" style="max-width: 461px"></p><ol start="2"><li>Replace the content of the file you just created with:<br>
+</li></ol><h3>        <a href="https://github.com/googlesamples/io2015-codelabs/tree/master/musicplayer-auto-wear/final/mobile/src/main/res/xml/automotive_app_desc.xml">automotive_app_desc.xml</a></h3><codelab-snippet>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;automotiveApp&gt;
+    &lt;uses name="media"/&gt;
+&lt;/automotiveApp&gt;</codelab-snippet><ol start="3"><li>Edit AndroidManifest.xml and include the following meta-data <strong>inside the application tag</strong>:<br>
+</li></ol><h3>        <a href="https://github.com/googlesamples/io2015-codelabs/tree/master/musicplayer-auto-wear/final/mobile/src/main/AndroidManifest.xml">AndroidManifest.xml</a></h3><codelab-snippet>&lt;meta-data
+   android:name="com.google.android.gms.car.application"
+   android:resource="@xml/automotive_app_desc" /&gt;</codelab-snippet><p>Now your music player is ready to work on Android Auto! Deploy the modified app to your phone, disconnect it from your computer and connect the phone via USB to the Android Auto head unit.</p><p>Click twice on the the Music (headphones) icon:</p><p><img src="../img/android-music-player/img-12.png" style="max-width: 624px"></p><p>Select your app ("Music Player Codelab") from the list and have fun with it!</p><p><img src="../img/android-music-player/img-13.png" style="max-width: 624px"></p><h2>Takeaways</h2><ul><li>If you use the Android Lollipop media APIs, you get your app running on Android Auto just by declaring the proper meta-data. </li></ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:00">
+        
+          <h1></h1><p><img src="../img/android-music-player/img-14.png" style="max-width: 624px"></p><p>Your music player now plays media on a service and allows for media browsing and playback controls on Android Wear and Android Auto with minimal effort. Using the Android Lollipop media APIs enables your app to seamlessly play music where your user wants, with minimal development and maintenance effort from you.</p><h3 class="checklist">What we've covered</h3><ul class="checklist">
+<li>Moving music playback into a service.</li>
+<li>Browsing and playing on Android Wear.</li>
+<li>Browsing and playing on Android Auto.</li>
+</ul><h3>Next Steps</h3><p>This codelab ends here, but if you want to add more features, you can try to:</p><ul>
+<li>
+<a href="http://developer.android.com/training/auto/audio/index.html#support_voice">Support voice searches</a>, like "Listen to MyFavoriteBand", which will allow your app to respond to voice commands on Android Auto, Android Wear and Google Now</li>
+<li>Support playback queueing and playlists.</li>
+<li>Add <a href="https://developer.android.com/training/tv/start/start.html">Android TV</a>&#160;support</li>
+<li>Add <a href="https://developers.google.com/cast/">Google Cast</a>&#160;support</li>
+</ul><p>Also, take a look at our open source reference music player, the <a href="http://github.com/googlesamples/android-UniversalMusicPlayer">Universal Music Player</a>, which shows how to handle many issues you will encounter when creating a multi-form factor music player on Android.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul>
+<li>Watch this great devbyte video:<br> <a href="https://www.youtube.com/watch?v=Q96Sw6v4ULg">Devbytes: Android Auto Audio</a>
+</li>
+<li>Take the <a href="https://www.udacity.com/course/android-ubiquitous-computing--ud875">Ubiquitous Computing Online course</a>.</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

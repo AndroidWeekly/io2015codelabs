@@ -1,0 +1,255 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Enable Deep Linking to your App"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Search"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p><img src="../img/android-deep-linking/img-1.png" style="max-width: 597px"></p><p>In this&#160;codelab, you&#8217;ll&#160;learn how to handle deep links in a sample Android app. You&#8217;ll be able to play with the sample app to simulate deep linking from search results on your own Android device. </p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Updating the Android manifest to support deep links.</li>
+<li>Triggering deep links from the Android Debug Bridge.</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>
+<a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>&#160;version 1.0+</li>
+<li>The sample code</li>
+<li>The <a href="https://play.google.com/store/apps/details?id=com.google.android.googlequicksearchbox">Google app</a>&#160;version 2.8+</li>
+<li>A test device with Android&#160;4.1+</li>
+<li>A USB micro to USB cable.</li>
+</ul><codelab-survey><h4>How&#160;will you use this tutorial?</h4>
+<select><option>Read it through only</option>
+<option>Read it and complete the exercises</option></select><h4>How&#160;would rate your experience with building Android apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="1:30">
+        
+          <h1></h1><p>You can either download all the sample code to your computer...&#160;</p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/google/search-samples/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/google/search-samples.git</pre><aside class="special"><p>The search-samples repository contains many sample projects. This codelab only uses two:</p>
+<ul>
+<li>
+<img src="../img/android-deep-linking/img-2.png" style="max-width: 20px"><strong>recipe-app-start</strong>&#8212;The starting code that you&#8217;ll build upon in this codelab.</li>
+<li>
+<img src="../img/android-deep-linking/img-2.png" style="max-width: 20px"><strong>android-deep-linking</strong>&#8212;The complete code for the finished sample app.</li>
+</ul></aside>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Run the sample app" 
+        duration="1:30">
+        
+          <h1></h1><p>First, let&#8217;s see what the finished sample app looks like. With the&#160;code downloaded, the following instructions describe how to open the completed sample app in <a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>.</p><ol start="1">
+<li>Select the <img src="../img/android-deep-linking/img-2.png" style="max-width: 20px"><code>android-deep-linking</code>&#160;directory from the sample code folder (<strong>Quickstart</strong>&#160;&gt; &#160;<strong>Import Project&#8230; </strong>&gt; <code>android-deep-linking</code>).</li>
+<li>Click the <img src="../img/android-deep-linking/img-3.png" style="max-width: 20px"><strong>Gradle sync </strong>button.</li>
+<li>
+<a href="http://developer.android.com/tools/device.html">Enable USB debugging</a>&#160;on your Android device.</li>
+<li>Plug in your Android device&#160;and click the <img src="../img/android-deep-linking/img-4.png" style="max-width: 20px"><strong>Run</strong>&#160;button. You should see the Recipe App home screen appear after a few seconds.</li>
+<li>Open a command line terminal on your computer and enter the following Android Debug Bridge command:</li>
+</ol><pre>adb shell am start -a android.intent.action.VIEW \
+-d "http://recipe-app.com/recipe/pierogi-poutine" com.recipe_app</pre><ol start="6"><li>Verify that a recipe appears&#160;in the sample app. This is the result of a deep link into the app!</li></ol><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="https://developer.android.com/sdk/installing/studio.html">How do I install Android Studio?</a></li>
+<li><a href="http://developer.android.com/tools/device.html">How do I enable USB debugging?</a></li>
+<li><a href="http://stackoverflow.com/a/16598454">Why doesn't Android Studio see my device?</a></li>
+<li><a href="http://stackoverflow.com/a/4786299">Android error: Failed to install *.apk on device *: timeout?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Test deep links" 
+        duration="2:00">
+        
+          <h1></h1><p>Now that you've deep deep links in action, it's time to dig deeper into what deep links are and how they work. First let's look at some sample links from our recipe website.</p><pre>http://recipe-app.com/recipe/grilled-potato-salad
+http://recipe-app.com/recipe/haloumi-salad
+http://recipe-app.com/recipe/wedge-salad</pre><p>If your app is set up to support web deep links, you can click on these web links in a web browser and get taken to the corresponding page within your Android app. Let's simulate that from ADB now:</p><ol start="1">
+<li>Make sure your device is in the same state you left it after testing the sample app above.</li>
+<li>Repeat the same Android Debug Bridge command you used previously, but this time, with a different recipe.</li>
+</ol><pre>adb shell am start -a android.intent.action.VIEW \
+-d "http://recipe-app.com/recipe/grilled-potato-salad"</pre><p>You should see the recipe app refresh with the potato salad recipe.</p><ol start="3"><li>Try using the following recipe URLs &#160;and repeating the step above:</li></ol><p>When you run this command, you should see a disambiguation dialog pop up which asks you if you want to open the link in a web browser or with the sample app. This disambiguation dialog doesn't show if we link directly to the sample app with an app deep link.</p><p><img src="../img/android-deep-linking/img-5.png" style="max-width: 276px"></p><p>Android app deep links have a specific protocol and invoke the app package name, but otherwise look similar in structure to the URL of the corresponding pages. This is how they're constructed:</p><p><img src="../img/android-deep-linking/img-6.png" style="max-width: 624px"></p><p>Using this protocol, we can create Android app deep links for the other recipes from our website like this:</p><pre>android-app://com.recipe_app/http/recipe/grilled-potato-salad
+android-app://com.recipe_app/http/recipe/haloumi-salad
+android-app://com.recipe_app/http/recipe/wedge-salad</pre><p>Now, lets try these app deep links on the sample app using the same steps as we used above except we'll pass in Android app deep links instead.</p><pre>adb shell am start -a android.intent.action.VIEW \
+-d "http://recipe-app.com/recipe/grilled-potato-salad" com.recipe_app</pre><p>Now you should see the sample app display a recipe without requiring a disambiguation dialog. This is how our sample app will behave when it is completed.</p><aside class="special"><p><strong>Do you have a custom protocol?</strong></p>
+<p>In some cases, your app might already be using its own custom protocol for deep linking. For example: <code>recipe-app://recipe/grilled-potato-salad</code>. In that case, you can include your custom protocol like this: <code>android-app://com.recipe_app/</code><strong>recipe-app</strong><code>/recipe/grilled-potato-salad</code></p></aside><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="http://stackoverflow.com/a/24850504">Why do I get "Error: Activity not started, unable to resolve Intent"?</a></li>
+<li><a href="http://stackoverflow.com/a/25072188">Is host a required configuration for deep linking in Android?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Build the starter app" 
+        duration="1:30">
+        
+          <h1></h1><p><img src="../img/android-deep-linking/img-7.png" style="max-width: 241px"></p><p>Now you&#8217;re ready to build on top of the starter project to add deep links to it.</p><ol start="1">
+<li>Select the <img src="../img/android-deep-linking/img-2.png" style="max-width: 20px"><code>recipe-app-start</code>&#160;directory from your sample code download (<strong>File</strong>&#160;&gt; &#160;<strong>Import Project&#8230; </strong>&gt; <code>recipe-app-star</code>).</li>
+<li>Click the <img src="../img/android-deep-linking/img-3.png" style="max-width: 20px"><strong>Gradle sync </strong>button.</li>
+<li>Click the <img src="../img/android-deep-linking/img-4.png" style="max-width: 20px"><strong>Run</strong>&#160;button.</li>
+</ol><p>You should see the Recipe App home screen appear after a few seconds.</p><p>Open a command line terminal on your computer and try to trigger a deep link like this:</p><pre>adb shell am start -a android.intent.action.VIEW \
+-d "http://recipe-app.com/recipe/pierogi-poutine" com.recipe_app</pre><p>You&#8217;ll see the following error because the starter project doesn&#8217;t yet support deep links:</p><pre>Error: Activity not started, unable to resolve Intent { act=android.intent.action.VIEW 
+dat=http://recipe-app.com/recipe/pierogi-poutine flg=0x10000000 pkg=com.recipe_app }</pre><p>Don't worry we'll add support for deep links in the following steps.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add an intent filter to the manifest" 
+        duration="1:00">
+        
+          <h1></h1><p>The first step in adding deep links to your app is to update the Android manifest. Let's do that now. Add a new intent filter to the <code>Activity</code>&#160;of your Android manifest file so that the Android operating system knows which deep links your app can handle. &#160; </p><h3><a href="https://github.com/google/search-samples/blob/master/app-indexing/app/src/main/AndroidManifest.xml">AndroidManifest.xml</a></h3><codelab-snippet>&lt;activity android:name="com.recipe_app.client.RecipeActivity"
+          android:label="@string/title_gizmos" &gt;
+    &lt;intent-filter android:label="@string/app_name"&gt;
+        &lt;action android:name="android.intent.action.VIEW" /&gt;
+        &lt;category android:name="android.intent.category.DEFAULT" /&gt;
+        &lt;category android:name="android.intent.category.BROWSABLE" /&gt;
+        &lt;!-- Accepts URIs that begin with "http://recipe-app.com/recipe" --&gt;
+        &lt;data android:scheme="http"
+              android:host="recipe-app.com"
+              android:pathPrefix="/recipe" /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;</codelab-snippet><p>The updated manifest provides the following new tags:</p><table>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1"><p><strong>Tags</strong></p></td>
+<td colspan="1" rowspan="1"><p><strong>Description</strong></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>&lt;intent-filter&gt;</code></p></td>
+<td colspan="1" rowspan="1"><p>Contains the view elements for the <code>RecipeActivity.</code></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>&lt;action&gt; </code></p></td>
+<td colspan="1" rowspan="1"><p>Specifies the <code>ACTION_VIEW</code>&#160;intent action.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>&lt;data&gt; </code></p></td>
+<td colspan="1" rowspan="1"><p>One for each data URI <em>format</em>&#160;that the activity accepts. This is the primary mechanism to declare the format for our deep links.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>&lt;category&gt;</code></p></td>
+<td colspan="1" rowspan="1">
+<p>Used both for <code>BROWSABLE</code>&#160;and <code>DEFAULT</code>&#160;intent categories:</p>
+<p><code>BROWSABLE</code>&#160;-- required for a mobile browser to execute the intent from within Google Search results. Without this attribute, a click on your URL from a mobile browser will not resolve to your app. Instead, the current web browser will open the URL of the website.</p>
+<p><code>DEFAULT</code>&#160;-- required only if you want your Android app to respond to a click from <em>any</em>&#160;referring website. The intent used from Google search results includes the identity of your app, so the intent explicitly points to your app as the recipient. Other links to your site do not know your app identity, so the DEFAULT category declares your app can accept an implicit intent.</p>
+</td>
+</tr>
+</tbody>
+<tbody></tbody>
+</table><aside class="special"><p><strong>Note</strong>: If you have a multiple deep link formats (eg. http:// and recipe-app://), you&#8217;ll need to add a individual intent filters to handle each one.</p></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add code for the intent filter" 
+        duration="1:30">
+        
+          <h1></h1><p>With the intent declared for the <code>RecipeActivity</code>, you now need to add the code to the sample app to show a recipe when a deep link intent is received.</p><p>First, in the <code>onCreate() </code>method, add a call to <code>onNewIntent()</code>&#160;and pass in the intent that was sent to create the current Activity.</p><h3><a href="https://github.com/google/search-samples/blob/master/app-indexing/app/src/main/java/com/recipe_app/client/RecipeActivity.java">RecipeActivity.java</a></h3><codelab-snippet>@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_recipe);
+    onNewIntent(getIntent());
+}</codelab-snippet><p>Then, define the <code>onNewIntent()</code>&#160;method and verify that the Intent is a deep link intent. If it is a deep link intent, extract the recipe URI from the intent data, look it up in the content provider&#160;and make a call to the <code>showRecipe() </code>method to display the recipe.</p><h3><a href="https://github.com/google/search-samples/blob/master/app-indexing/app/src/main/java/com/recipe_app/client/RecipeActivity.java">RecipeActivity.java</a></h3><codelab-snippet>protected void onNewIntent(Intent intent) {
+    String action = intent.getAction();
+    String data = intent.getDataString();
+    if (Intent.ACTION_VIEW.equals(action) &amp;&amp; data != null) {
+        String recipeId = data.substring(data.lastIndexOf("/") + 1);
+        Uri contentUri = RecipeContentProvider.CONTENT_URI.buildUpon()
+                .appendPath(recipeId).build();
+        showRecipe(contentUri);
+    }
+}</codelab-snippet><p>This takes the unique recipe ID in the deep link and looks it up in the local database of our recipe app. If a recipe with that ID is found, the app will show it on the screen.</p><aside class="warning"><p><strong>Important</strong>: An app opened via a deep link should provide users with a <a href="http://googlewebmastercentral.blogspot.com/2008/10/first-click-free-for-web-search.html">First Click Free</a>&#160;experience. This means that on the first visit to your app, a user should go directly to the relevant content, and not be interrupted with any interstitial content like prompts or login screens. You may prompt the user for an action after the first click. The First Click Free experience must be provided even if the app has never been launched or a user logged in.</p></aside><h3 class="faq">Frequently Asked Questions</h3><ul class="faq"><li><a href="http://stackoverflow.com/a/25997627">How can I avoid opening multiple instances of my app on a deep link?</a></li></ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Test the intent handler" 
+        duration="1:00">
+        
+          <h1></h1><p><img src="../img/android-deep-linking/img-1.png" style="max-width: 556px"></p><p>Now&#160;make sure that the deep links make it all the way to the correct views in your completed sample app.</p><ol start="1">
+<li>Click the <img src="../img/android-deep-linking/img-3.png" style="max-width: 20px"><strong>Gradle sync </strong>button.</li>
+<li>Click the <img src="../img/android-deep-linking/img-4.png" style="max-width: 20px"><strong>Run</strong>&#160;button. You should see the Recipe App home screen appear after a few seconds.</li>
+<li>Open a command line terminal on your computer and try to trigger a deep link like this:</li>
+</ol><pre>adb shell am start -a android.intent.action.VIEW \
+-d "http://recipe-app.com/recipe/pierogi-poutine" com.recipe_app</pre><ol start="4"><li>Try changing these other recipe URLs into deep links and repeating the steps above.</li></ol><pre>http://recipe-app.com/recipe/grilled-potato-salad
+http://recipe-app.com/recipe/haloumi-salad
+http://recipe-app.com/recipe/wedge-salad</pre><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="http://stackoverflow.com/a/24850504">Why do I get "Error: Activity not started, unable to resolve Intent"?</a></li>
+<li><a href="https://support.google.com/googleplay/android-developer/answer/6041489">How do I get my deep links to show up in search?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:00">
+        
+          <h1></h1><p><img src="../img/android-deep-linking/img-8.png" style="max-width: 624px"></p><p>Your app is now ready to handle deep links from Google Search. </p><h3 class="checklist">What we've covered</h3><ul class="checklist">
+<li>Updating the Android manifest to support deep links.</li>
+<li>Triggering deep links from the Android Debug Bridge.</li>
+</ul><h3>Next Steps</h3><ul>
+<li>Add deep links to your own app.</li>
+<li>Make sure that your <a href="https://support.google.com/googleplay/android-developer/answer/6041489">website and app are verified</a>.</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul>
+<li>Learn how to <a href="http://search-codelabs.appspot.com/codelabs/app-indexing">show autocomplete results</a>.</li>
+<li>Read the App Indexing <a href="https://developers.google.com/app-indexing/">developer documentation</a>.</li>
+<li>Watch these great devbyte videos:<br> &#160; &#160;<a href="https://www.youtube.com/watch?v=aISUYHTkTOU">Is your app in the Index?</a><br> &#160; &#160;<a href="https://www.youtube.com/watch?v=PS1FbB5qWEI">Voice search in your app</a>
+</li>
+<li>Post questions and find answers on Stackoverflow under the <a href="http://stackoverflow.com/questions/tagged/deep-linking" class="stackoverflow-tag">deep-linking</a>&#160;or <a href="http://stackoverflow.com/questions/tagged/android-app-indexing" class="stackoverflow-tag">android-app-indexing</a>&#160;tags.</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

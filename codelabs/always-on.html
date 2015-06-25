@@ -1,0 +1,316 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Android Wear Always-on Application"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Android Wear"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="90:00">
+        
+          <h1></h1><p>When you buy a watch you want it to, well, tell the time. So most Android Wear watches include an always-on&#160;screen&#8212;no tapping, twisting or shaking required to see what time it is. With Android Wear 5.1&#160;or higher,&#160;we have expanded this option to apps so that they can stay visible as long as you need them instead of disappearing when you drop your arm. Apps that supports this functionality are called <a href="http://developer.android.com/training/wearables/apps/always-on.html">always-on apps</a>. There are numerous use cases that can benefit from being an always-on app, from shopping lists to exercise tracking.</p><p>This codelab will introduce you to the key concepts behind always-on&#160;apps. It will then walk you through converting an existing stopwatch app into an always-on app which will go on for as long as the user needs it . There is also a bonus section on increasing the refresh rate of the app while it is in ambient mode from once per minute to once every 10 seconds.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Concepts and setup">
+        
+          <h1></h1><h3>Concepts</h3><p>To start off let&#8217;s learn a little bit about Android Wear and the key concepts behind always-on apps.</p><p><img src="../img/always-on/img-1.png.gif" style="max-width: 597px"></p><p>Android Wear is a wearable platform designed for small, powerful devices worn on the body. It is designed to deliver useful information when you need it most, intelligent answers to spoken questions, and tools to help reach fitness goals.</p><p>Some of these interaction can be brief, for example checking the location of your next meeting. Others can be longer, such as referring to your grocery list while shopping. During such longer interactions the default screen timeout can pause the application in the middle of the activity, resulting in friction in the user experience.. There are two potential solutions to this issue:</p><ul>
+<li>
+<strong>Bad:</strong>&#160;Override the default system setting and keep the screen on during the activity, which keeps the system awake and the screen on full brightness, and as a result drains a significant amount of the battery.</li>
+<li>
+<strong>Good:</strong>&#160;Convert the application to become an always-on app, which enables the application to stay in the foreground while allowing the system to sleep when the user is not interacting with the application, and also allowing the application to update the screen.</li>
+</ul><p>Similar to watch faces, an always on app has two modes and is able to switch between them in a session:</p><ul>
+<li>
+<strong>Interactive: </strong>The user is paying full attention and is able to control the application. Typically apps will be in full color&#160;and may offer fluid animation&#160;when in this mode.<br>
+</li>
+<li>
+<strong>Ambient: </strong>The watch is not in active use. The system is in sleep mode while the screen remains on and is refreshed once a minute by default.</li>
+</ul><p>With the basic concepts out of the way, let&#8217;s get started! To make this as quick as possible, we have prepared a sample project for you to build on. It contains some basic code and application settings necessary for building watch faces.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code">
+        
+          <h1></h1><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/googlesamples/io2015-codelabs.git</pre>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Set up Android Studio">
+        
+          <h1></h1><p>Start Android Studio, and select &#8220;Open an existing Android Studio project&#8221; from the Welcome screen, open the project&#160;directory, navigate to the directory <code>wear/always-on</code>&#160;and open&#160;the <code>build.gradle</code>&#160;file&#160;in&#160;that directory:</p><p><img src="../img/always-on/img-2.png" style="max-width: 624px"></p><p>If the following screen appears, click OK on "Import Project from Gradle" screen without making any changes.</p><p><img src="../img/always-on/img-3.png" style="max-width: 358px"></p><p>In the upper left hand corner of the project window, you should see something like this:</p><p><img src="../img/always-on/img-4.png" style="max-width: 396px"></p><p>There are three folder icons. Each of them are known as a &#8220;module&#8221;. Please note that Android Studio might take several seconds to compile the project in the background for the first time. During this time, you will see a spinner in the status bar&#160;at the bottom of Android Studio:</p><p><img src="../img/always-on/img-5.png" style="max-width: 624px"></p><p>We recommend that you wait until this has finished before making code changes. This will allow Android Studio to pull in all the necessary components. In addition, if you get a prompt saying "Reload for language changes to take effect?" or something similar, select &#8220;Yes&#8221;.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Emulator Setup">
+        
+          <h1></h1><p>If you need help setting up an Android Wear emulator, please refer to the <a href="https://developer.android.com/training/wearables/apps/creating.html#SetupEmulator">&#8220;Set Up an Android Wear Emulator or Device&#8221;</a>&#160;section of the "Creating and Running a Wearable App" article.</p><aside class="special"><p>This codelab uses Android Studio (version 1.1), an integrated development environment (IDE) for developing Android apps. In addition, it will require Android Wear SDK components to be downloaded. Please refer to <a href="http://goo.gl/0AtObp">this guide</a>&#160;for installing both the Android Studio and the required SDK components.</p>
+<p><strong>Note: Please configure an emulator running API 22 or later.</strong></p></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run the starter project">
+        
+          <h1></h1><p>Let's run it on a watch / emulator. </p><ul>
+<li>Connect your Android Wear device&#160;or start an emulator.</li>
+<li>In the toolbar, select the &#8220;1-base&#8221;&#160;configuration&#160;from the drop down and click the green triangle run button next to it:</li>
+</ul><p><img src="../img/always-on/img-6.png" style="max-width: 445px"></p><ul>
+<li>Select your Android device or emulator and click OK. This will install the watch face on the Android Wear device or emulator.</li>
+<li>After a couple of seconds, your watch face is built and ready to deploy.&#160;You will see a spinner in the status bar at the bottom of Android Studio while this is happening:</li>
+</ul><p><img src="../img/always-on/img-7.png" style="max-width: 624px"></p><ul><li>If it is not already at the &#8220;4: Run&#8221; tab at the bottom left hand side of Android Studio, select that tab and you can see how the installation progress. At the end of the installation process, you should see something similar to this:</li></ul><pre>Waiting for device.
+Target device: Android_Wear_Round_API_22 [emulator-5554]
+Uploading file
+        local path: /Users/hellouser/AndroidStudioProject/android-codelab-always-on/1-base/build/outputs/apk/1-base-debug.apk
+        remote path: /data/local/tmp/com.android.example.ambientstopwatch
+Installing com.android.example.ambientstopwatch
+DEVICE SHELL COMMAND: pm install -r "/data/local/tmp/com.android.example.ambientstopwatch"
+pkg: /data/local/tmp/com.android.example.ambientstopwatch
+Success
+
+
+Launching application: com.android.example.ambientstopwatch/com.android.example.alwaysonstopwatch.StopwatchActivity.
+DEVICE SHELL COMMAND: am start -n "com.android.example.ambientstopwatch/com.android.example.alwaysonstopwatch.StopwatchActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
+Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.android.example.ambientstopwatch/com.android.example.alwaysonstopwatch.StopwatchActivity }</pre><ul>
+<li>Once that has happened, the stopwatch app should automatically launch.</li>
+<li>If you do not see this, try deploying the app again by pressing the green triangle button in the toolbar.</li>
+</ul><p>Here's what it should look like. Don&#8217;t worry if the power button to the right do not appear in the emulator - this is okay!</p><p><img src="../img/always-on/img-8.png" style="max-width: 303px"></p><aside class="special"><p>Why do we put the current time in this stopwatch app? Always-on apps can be expected to be running for a longer period of time.&#160;During this time, the user might want to check the time - it&#8217;s a watch after all! As a result, if you do not have it already, consider displaying the time in your always-on app.</p></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Understand the starter project">
+        
+          <h1></h1><p>All right, you&#8217;re set up and ready to start converting the application into an always-on app. We&#8217;ll set off using the <code>1-base</code>&#160;module, which is the starting point for the stopwatch that we'll be building upon. You will be adding code from each step to <code>1-base</code>.</p><p>Each of the following modules can be used as reference points to check your work or for reference if you encounter any issues.</p><p>Overview of key components</p><ul>
+<li>
+<code>StopwatchActivity</code>&#160;- This is our stop watch. - This file is located in the directory <code>1-base/java/com/android/example/alwaysonstopwatch</code>. In Android Studio, this is located under <code>1-base/java/com.android.example.alwaysonstopwatch</code>. Within this Activity class, we have:</li>
+<li>
+<code>onCreate</code>&#160;- In this method, we wire up the UI elements (buttons, text views, etc).&#160;It also contains code which attaches the buttons to actions when they are clicked.</li>
+<li>
+<code>mActiveModeUpdateHandler</code>&#160;variable and <code>UpdateHandler</code>&#160;class - These two work together to power the stopwatch by updating the screen once a second when the stopwatch is in action.</li>
+<li>
+<code>mActiveClockUpdateHandler</code>&#160;variable and <code>UpdateClockHandler</code>&#160;class - These two work together to power the current time (updates once a minute). While the stopwatch is the main use-case for our app, users will still want to know the time if they are timing something that could last many minutes to hours.</li>
+<li>
+<code>toggleStartStop</code>&#160;- This controls the behaviour when the stopwatch is started or paused..</li>
+<li>
+<code>res/layout/activity_stopwatch.xml</code>&#160;- This is the layout of the stop watch UI.directory where the screen layout is stored.</li>
+</ul><h3>Summary </h3><p>In this step you&#8217;ve learned about:</p><ul>
+<li>Android Wear and the concepts behind always-on apps</li>
+<li>The basics of our starting point - 1-base</li>
+<li>How to connect to Android Wear device, deploy the app and run it!</li>
+</ul><h3>Next up </h3><p>Let&#8217;s start making this app an always-on app!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Make it an always-on app">
+        
+          <h1></h1><p>In this step, we will start making our app an always-on app. It will have the ability to jump between active and ambient mode and it will stay in the foreground until the user explicitly dismisses it. The screen will update once a minute which is the default for always-on apps.</p><aside class="special"><p>If you are stuck at any point, please refer to the module <code>2-ambient</code>&#160;for the complete code.</p></aside><h3>Gradle file changes</h3><p>In order to reference the new functionalities related to always-on apps, we need to add one dependencies to the <code>build.gradle</code>&#160;file for <code>com.google.android.wearable:wearable:1.0.0</code>:</p><p><img src="../img/always-on/img-9.png" style="max-width: 301px"></p><codelab-snippet>dependencies {
+    compile 'com.google.android.support:wearable:1.2.0'
+    // Add the following line
+    provided 'com.google.android.wearable:wearable:1.0.0'
+}</codelab-snippet><h3>Manifest changes</h3><p>To convert our app to an always-on&#160;app, we need to change several attributes related to our app in <code>AndroidManifest.xml</code>&#160;. This is located here:</p><p><img src="../img/always-on/img-10.png" style="max-width: 346px"></p><p>We need to make the following changes to the file:</p><ul><li>Always-on apps&#160;require the permission of keeping a wake lock, so put the following in between&#160;the&#160;<code>manifest</code>&#160;and <code>uses-feature</code>&#160;elements:</li></ul><codelab-snippet>&lt;uses-permission android:name="android.permission.WAKE_LOCK" /&gt;</codelab-snippet><ul><li>Always-on app is a new concept introduced in Android&#160;Wear 5.1.&#160;To specify that the app should only be installed on devices running Android 5.1 or higher, insert the following between <code>application</code>&#160;and <code>activity</code>&#160;elements:</li></ul><codelab-snippet>&lt;uses-library android:name="com.google.android.wearable" android:required="true" /&gt;</codelab-snippet><aside class="special"><p>If your app supports devices prior to Android 5.1 (API level 22), you should set this option to <code>false</code>. When running on devices running older versions of Android, your application will fall back to normal activities, and when the device switches to ambient mode, the device returns to the home screen and exits your activity.</p></aside><ul><li>Comment out / remove the following line in <code>StopwatchActivity.java</code>&#160;which keeps the screen on all the time:</li></ul><codelab-snippet>getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);</codelab-snippet><h3>Switching on Ambient Mode</h3><p>Supporting ambient mode and making&#160;our app an always-on app requires additional lifecycle states for the activity. These additional states are&#160;built&#160;into a new activity class called <code>WearableActivity</code>. To support ambient mode, we need to perform the following steps:</p><ul><li>Change &#160;<code>StopwatchActivity</code>&#160;from extending <code>Activity</code>&#160;to extending <code>WearableActivity:</code>
+</li></ul><codelab-snippet>public class StopwatchActivity extends WearableActivity {</codelab-snippet><ul><li>In onCreate, call <code>setAmbientEnabled():</code>
+</li></ul><codelab-snippet>@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_stop_watch);
+    setAmbientEnabled();
+    // ...</codelab-snippet><h3>Tell the application what to do in ambient mode</h3><p>If you run the application now, it will stay in the foreground but it does not understand what it should do differently in interactive mode and ambient mode. As a result, in ambient mode, it will be stuck at whatever time that it gets to and there will be no update until you wake it up into interactive mode.&#160;</p><aside class="special"><p>If you keep your watch attached to a power source, the behaviour may be different and the watch will continue to update once a second. This is because when the watch is plugged in, it never goes into deep sleep and the handler code will continue to work. This is one of the reason why developers should test their apps in real life rather than relying purely on emulator or docked devices.</p></aside><p>Before we begin changing the lifecycle code, we will need to: 1) add a notice to remind the user that the screen is updated once a minute (this is the default for always-on apps and you can find out how you can change it in the next section) and 2) load some of the settings including the colours that we use for when we are in interactive mode so we can wake up to them from a black and white ambient mode:</p><ul><li>In <code>string.xml</code>&#160;under <code>res/values</code>, add the following:</li></ul><codelab-snippet>&lt;string name="updatefrequencynotice"&gt;Updates every minute&lt;/string&gt;</codelab-snippet><ul><li>In <code>activity_stop_watch.xml</code>&#160;under <code>res/layout</code>, add the following after the last button&#160;control within the <code>GridLayout</code>&#160;element:</li></ul><codelab-snippet>&lt;TextView android:id="@+id/notice"
+            android:layout_columnSpan="2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/updatefrequencynotice"
+            android:visibility="invisible"
+            android:textColor="@color/white"
+            android:includeFontPadding="false"
+            android:textSize="12sp" /&gt;</codelab-snippet><ul>
+<li>In <code>StopwatchActivity</code>
+</li>
+<li>Add a private <code>TextView</code>&#160;variable called <code>mNotice</code>.</li>
+<li>Add a private <code>GridLayout</code>&#160;variable call <code>mBackground</code>
+</li>
+<li>Add two class level private variables for representing the background and foreground colours in interactive mode respectively: </li>
+</ul><codelab-snippet>private int mActiveBackgroundColor;
+private int mActiveForegroundColor;</codelab-snippet><ul><li>Attach reference to <code>mNotice</code>&#160;in <code>onCreate</code>&#160;and set anti-aliasing to false&#160;as this will take less processing power to render:</li></ul><codelab-snippet>mNotice = (TextView) findViewById(R.id.notice);
+mNotice.getPaint().setAntiAlias(false);</codelab-snippet><ul><li>Attach a reference to the background to <code>mBackground</code>&#160;in <code>onCreate:</code>
+</li></ul><codelab-snippet>mBackground = (GridLayout) findViewById(R.id.grid_background);</codelab-snippet><ul><li>Load these settings from the <code>color.xml</code>&#160;setting file by adding the following lines into the <code>onCreate</code>&#160;method in <code>StopwatchActivity</code>:</li></ul><codelab-snippet>mActiveBackgroundColor = getResources().getColor(R.color.activeBackground);
+mActiveForegroundColor = getResources().getColor(R.color.activeText);</codelab-snippet><p>Another thing we should do is to stop the handler from running in ambient mode, in the method <code>updateDisplayAndSetRefresh</code>&#160;we should add a check to see if the watch is in ambient mode before we schedule a delay call to the handler. Developers can check whether the app is currently in ambient mode by calling <code>isAmbient()</code>&#160;- wrap this code in a check like so</p><codelab-snippet>//...
+if(!isAmbient()) {
+    long timeMs = System.currentTimeMillis();
+    long delayMs = ACTIVE_INTERVAL_MS - 
+        (timeMs % ACTIVE_INTERVAL_MS);
+    Log.d(TAG, "NOT ambient - delaying by: " + delayMs);
+    mActiveModeUpdateHandler
+        .sendEmptyMessageDelayed(MSG_UPDATE_SCREEN, delayMs);
+}
+//...</codelab-snippet><p>When the watch is in ambient mode (and in deep sleep), there is a callback for updates, so you do not need the handler. In addition, a handler can not wake up the processor from a sleep state, so it won't work anyway.&#160;We will expand on this in the next section.</p><p>To tell the system what to do in ambient mode, we override three methods</p><p><code>onEnterAmbient(...)</code></p><p>This is called when the application goes from interactive to ambient mode. This is where we typically change the formatting of the screen elements. Feel free to Copy &amp; Paste the following code into the StopwatchActivity to account for ambient mode.</p><codelab-snippet>@Override
+public void onEnterAmbient(Bundle ambientDetails) {
+   Log.d(TAG, "ENTER Ambient");
+   super.onEnterAmbient(ambientDetails);
+
+   if (mRunning) {
+       mActiveModeUpdateHandler.removeMessages(R.id.msg_update);
+       mNotice.setVisibility(View.VISIBLE);
+   }
+
+   mActiveClockUpdateHandler.removeMessages(R.id.msg_update);
+
+   mTimeView.setTextColor(Color.WHITE);
+   Paint textPaint = mTimeView.getPaint();
+   textPaint.setAntiAlias(false);
+   textPaint.setStyle(Paint.Style.STROKE);
+   textPaint.setStrokeWidth(2);
+
+   mStartStopButton.setVisibility(View.INVISIBLE);
+   mResetButton.setVisibility(View.INVISIBLE);
+   mBackground.setBackgroundColor(Color.BLACK);
+
+   mClockView.setTextColor(Color.WHITE);
+   mClockView.getPaint().setAntiAlias(false);
+
+   updateClock();
+}</codelab-snippet><p><code>onExitAmbient()</code></p><p>Basically we invert what we have done before within <code>onEnterAmbient(...)</code></p><codelab-snippet>@Override
+public void onExitAmbient() {
+   Log.d(TAG, "EXIT Ambient");
+   super.onExitAmbient();
+
+   mTimeView.setTextColor(mActiveForegroundColor);
+   Paint textPaint = mTimeView.getPaint();
+   textPaint.setAntiAlias(true);
+   textPaint.setStyle(Paint.Style.FILL);
+
+   mStartStopButton.setVisibility(View.VISIBLE);
+   mResetButton.setVisibility(View.VISIBLE);
+   mBackground.setBackgroundColor(mActiveBackgroundColor);
+
+   mClockView.setTextColor(mActiveForegroundColor);
+   mClockView.getPaint().setAntiAlias(true);
+
+   mActiveClockUpdateHandler.sendEmptyMessage(R.id.msg_update);
+
+   if (mRunning) {
+       mNotice.setVisibility(View.INVISIBLE);
+       updateDisplayAndSetRefresh();
+   }
+}</codelab-snippet><p><code>onUpdateAmbient()</code></p><p>This method is being called once a minute&#160;while in ambient mode by the framework and developers should tell Android Wear what to update by:</p><ul>
+<li>Call the parent method - <code>super.onUpdateAmbient();</code>
+</li>
+<li>Update the clock by calling <code>updateClock()</code>
+</li>
+<li>Update the elapsed time by calling <code>updateDisplayAndSetRefresh()</code>
+</li>
+</ul><p>If you run the app now, it should show the something similar to following in interactive mode - it&#8217;s not all that different to before:</p><p><img src="../img/always-on/img-11.png" style="max-width: 271px"></p><p>However, if you wait for a timeout on a real device (for emulator press F7 or fn + F7) to switch to ambient mode, you will see the following and this will update once a minute:</p><p><img src="../img/always-on/img-12.png" style="max-width: 264px"></p><aside class="special"><p>For Android Wear devices which has a hardware button, covering the screen will take the user into ambient mode. Pressing the hardware button will exit the app. For devices without this hardware button, covering the screen will exit the app.</p></aside><h3>Having problems?</h3><p>If you see the error <code>INSTALL_FAILED_MISSING_SHARED_LIBRARY</code>, try updating the Wear emulator to version 22 or later. The ambient APIs are only available from this version.</p><h3></h3><h3>Summary </h3><p>In this step you&#8217;ve learned about:</p><ul>
+<li>Turning an Android Wear app into an always-on app</li>
+<li>Learn how to handle lifecycle changes entering, exiting ambient mode and what should be updated once a minute while in ambient mode</li>
+</ul><h3>Next up </h3><p>An optional activity to learn about increasing the update frequency of the app to more than once a minute while in ambient mode. Most apps won&#8217;t need to update faster than once per minute but this maybe appropriate, for example, for a running app showing the user the current pace.</p><p>If you still have time but don&#8217;t fancy having a go at increasing the refresh rate, we encourage you to alter the different parameters of the screen elements, for example, layout, stroke size, color of the various screen element, etc. Let&#8217;s see what you get!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Optional: Increase the update frequency in ambient mode">
+        
+          <h1></h1><p>For some applications, developers may want to update more frequently than once per minute. Since the Android Wear device is in deep sleep in ambient mode, the <code>Handler</code>&#160;class will not run in this state. As a result, we will need to setup an <code>AlarmManager</code>&#160;which will wake up the application at set intervals and update the screen.</p><aside class="special"><p>If you are stuck at any point, please refer to the module <code>3-frequency</code>&#160;for the complete code.</p></aside><h3>Set up the AlarmManager</h3><p>The first step is to set up the <code>AlarmManager</code>&#160;variable and a <code>PendingIntent</code>&#160;which will tell Android which <code>Activity</code>&#160;to launch when the <code>AlarmManager</code>&#160;fires. To do this, we will make the following changes in <code>StopwatchActivity</code>:</p><ul>
+<li>Create two private&#160;variables:</li>
+<li>An <code>AlarmManager</code>&#160;named <code>mAmbientStateAlarmManager</code>
+</li>
+<li>A <code>PendingIntent</code>&#160;named <code>mAmbientStatePendingIntent</code>
+</li>
+<li>Create a new static variable (<code>AMBIENT_INTERVAL_MS</code>) of type long for how often the screen will be updated. In our case, we will set this to <code>TimeUnit.SECONDS.toMillis(10)</code>&#160;or 10 seconds.</li>
+</ul><aside class="special"><p>Outside of this code lab, for your own app consider whether updating more than once a minute is important for the user experience. Apps such as to-do lists may not need to be updated at all unless the items changes so triggering a screen update once a minute to update the clock will be sufficient. For other apps, developers should aim to update no more frequently than once every 10 seconds while in ambient mode in order to achieve substantial power savings. The less frequent the update, the better.</p></aside><ul>
+<li>In the method onCreate, we will initialise both variables:</li>
+<li>For <code>mAmbientStateAlarmManager</code>, we set it to <code>(AlarmManager) getSystemService(Context.ALARM_SERVICE);</code>
+</li>
+<li>For <code>mAmbientStatePendingIntent</code>,</li>
+<li>Create an <code>Intent</code>&#160;which points at the StopwatchActivity.class:</li>
+</ul><codelab-snippet>Intent intent = new Intent(getApplicationContext(),
+                        StopwatchActivity.class);</codelab-snippet><ul><li>Initiate <code>mAmbientStatePendingIntent</code>&#160;using the following. </li></ul><codelab-snippet>mAmbientStatePendingIntent = PendingIntent.getActivity(
+                getApplicationContext(),
+                MSG_UPDATE_SCREEN,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);</codelab-snippet><aside class="special"><p>The last parameter is interesting. There are two options that will be appropriate here - <code>FLAG_CANCEL_CURRENT</code>&#160;and <code>FLAG_UPDATE_CURRENT</code>&#160;- we are using the latter because in this case whether we create a new <code>PendingIntent</code>&#160;will make little difference given there are no complex states being passed. By not creating a new PendingIntent, this makes the operation more efficient.</p></aside><ul><li>
+<code>AlarmManager</code>&#160;requires a permission to run. Open <code>AndroidManifest.xml</code>&#160;and put the following in just below the <code>WAKE_LOCK</code>&#160;permission we added in the last step:</li></ul><codelab-snippet>&lt;uses-permission
+    android:name="com.android.alarm.permission.SET_ALARM"/&gt;</codelab-snippet><ul><li>To keep the UI consistent, update the following string value in <code>string.xml</code>&#160;under <code>res/values</code>,</li></ul><codelab-snippet>&lt;string name="updatefrequencynotice"&gt;Updates every 10 seconds&lt;/string&gt;</codelab-snippet><h3>Activate the AlarmManager</h3><p>With the basics in place, it&#8217;s now time to add the code to trigger the AlarmManager. We need to update the code where previously we would have had the Handler code updating the screen. So this will be in the <code>updateDisplayAndSetRefresh</code>&#160;method:</p><ul><li>Add additional condition for when the application is not in ambient mode:</li></ul><codelab-snippet>if (!isAmbient()) {
+    // same code as before...
+} else {
+    // Our new code for AlarmManager goes here!
+}</codelab-snippet><ul><li>In this new conditional bracket&#160;(i.e. in the <code>else</code>&#160;part&#160;which is when the watch is in ambient mode), we calculate how long we should wait until the next alarm using <code>System.currentTimeMillis()</code>:</li></ul><codelab-snippet>long timeMs = System.currentTimeMillis();
+long delayMs = AMBIENT_INTERVAL_MS - (timeMs % AMBIENT_INTERVAL_MS);
+long triggerTimeMs = timeMs + delayMs;</codelab-snippet><ul><li>Cancel any previous alarm using the <code>cancel</code>&#160;method on <code>mAmbientStateAlarmManager</code>&#160;feeding in the <code>mAmbientStatePendingIntent</code>. </li></ul><aside class="special"><p>So why do we need to do this? Aside from <code>AlarmManager</code>&#160;itself scheduling update, there is also the potential that <code>onUpdateAmbient</code>&#160;calling <code>updateDisplayAndSetRefresh</code>&#160;and schedule an alarm. In this case, we will not want multiple alarms to be scheduled which can get confusing very quickly. Hence, we cancel all alarms with that <code>PendingIntent</code>&#160;before we schedule the next alarm.</p></aside><ul><li>Schedule the next alarm:</li></ul><codelab-snippet>mAmbientStateAlarmManager.setExact(
+                        AlarmManager.RTC_WAKEUP,
+                        triggerTimeMs,
+                        mAmbientStatePendingIntent);</codelab-snippet><aside class="special"><p>In this code lab, we use <code>AlarmManager.RTC_WAKEUP</code>&#160;because we use <code>System.currentTimeMillis()</code>&#160;as a time measure. There is an alternative triggering mode <code>AlarmManager.ELAPSED_REALTIME_WAKEUP</code>&#160;which uses <code>SystemClock.elapsedRealtime()</code>&#160;as a timing basis. Either of these pairs of triggering mode / time measure will work but remember to keep them consistent and not mix the triggering mode and time measure up. </p></aside><ul>
+<li>In <code>onExitAmbient</code>&#160;mode, check if the stopwatch is running just below &#160; &#160; &#160; &#160; <code>super.onExitAmbient()</code>. If it is, cancel any alarm using the <code>cancel</code>&#160;method on <code>mAmbientStateAlarmManager</code>. Don&#8217;t worry about starting the <code>Handler</code>&#160;related code which will update the screen once a second in interactive mode. This is handled by <code>updateDisplayAndSetRefresh</code>&#160;when it is called further down in the method.</li>
+<li>Cancel any alarm&#160;in <code>onDestroy</code>&#160;method when the application exits</li>
+<li>Add a new method <code>onNewIntent</code>, this will be called when the alarm is fired:</li>
+</ul><codelab-snippet>@Override
+public void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+
+    setIntent(intent);
+    updateDisplayAndSetRefresh();
+}</codelab-snippet><aside class="special"><p>If you open up the <code>AndroidManifest.xml</code>&#160;file, you will notice an attribute in the <code>Activity</code>&#160;element called <code>android:launchMode</code>&#160;which is set to <code>"singleInstance"</code>. This is important or the <code>AlarmManager</code>&#160;will launch a new <code>Activity</code>&#160;every time it fires rather than updating the same one. Alternative ways of dealing with this exists but this is one of the cleaner ways.</p></aside><p>If you run the application again, it should update every 10 seconds:</p><h3>Summary </h3><p>In this step you&#8217;ve learned about:</p><ul>
+<li>How to increase the frequency of updates</li>
+<li>Learn how to use <code>AlarmManager</code>&#160;to schedule these updates even when the device is in deep sleep in Ambient mode</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul>
+<li><a href="https://www.youtube.com/watch?v=7m6Z9d0fDaM">Android Wear Devbyte - Always-on Apps</a></li>
+<li>Take the <a href="https://www.udacity.com/course/android-ubiquitous-computing--ud875">Ubiquitous Computing Online course</a>
+</li>
+<li><a href="https://developer.android.com/training/wearables/apps/bt-debugging.html">Debugging over Bluetooth</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

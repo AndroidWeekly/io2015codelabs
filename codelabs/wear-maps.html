@@ -1,0 +1,550 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Wearable Maps"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Geo, Android Wear"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p>In&#160;this&#160;codelab, you&#8217;ll&#160;learn how to update an existing <a href="https://developer.android.com/wear/">Android Wear</a>&#160;app to include a wearable map. You&#8217;ll get a chance to run the app and explore some of the options for embedding maps into your wearable device.</p><p>The app we&#8217;ll be using is the &#8220;XYZ Tourist Attractions&#8221; app, which you may have seen before as an Android Wear code-lab. If you want to dive deep into developing for Android Wear, then make sure you check out the project. It&#8217;s on <a href="https://github.com/googlesamples/android-XYZTouristAttractions#readme">GitHub</a>.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Updating an Android Wear app to include a Google Map</li>
+<li>Using a &#8220;Lite mode&#8221; map to generate a quick, almost-static map</li>
+<li>How to display multiple maps in a wearable app</li>
+<li>A few handy shortcuts within Android Studio to help your day-to-day development</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>
+<a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>&#160;version 1.0+</li>
+<li>The sample code</li>
+<li>A test device with Android&#160;4.1+</li>
+<li>A test Android Wear device</li>
+</ul><codelab-survey><h4>How&#160;will you use use this tutorial?</h4>
+<select><option>Skim read</option>
+<option>Read it and complete the exercises</option>
+<option>Check out the final code and run the app</option></select><h4>How&#160;would rate your experience with building Android apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>Have you ever built an Android Wear app?</h4>
+<select><option>Yes, I&#8217;m pretty familiar with Wear app development</option>
+<option>I&#8217;ve dabbled a little</option>
+<option>Nope</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="1:30">
+        
+          <h1></h1><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/googlesamples/io2015-codelabs.git</pre><aside class="special"><p>The <code>io2015-codelabs</code>&#160;repository contains many sample projects. This codelab only uses one:</p>
+<ul><li>
+<img src="../img/wear-maps/img-3.png" style="max-width: 20px"><strong>wear/wear-maps/start</strong>&#8212;This Maps on Android Wear codelab.</li></ul></aside>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Run the sample app" 
+        duration="1:30">
+        
+          <h1></h1><p>First, let&#8217;s see what the app looks like before we add a map. With the&#160;code downloaded, the following instructions describe how to open the XYZ Tourist Attractions app in <a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>.</p><ol start="1">
+<li>From the Android Studio Quick Start screen, click <strong>Import Project</strong>&#160;(or if Android Studio is open, <strong>File - New - Import Project</strong>).</li>
+<li>Browse to the unzipped code, or the location of the repository you have checked out, it should be&#160;<img src="../img/wear-maps/img-4.png" style="max-width: 20px"><code>android-XYZTouristAttractions</code>. Make sure you select the folder.</li>
+<li>
+<a href="http://developer.android.com/tools/device.html">Enable USB debugging</a>&#160;on your Android device.</li>
+<li>Now plug&#160;in your Android phone/tablet, set the <strong>build configuration</strong>&#160;to <img src="../img/wear-maps/img-5.png" style="max-width: 20px"><strong>Application </strong>(it&#8217;s the drop-down box, <strong>not</strong>&#160;the Android Device Monitor, which has the same icon) and click the <img src="../img/wear-maps/img-6.png" style="max-width: 20px"><strong>Run</strong>&#160;button. You should see the app launch on your device after a few seconds.</li>
+</ol><aside class="special"><p><strong>Note</strong>: If you see an error like &#8220;failed to find target...&#8221;, &#8220;failed to find Build Tools&#8230;&#8221; or &#8220;failed to resolve&#8230;&#8221; then follow the instructions to install the missing pieces and continue.</p></aside><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="https://developer.android.com/sdk/installing/studio.html">How do I install Android Studio?</a></li>
+<li><a href="http://developer.android.com/tools/device.html">How do I enable USB debugging?</a></li>
+<li><a href="http://stackoverflow.com/a/16598454">Why doesn't Android Studio see my device?</a></li>
+<li><a href="http://stackoverflow.com/a/4786299">Android error: Failed to install *.apk on device *: timeout?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Launch the Wearable App" 
+        duration="3:00">
+        
+          <h1></h1><p>In order to push wearable apps to the wearable device and debug them, they need&#160;to be connected to the development machine.&#160;This can be done over Bluetooth using a phone, or by connecting the wearable device directly to the development machine with a USB cable.</p><p>If you&#8217;re working on this at the code lab booth here at Google I/O, then the wearable devices will already be set up and ready to use. If you&#8217;re working on this using your own devices, then <a href="https://developer.android.com/training/wearables/apps/bt-debugging.html">you&#8217;ll need to follow these instructions over in the Android docs</a>.</p><p>Once you&#8217;ve got debugging set up, follow these steps.</p><p>1. Switch the build configuration to <img src="../img/wear-maps/img-5.png" style="max-width: 20px"><strong>Wearable</strong>&#160;and press the <img src="../img/wear-maps/img-6.png" style="max-width: 20px"><strong>Run</strong>&#160;button.</p><aside class="special"><p><strong>Note</strong>: On the first run, Android Studio may pop up the &#8220;Edit Configuration&#8221; dialog if there is no default activity configured. If that happens, under the <strong>Activity</strong>&#160;section, choose <strong>Do not launch Activity</strong>&#160;and press <strong>Run</strong>. We&#8217;ll be loading them manually in this lab.</p></aside><p>2. Watch the build process and confirm that the app has been deployed to the watch.&#160;In the latest version of Android Wear, you will see a card indicating that the app was installed, but on earlier versions you will not see anything yet.</p><p>3. Now load the <strong>XYZTouristAttractions </strong>app on the phone or tablet, open the <img src="../img/wear-maps/img-7.png" style="max-width: 20px">options menu, choose <strong>Test Micro App</strong>&#160;and tap <strong>OK</strong>.</p><p><img src="../img/wear-maps/img-8.png" style="max-width: 263px"></p><p>4. Check the watch for the new card. As it mentioned in the previous dialog, the priority is set to the default, so you may need to scroll down through the cards and you may need to wait at least 20 seconds for the image data to transfer.</p><p>5. On the watch, with the XYZ card open, swipe left and tap <strong>Explore</strong>.</p><p>6. Page through (swipe left/right and up/down) the screens and take a look around. This row/column layout is powered by a <a href="http://developer.android.com/reference/android/support/wearable/view/GridPagerAdapter.html">GridPagerAdapter</a>. We&#8217;ll be adding a new column later in this lab.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add a Lite Map" 
+        duration="15:00">
+        
+          <h1></h1><p><img src="../img/wear-maps/img-2.png" style="max-width: 290px"></p><p>Now let&#8217;s write some code! We&#8217;ll add a map with an overlay explaining to the user that they should tap to load an interactive map.</p><p>Here are the steps we&#8217;ll be taking:</p><ol start="1">
+<li>We&#8217;ll add our key and permissions to the application&#8217;s manifest.</li>
+<li>We&#8217;ll create a new layout for the map &#8220;page&#8221;</li>
+<li>As we&#8217;ll be using <strong><a href="http://developer.android.com/reference/com/google/android/gms/maps/MapFragment.html">MapFragment</a></strong>, we&#8217;ll need a <strong><a href="http://developer.android.com/reference/android/app/FragmentManager.html">FragmentManager</a></strong>. This means we&#8217;ll need to upgrade our stored <strong><a href="http://developer.android.com/reference/android/content/Context.html">Context</a></strong>&#160;to an <strong><a href="http://developer.android.com/reference/android/app/Activity.html">Activity</a></strong>.</li>
+<li>We&#8217;ll add a new column to the grid pager, containing the map</li>
+<li>We&#8217;ll add a marker to the map.</li>
+<li>We&#8217;ll add the overlay, even though it won&#8217;t do anything yet.</li>
+</ol><h2>Adding permissions and a key</h2><p>To add the permissions, open up <strong>AndroidManifest.xml</strong>&#160;in the <img src="../img/wear-maps/img-4.png" style="max-width: 20px">&#160;<strong>Wearable</strong>&#160;project and add the following lines under the <strong>&lt;manifest&gt;</strong>&#160;block, after the <strong>&lt;uses-feature&gt;</strong>&#160;line.</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/AndroidManifest.xml">AndroidManifest.xml</a></h3><codelab-snippet>&lt;!-- These permissions are used by the Google Maps API --&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/&gt;
+&lt;uses-permission android:name="android.permission.INTERNET"/&gt;
+&lt;uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/&gt;
+&lt;uses-feature android:glEsVersion="0x00020000" android:required="true"/&gt;</codelab-snippet><p>And add the following line within the <strong>&lt;application&gt;</strong>&#160;block.</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/AndroidManifest.xml">AndroidManifest.xml</a></h3><codelab-snippet>&lt;meta-data android:name="com.google.android.geo.API_KEY"
+   android:value="@string/google_maps_key"/&gt;</codelab-snippet><p>To get an API key, <a href="https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID">click here</a>&#160;and follow the prompts to log in and create or select a project. When you reach the &#8220;Edit allowed Android applications&#8221; prompt, <strong>leave the box empty </strong>and just click <strong>Create</strong>.</p><aside class="warning"><p><strong>Important</strong>: In a real world scenario, you should follow the steps listed to secure your key, otherwise your key could be stolen and abused, leading to the key (and therefore your app) being blocked.</p></aside><p>Take note of the text next to <strong>API key</strong>&#160;- we&#8217;ll need that in a second.</p><p>Back in Android Studio, we want to add the API key as a string resource. Under the <img src="../img/wear-maps/img-4.png" style="max-width: 20px">&#160;<strong>Wearable</strong>&#160;project, navigate to <strong>res/values</strong>&#160;and open <strong>strings.xml</strong>. Add a new line after the other <strong>&lt;string../&gt;</strong>&#160;lines:</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/res/values/strings.xml">strings.xml</a></h3><codelab-snippet>&lt;string name="google_maps_key"&gt;YOUR_API_KEY_HERE&lt;/string&gt;</codelab-snippet><p>You will need to add your API key here! Replace <strong>YOUR_API_KEY_HERE</strong>&#160;with the API key you created a moment ago.&#160;It will be a long string of characters that begins with &#8220;AIza&#8230;&#8221;.</p><h2>Creating a new layout for the Map page</h2><p>1. Under the <img src="../img/wear-maps/img-4.png" style="max-width: 20px">&#160;<strong>Wearable</strong>&#160;project, navigate to <strong>res/layout</strong>, right click on <strong>layout </strong>and choose <strong>New</strong>&#160;- <strong>Layout resource file</strong>.</p><p>a. Set the <strong>File name</strong>&#160;to <strong>gridpager_map.xml</strong></p><p>b. Set the <strong>Root element</strong>&#160;to <strong>FrameLayout</strong></p><p>c. Click OK</p><p>2. Switch to text editing by clicking the <strong>Text</strong>&#160;tab at the bottom of the editing area.</p><p>3. Paste this code, totally replacing the contents of the existing file.</p><h3>gridpager_map.xml</h3><codelab-snippet>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            tools:ignore="MissingPrefix"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/mapLayout"&gt;
+
+   &lt;ProgressBar
+        android:id="@+id/mapLoadingIndicator"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" /&gt;
+
+   &lt;fragment
+           android:id="@+id/map"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           map:liteMode="true"
+           map:cameraZoom="12"
+           android:name="com.google.android.gms.maps.MapFragment" /&gt;
+
+   &lt;FrameLayout
+           android:id="@+id/overlayHolder"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_gravity="bottom"
+           android:background="#66000000"&gt;
+
+       &lt;TextView
+               android:id="@+id/overlayText"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:gravity="center"
+               style="@style/ActionTextStyle"
+               android:maxLines="2"
+               android:layout_marginBottom="@dimen/indicator_margin" /&gt;
+
+   &lt;/FrameLayout&gt;
+
+&lt;/FrameLayout&gt;</codelab-snippet><aside class="special"><p><strong>Notes!</strong></p>
+<ul>
+<li>The <strong>&lt;fragment/&gt;</strong>&#160;element has an attribute <strong>map:liteMode</strong>. This is the how we instruct the API to use a &#8220;lite&#8221; mode map, with limited interactivity but faster rendering.</li>
+<li>We have included the overlay text controls here. This will save us a bit of time later on.</li>
+<li>Find out more about Lite Mode Maps, check out <a href="https://developers.google.com/maps/documentation/android/lite">the developer documentation</a>.</li>
+</ul></aside><h2>Upgrade the Context to an Activity</h2><p>In this step we&#8217;re just using Android Studio&#8217;s built in refactoring tools to rename and change the type of a variable.</p><p>1. Open the <strong>AttractionsGridPagerAdapter </strong>class (it&#8217;s under the <img src="../img/wear-maps/img-4.png" style="max-width: 20px"><strong>Wearable</strong>&#160;project, in <strong>java/com/example/android/xyztouristattractions/ui</strong>)</p><p>2. Find where the <strong>mContext </strong>field is declared, it will be near the top of the file and look like private Context mContext;</p><p>3. To rename the variable, right-click on mContext, and choose Refactor - Rename, type mActivity&#160;and press <strong>Enter </strong>to make the change.</p><p>4. Now right-click on the type (Context) and<strong>&#160;</strong>choose <strong>Refactor - Type Migration.</strong>&#160;Type Activity&#160;into the type field and press <strong>Refactor</strong>. The line should now read private Activity mActivity;)</p><p>5. Finally, rename the context&#160;argument in the constructor to activity.</p><p>6. A few lines down, check that the constructor has been updated, it should look like this.</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/java/com/example/android/xyztouristattractions/ui/AttractionsGridPagerAdapter.java">AttractionsGridPagerAdapter.java</a></h3><codelab-snippet>public AttractionsGridPagerAdapter(
+       Activity activity, ArrayList&lt;Attraction&gt; attractions) {
+   super();
+   mActivity = activity;
+   mLayoutInflater = LayoutInflater.from(activity);
+   mAttractions = attractions;
+}</codelab-snippet><h2>Add a new column to the grid layout</h2><p>The grid-based layout is configured to present a row for each attraction and displays information and actions in each column (e.g. photo, distance, start walking navigation). We&#8217;ll replace the secondary image (distance)&#160;column with a map column.</p><p>1. While still in the <strong>AttractionsGridPagerAdapter </strong>class, scroll to the top of the file, looking for the private constants prefixed with PAGER_.</p><p>2. Rename PAGER_SECONDARY_IMAGE_COLUMN&#160;to PAGER_MAP_COLUMN&#160;using Android Studio&#8217;s rename tool (right-click on the variable, Refactor, Rename). &#160;The list of pager variables should look something like this.</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/java/com/example/android/xyztouristattractions/ui/AttractionsGridPagerAdapter.java">AttractionsGridPagerAdapter.java</a></h3><codelab-snippet>private static final int PAGER_PRIMARY_IMAGE_COLUMN = 0;
+private static final int PAGER_MAP_COLUMN = 1;
+private static final int PAGER_DESCRIPTION_COLUMN = 2;
+private static final int PAGER_NAVIGATE_ACTION_COLUMN = 3;
+private static final int PAGER_OPEN_ACTION_COLUMN = 4;</codelab-snippet><p>3. We&#8217;ll need to keep a reference to the <strong>GoogleMap</strong>&#160;object and the layout that holds it, so add these two lines below.</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/java/com/example/android/xyztouristattractions/ui/AttractionsGridPagerAdapter.java">AttractionsGridPagerAdapter.java</a></h3><codelab-snippet>private FrameLayout mMapLayout;
+private GoogleMap mMap;</codelab-snippet><aside class="special"><p><strong>Note:</strong>&#160;If Android Studio shows an error &#8220;<strong>Cannot resolve symbol</strong>&#8221; after copying and pasting, then follow the instructions it gives - usually just press <strong>Alt-Enter</strong>&#160;and&#160;choose <strong>Import Class </strong>- and it will add the missing import statement.</p></aside><p>4. Scroll down and find the method instantiateItem(..). You can see in the switch block that this is where each page is created.</p><p>5. We&#8217;ll need to remove PAGER_MAP_COLUMN&#160;from the first block and create a new block to handle the map. The code will need to inflate the layout we defined above, add it to the container&#160;provided and initialise the map. Here&#8217;s the code for the updated first and second statements -&#160;we&#8217;ll put in a couple of function placeholders that we&#8217;ll code up in the next step.</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/java/com/example/android/xyztouristattractions/ui/AttractionsGridPagerAdapter.java">AttractionsGridPagerAdapter.java</a></h3><codelab-snippet>case PAGER_PRIMARY_IMAGE_COLUMN:
+   // One page of full screen images, one with the attraction name
+   // and one with the distance to the attraction
+   final View view = mLayoutInflater.inflate(
+           R.layout.gridpager_fullscreen_image, container, false);
+   ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
+   TextView textView = (TextView) view.findViewById(R.id.textView);
+   FrameLayout overlayTextLayout =
+           (FrameLayout) view.findViewById(R.id.overlaytext);
+
+   mDelayedHide.add(overlayTextLayout);
+   view.setOnClickListener(mDelayedHide);
+
+   FrameLayout.LayoutParams params =
+           (FrameLayout.LayoutParams) textView.getLayoutParams();
+   params.bottomMargin = params.bottomMargin + mInsets.bottom;
+   params.leftMargin = mInsets.left;
+   params.rightMargin = mInsets.right;
+   textView.setLayoutParams(params);
+
+   imageView.setImageBitmap(attraction.image);
+   textView.setText(attraction.name);
+   container.addView(view);
+   return view;
+
+case PAGER_MAP_COLUMN:
+   // The map page
+
+   // Load the layout and add to the grid
+   if (mMapLayout == null) {
+       mMapLayout = (FrameLayout) mLayoutInflater.inflate(
+               R.layout.gridpager_map, container, false);
+       container.addView(mMapLayout);
+   }
+
+   // Hide the overlay text in a moment
+   mDelayedHide.add(mMapLayout.findViewById(R.id.overlayHolder));
+
+   // And ensure we provide padding for round devices
+   TextView overlayText = (TextView)    mMapLayout.findViewById(R.id.overlayText);
+   params = (FrameLayout.LayoutParams)    overlayText.getLayoutParams();
+   params.bottomMargin = params.bottomMargin + mInsets.bottom;
+   params.leftMargin = mInsets.left;
+   params.rightMargin = mInsets.right;
+   overlayText.setLayoutParams(params);
+
+   // Initialise the map
+   if (mMap == null) {
+       MapFragment mapFragment = (MapFragment) mActivity.getFragmentManager()
+               .findFragmentById(R.id.map);
+       mapFragment.getMapAsync(getMapReadyCallback(attraction));
+   } else {
+       updateMapLocation(attraction);
+   }
+
+   return mMapLayout;</codelab-snippet><aside class="special"><p>Note: After importing any missing symbols (<strong>Alt-Enter</strong>), you should still have two errors (for <strong>getMapReadyCallback </strong>and&#160;updateMapLocation). That&#8217;s OK - we&#8217;ll implement them soon.</p></aside><p>6. To make sure we only have one copy of the map, we&#8217;ll need to exclude it from being cleaned up in the destroyItem&#160;method. Update it to look like this:</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/java/com/example/android/xyztouristattractions/ui/AttractionsGridPagerAdapter.java">AttractionsGridPagerAdapter.java</a></h3><codelab-snippet>@Override
+protected void destroyItem(ViewGroup viewGroup, int row, int column, Object object) {
+   mDelayedHide.remove((View) object);
+   // As we're storing our map, don't remove it here.
+   if (column != PAGER_MAP_COLUMN) {
+       viewGroup.removeView((View) object);
+   }
+}</codelab-snippet><h2>Add a marker to the map</h2><p>In the last step we used two placeholder functions, getMapReadyCallback and&#160;updateMapLocation. Paste the following code into the class to add them, alongside the other private methods (e.g. right before <strong>private void&#160;startAction(..)</strong>):</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/java/com/example/android/xyztouristattractions/ui/AttractionsGridPagerAdapter.java">AttractionsGridPagerAdapter.java</a></h3><codelab-snippet>private OnMapReadyCallback getMapReadyCallback(final Attraction attraction) {
+   return new OnMapReadyCallback() {
+       @Override
+       public void onMapReady(GoogleMap googleMap) {
+           mMap = googleMap;
+           mMap.setMyLocationEnabled(true);
+           updateMapLocation(attraction);
+       }
+   };
+}
+
+private void updateMapLocation(Attraction attraction) {
+   mMap.clear();
+   mMap.moveCamera(
+           CameraUpdateFactory.newLatLng(attraction.location));
+   mMap.addMarker(new MarkerOptions()
+           .position(attraction.location)
+           .title(attraction.name));
+}</codelab-snippet><aside class="special"><p><strong>Note:</strong>&#160;If Android Studio shows an error &#8220;<strong>Cannot resolve symbol</strong>&#8221; after copying and pasting, then follow the instructions it gives - usually just press <strong>Alt-Enter</strong>&#160;and choose <strong>Import Class </strong>- and it will add the missing import statement.</p></aside><h2>Add the overlay text</h2><p>To make sure your users know about the sweet interactive map you&#8217;re about to give them, let&#8217;s add some text to the overlay. Open up <strong>gridpager_map.xml</strong>&#160;again, and add an <strong>android:text</strong>&#160;attribute to the existing <strong>TextView</strong>&#160;like so.</p><h3>gridpager_map.xml</h3><codelab-snippet>&lt;TextView
+    android:id="@+id/overlayText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:maxLines="2"
+    android:layout_marginBottom="@dimen/indicator_margin"
+    android:text="@string/map_control_hint"
+    style="@style/PagerTitleStyle"/&gt;</codelab-snippet><p>Android Studio will indicate that the @string you just used does not exist. Let&#8217;s fix this.</p><ol start="1">
+<li>Click on the text you added and press <strong>Alt-Enter</strong>&#160;to bring up the suggested fixes</li>
+<li>Choose &#8220;<strong>Create string value resource &#8216;map_control_hint&#8217;</strong>&#8221;</li>
+<li>When prompted, enter the text &#8220;Tap to load an interactive map&#8221; (no quotes) into the <strong>Resource value</strong>&#160;field </li>
+<li>Click OK!</li>
+</ol>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run the app!" 
+        duration="1:00">
+        
+          <h1></h1><p>Phew! Let&#8217;s check out the project so far.</p><ol start="1">
+<li>Make sure your wearable device is still plugged in</li>
+<li>Set the build configuration to <img src="../img/wear-maps/img-5.png" style="max-width: 20px"><strong>Wearable</strong>&#160;and click the <img src="../img/wear-maps/img-6.png" style="max-width: 20px"><strong>Run</strong>&#160;button</li>
+<li>Open up the phone running the main <strong>XYZTouristAttractions</strong>&#160;application, choose <strong>Test Micro App</strong>&#160;from the options menu and tap <strong>OK</strong>
+</li>
+<li>Check the watch for the tourist attractions card, swipe left and press <strong>Explore</strong>
+</li>
+<li>When the app loads you should be able to swipe through the cards and see the map on the 2nd column of each row.</li>
+</ol><p><img src="../img/wear-maps/img-2.png" style="max-width: 290px"></p><p>Nice work! Depending on how you want to use Google Maps in your wearable app, this may be as far as you need to go. In the next steps we&#8217;ll load up a more rich, interactive map on the watch.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add an interactive map" 
+        duration="10:00">
+        
+          <h1></h1><p>Now let&#8217;s add a full map to the app, so our users can pan and zoom.</p><p>1. Let&#8217;s write our new Activity first. Create a new class, <strong>MapActivity</strong>&#160;(under the <img src="../img/wear-maps/img-4.png" style="max-width: 20px">&#160;<strong>Wearable</strong>&#160;project, in <strong>com.example.android.xyztouristattractions.ui</strong>)</p><p>2. Paste in this code&#160;and take a minute to read it through. This activity has a few features:</p><p>a. It uses <strong>DismissOverlayView</strong>&#160;to indicate that the user should long-press to exit</p><p>b. It loads the <strong>Attraction</strong>&#160;in as an extra bundled with the intent</p><p>c. And it sets up the map with a marker based on the provided attraction</p><h3>MapActivity.java</h3><codelab-snippet>package com.example.android.xyztouristattractions.ui;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.wearable.view.DismissOverlayView;
+
+import com.example.android.xyztouristattractions.R;
+import com.example.android.xyztouristattractions.common.Attraction;
+import com.example.android.xyztouristattractions.common.Constants;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+/**
+* Sample that shows how to set up a basic Google Map on Android Wear. This Activity is started from
+* AttractionsActivity when the user taps the lite map.
+*/
+public class MapActivity extends Activity implements OnMapReadyCallback,
+       GoogleMap.OnMapLongClickListener {
+
+   /**
+    * Overlay that shows a short help text when first launched. It also provides an option to
+    * exit the app.
+    */
+   private DismissOverlayView mDismissOverlay;
+
+   /**
+    * The map. It is initialized when the map has been fully loaded and is ready to be used.
+    * @see #onMapReady(com.google.android.gms.maps.GoogleMap)
+    */
+   private GoogleMap mMap;
+
+   /**
+    * The attraction. It will be used to center and highlight on the map, once loaded.
+    */
+   private Attraction mAttraction;
+
+   public void onCreate(Bundle savedState) {
+       super.onCreate(savedState);
+
+       // Set the layout. It only contains a SupportMapFragment and a DismissOverlay.
+       setContentView(R.layout.activity_map);
+
+       // Obtain the Attraction that we need to display.
+       mAttraction = getIntent().getParcelableExtra(Constants.EXTRA_ATTRACTION);
+
+       // Obtain the DismissOverlayView and display the intro help text.
+       mDismissOverlay = (DismissOverlayView) findViewById(R.id.map_dismiss_overlay);
+       mDismissOverlay.setIntroText(R.string.exit_intro_text);
+       mDismissOverlay.showIntroIfNecessary();
+
+       // Obtain the MapFragment and set the async listener to be notified when the map is ready.
+       MapFragment mapFragment = (MapFragment) getFragmentManager()
+                       .findFragmentById(R.id.map);
+       mapFragment.getMapAsync(this);
+
+   }
+
+   @Override
+   public void onMapReady(GoogleMap googleMap) {
+       // Map is ready to be used.
+       mMap = googleMap;
+
+       // Set the long click listener as a way to exit the map.
+       mMap.setOnMapLongClickListener(this);
+
+       if (mAttraction != null) {
+           // Add a marker with a title that is shown in its info window.
+           mMap.addMarker(new MarkerOptions()
+                   .position(mAttraction.location)
+                   .title(mAttraction.name));
+
+           // Move the camera to show the marker.
+           mMap.moveCamera(CameraUpdateFactory.newLatLng(mAttraction.location));
+       }
+   }
+
+   @Override
+   public void onMapLongClick(LatLng latLng) {
+       // Display the dismiss overlay with a button to exit this activity.
+       mDismissOverlay.show();
+   }
+}</codelab-snippet><p>You should have 3 errors that need to be corrected, let&#8217;s fix them now.</p><p>4. First, create the missing layout (this will fix 2 of the errors).</p><p>a. Scroll to the line in <strong>onCreate</strong>&#160;that reads setContentView(R.layout.activity_map)</p><p>b. Click on the red text (<strong>activity_map</strong>) press <strong>Alt-Enter</strong>&#160;(alternatively, use the right light bulb that appears in the left gutter) and choose <strong>Create layout resource file activity_map.xml</strong></p><p>c. Leave the default settings, just click <strong>OK</strong></p><p>d. Android Studio will give you a placeholder design for free, but we&#8217;re going to delete it all and replace it with this code.</p><h3>activity_map.xml</h3><codelab-snippet>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;FrameLayout
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       android:layout_height="match_parent"
+       android:layout_width="match_parent"&gt;
+
+   &lt;fragment
+           android:id="@+id/map"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:name="com.google.android.gms.maps.MapFragment" /&gt;
+
+   &lt;android.support.wearable.view.DismissOverlayView
+           android:id="@+id/map_dismiss_overlay"
+           android:layout_height="match_parent"
+           android:layout_width="match_parent"/&gt;
+&lt;/FrameLayout&gt;</codelab-snippet><p>5. Now create the missing constant</p><p>a. Scroll to the error, it&#8217;s the line that reads:</p><pre>mAttraction = getIntent().getParcelableExtra(Constants.EXTRA_ATTRACTION);</pre><p>b. Click on the red text (<strong>EXTRA_ATTRACTION</strong>) press <strong>Alt-Enter</strong>&#160;(alternatively, use the right light bulb that appears in the left&#160;gutter) and choose <strong>Create constant field &#8216;EXTRA_ATTRACTION&#8217;</strong></p><p>c. <strong>Constants.java</strong>&#160;should now be displayed, with the cursor on a new line that looks like this.</p><pre>public static final String EXTRA_ATTRACTION = ;</pre><p>d. Press <strong>Enter</strong>&#160;to accept <strong>String</strong>&#160;as the correct type (the red outline around <strong>String</strong>&#160;should now disappear)</p><p>e. When the cursor moves to the end of the line, type &#8220;extra_attraction&#8221;&#160;(with quotes) and press <strong>Enter</strong>&#160;to dismiss the red outline. The line should now look like this.</p><pre>public static final String EXTRA_ATTRACTION = "extra_attraction";</pre><p>f. This is enough, but the new line belongs further down the file. Cut and paste the line (or use Command/Ctrl-Shift-&#8595;) to move it below the comment &#8220;<strong>// Intent and bundle extras</strong>&#8221;</p><p>6. Before this Activity can be referenced, we need to declare it in the manifest. Open up <strong>AndroidManifest.xml </strong>from the <img src="../img/wear-maps/img-4.png" style="max-width: 20px"><strong>Wearable </strong>project and add this line inside the <strong>&lt;application&gt;</strong>&#160;block.</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/AndroidManifest.xml">AndroidManifest.xml</a></h3><codelab-snippet>&lt;activity
+   android:name=".ui.MapActivity"
+   android:exported="false"
+   android:label="@string/app_name" /&gt;</codelab-snippet><p>7. In order to get the information about the tourist attraction that we want to highlight, we have send it as a <strong>Parcelable</strong>&#160;extra through the intent that starts this activity. However, the <strong>Attraction </strong>class does not implement the <strong>Parcelable </strong>interface. Let&#8217;s fix that.</p><p>a. There are a number of tools that can do this for you automatically, including <a href="http://www.parcelabler.com/">http://www.parcelabler.com/</a>. Feel free to use a tool to do this, or simply replace the existing code with the code below.</p><p>b. Here&#8217;s the updated code for <strong>Attractions.java</strong>, found in the <img src="../img/wear-maps/img-4.png" style="max-width: 20px">&#160;<strong>Shared </strong>project under <strong>java/com/example/android/xyztouristattractions/common</strong>.</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Shared/src/main/java/com/example/android/xyztouristattractions/common/Attraction.java">Attraction.java</a></h3><codelab-snippet>package com.example.android.xyztouristattractions.common;
+
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.android.gms.maps.model.LatLng;
+
+/**
+* A simple shared tourist attraction class to easily pass data around. Used
+* in both the mobile app and wearable app.
+*
+* Implements Parcelable so that Attractions can be passed from one Activity
+* to another. Note that the Wearable DataItem does not support Parcelable
+* items so it cannot be used for moving items from device to wearable.
+*/
+public class Attraction implements Parcelable {
+   public String name;
+   public String description;
+   public String longDescription;
+   public Uri imageUrl;
+   public Uri secondaryImageUrl;
+   public LatLng location;
+   public String city;
+
+   public Bitmap image;
+   public Bitmap secondaryImage;
+   public String distance;
+
+   public Attraction() {}
+
+   public Attraction(String name, String description, String longDescription, Uri imageUrl,
+                     Uri secondaryImageUrl, LatLng location, String city) {
+       this.name = name;
+       this.description = description;
+       this.longDescription = longDescription;
+       this.imageUrl = imageUrl;
+       this.secondaryImageUrl = secondaryImageUrl;
+       this.location = location;
+       this.city = city;
+   }
+
+   protected Attraction(Parcel in) {
+       name = in.readString();
+       description = in.readString();
+       longDescription = in.readString();
+       imageUrl = (Uri) in.readValue(Uri.class.getClassLoader());
+       secondaryImageUrl = (Uri) in.readValue(Uri.class.getClassLoader());
+       location = (LatLng) in.readValue(LatLng.class.getClassLoader());
+       city = in.readString();
+   }
+
+   @Override
+   public int describeContents() {
+       return 0;
+   }
+
+   @Override
+   public void writeToParcel(Parcel dest, int flags) {
+       dest.writeString(name);
+       dest.writeString(description);
+       dest.writeString(longDescription);
+       dest.writeValue(imageUrl);
+       dest.writeValue(secondaryImageUrl);
+       dest.writeValue(location);
+       dest.writeString(city);
+   }
+
+   @SuppressWarnings("unused")
+   public static final Parcelable.Creator&lt;Attraction&gt; CREATOR = new Parcelable.Creator&lt;Attraction&gt;() {
+       @Override
+       public Attraction createFromParcel(Parcel in) {
+           return new Attraction(in);
+       }
+
+       @Override
+       public Attraction[] newArray(int size) {
+           return new Attraction[size];
+       }
+   };
+
+}</codelab-snippet><aside class="warning"><p><strong>Important</strong>: When making a class <strong>Parcelable</strong>, you need to ensure that you keep the size of the marshalled parcel to a minimum, as intents can only package up a small amount of data (particularly on a wearable device).</p>
+<p>For example, in the above code we do not send the Bitmap data in our parcel.</p>
+<p>Make sure you:</p>
+<ul>
+<li>Do not parcel large data, like Bitmap objects</li>
+<li>Do not use large Strings or Strings with no length limit</li>
+<li>Wherever possible, replace large objects with an ID or a URI that can be used by the receiving intent to retrieve the full data as needed</li>
+</ul></aside><p>8. Now we just need to wire up the tap event from our lite-mode map to launch the full map!</p><p>a. Open the <strong>AttractionsGridPagerAdapter</strong>&#160;class and find the method getMapReadyCallback(..)&#160;that we created earlier.</p><p>b. Add an <strong>OnClickListener</strong>&#160;to the <strong>GoogleMap </strong>that launches the <strong>MapActivity</strong>. Your finished method should look like this:</p><h3><a href="https://github.com/googlesamples/android-XYZTouristAttractions/blob/master/Wearable/src/main/java/com/example/android/xyztouristattractions/ui/AttractionsGridPagerAdapter.java">AttractionsGridPagerAdapter.java</a></h3><codelab-snippet>private OnMapReadyCallback getMapReadyCallback(final Attraction attraction) {
+   return new OnMapReadyCallback() {
+       @Override
+       public void onMapReady(GoogleMap googleMap) {
+           mMap = googleMap;
+           mMap.setMyLocationEnabled(true);
+           mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+               @Override
+               public void onMapClick(LatLng latLng) {
+                   Intent intent = new Intent(mActivity, MapActivity.class);
+                   intent.putExtra(Constants.EXTRA_ATTRACTION, attraction);
+                   mActivity.startActivity(intent);
+               }
+           });
+           updateMapLocation(attraction);
+       }
+   };
+}</codelab-snippet>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run the app!" 
+        duration="1:00">
+        
+          <h1></h1><p>Now that it&#8217;s all finished, let&#8217;s run the app again to see how it looks.</p><ol start="1">
+<li>Make sure your wearable device is still plugged in</li>
+<li>Set the build configuration to <img src="../img/wear-maps/img-5.png" style="max-width: 20px"><strong>Wearable</strong>&#160;and click the <img src="../img/wear-maps/img-6.png" style="max-width: 20px"><strong>Run</strong>&#160;button</li>
+<li>Open up the phone running the main <strong>XYZTouristAttractions</strong>&#160;application, choose <strong>Test Micro App</strong>&#160;from the options menu and tap <strong>OK</strong>
+</li>
+<li>Check the watch for the tourist attractions card, swipe left and press <strong>Explore</strong>
+</li>
+<li>When the app loads you should be able to swipe through the cards and see the map on the 2nd column of each row.</li>
+<li>As the text states, you should now be able to tap to load your interactive map and then you can long press to exit.</li>
+</ol><p><img src="../img/wear-maps/img-2.png" style="max-width: 290px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:00">
+        
+          <h1></h1><p>Your app is now mapped!</p><h3 class="checklist">What we've covered</h3><ul class="checklist">
+<li>Re-using a Lite-mode map for multiple pages in a grid pager</li>
+<li>Adding and centering a marker on the map</li>
+<li>Tapping through to a full, zoomable and pannable map</li>
+</ul><h3>Next Steps</h3><ul>
+<li>Add a map to <strong>your</strong>&#160;app!</li>
+<li>Try opening the marker&#8217;s <a href="https://developer.android.com/reference/com/google/android/gms/maps/model/Marker.html#showInfoWindow()">info window</a>&#160;by default, and adding some other data, such as the distance</li>
+<li>Try and use data from the <a href="https://developers.google.com/maps/documentation/directions/">Directions API</a>&#160;to draw a <a href="https://developer.android.com/reference/com/google/android/gms/maps/model/Polyline.html">Polyline</a>&#160;on the map between the user and the tourist attraction</li>
+</ul><p>If you would like to find out more about the Android Maps API please see the <a href="https://developers.google.com/maps/documentation/android/">full developer documentation</a>.</p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

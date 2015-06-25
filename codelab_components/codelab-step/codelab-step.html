@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<polymer-element name="codelab-step" attributes="label nomarkdown image step duration feedback_link active">
+<template>
+  <link rel="stylesheet" type="text/css" href="codelab-step.css" />
+  <link href="../../bower_components/highlightjs/styles/railscasts.css" rel="stylesheet" />
+  <div class="instructions" data-step="{{step + 1}}" on-deep-link="{{jumpToLink}}">
+    <div class="inner">
+      <h2 id="title">{{step + 1}}. {{label}}</h2>
+      <content></content>
+    </div>
+  </div>
+  <footer>
+    <template if="{{feedback_link}}">
+      <div id="feedback">Did you find a mistake in this codelab? <a href="http://io2015codelabs.appspot.com/codelab_components/codelab-step/%7B%7Bfeedback_link%7D%7D" target="_blank">Please file a bug</a>.</div>
+    </template>
+  </footer>
+</template>
+<script>
+  Polymer('codelab-step', {
+    step: 0,
+    label: 'Step',
+    ready: function() {
+      var code_sections = this.querySelectorAll('code');
+      for (var i=0; i<code_sections.length; i++) {
+        var raw_code = code_sections[i].innerHTML;
+        var highlighted_code = raw_code;
+        var lang = code_sections[i].getAttribute('language');
+        if (lang) {
+          raw_code = raw_code.replace(/&lt;/g,'<');
+          raw_code = raw_code.replace(/&gt;/g,'>');
+          raw_code = raw_code.replace(/&amp;/g,'&');
+          highlighted_code = hljs.highlight(lang, raw_code).value;
+          code_sections[i].innerHTML = '<pre>' + highlighted_code + '</pre>';
+        }
+      }
+    },
+    activeChanged:function() {
+      if (this.active !== null) {
+        this.addLinkClass();
+      }
+    },
+    addLinkClass: function() {
+      // Add custom classes to links and make external links open in new tab
+      var links = this.querySelectorAll('html /deep/ a').array();
+      for (var i=0; i<links.length; i++) {
+        var link = links[i];
+        var href = link.getAttribute('href');
+        if (href != null) {
+          if (href.indexOf('http') == 0) {
+            //link.setAttribute('target', '_blank');
+            link.addEventListener('click', function(el, href) { return function(event){
+              //event.preventDefault();
+              el.fire("outbound-link-click", { "url": href });
+            }}(this, href), false);
+          }
+          if (href.indexOf('stackoverflow.com') > 0) {
+            link.classList.add('stackoverflow');
+          } else if (href.indexOf('github.com') > 0) {
+            link.classList.add('github');
+          } else if (href.indexOf('support.google.com/webmasters/') > 0) {
+            link.classList.add('webmaster_tools');
+          } else if (href.indexOf('developer.android.com') > 0 ||
+              href.indexOf('android-developer') > 0) {
+            link.classList.add('android_developer');
+          }
+        }
+      }
+    },
+    highlight: function() {
+      // Highlight code snippets.
+      var snippets = this.querySelectorAll('codelab-snippet');
+      for (var i = 0, snippet; snippet = snippets[i]; i++) {
+        snippet.highlight();
+      }
+    }
+  });
+</script>
+</polymer-element>

@@ -1,0 +1,572 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="node.js: Build a Web App using Google Cloud Platform"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Cloud"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p>In this codelab, you&#8217;ll learn how to integrate Google Cloud Platform services into a Node.js web application to store data, upload images, and authenticate users.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>How to query Datastore</li>
+<li>How to upload images to Cloud Storage</li>
+<li>How to authenticate users using OAuth 2.0</li>
+<li>How to fetch user profiles using the Google+ API</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>node.js</li>
+<li>npm</li>
+<li>The sample code</li>
+</ul><codelab-survey><h4>How&#160;will you use&#160;use this tutorial?</h4>
+<select><option>Read it through only</option>
+<option>Read it and complete the exercises</option></select><h4>How&#160;would&#160;you rate your experience with building node.js apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>How&#160;would&#160;you rate your experience with using Google Cloud Platform services?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="1:00">
+        
+          <h1></h1><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line:</p><pre>git clone https://github.com/googlesamples/io2015-codelabs</pre><aside class="special"><p>The <code>io2015-codelabs</code>&#160;repository contains many sample projects. This codelab only uses one:</p>
+<ul><li>
+<img src="../img/cloud-nodejs/img-1.png" style="max-width: 20px"><strong>cloud-nodejs</strong>&#8212;This node.js codelab.</li></ul></aside><aside class="special"><p>This codelab depends on <strong><a href="https://nodejs.org/">node.js</a></strong>&#160;being installed.<br><br>If you do not have it, download and install it now from <strong><a href="https://nodejs.org/download/">https://nodejs.org/download/</a></strong></p></aside>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Try out the sample" 
+        duration="5:00">
+        
+          <h1></h1><p>The sample has the following layout:</p><codelab-snippet>app.js        /* Express.js web application */
+books.js      /* Code for creating, deleting, and listing books */
+auth.js       /* Code for user authentication */
+config.js     /* Application configuration variables */
+package.json  /* npm package file including dependencies */
+views/
+  index.jade  /* HTML template */
+public/
+  style.css   /* CSS stylesheet */</codelab-snippet><p>To run the sample application on your local computer, let's perform the following steps in a terminal inside the <code>cloud-nodejs/start</code>&#160;folder.</p><p>1. Install dependencies. Enter the following command:</p><pre>$ npm install</pre><p>2. Run app.js to start the node.js server:</p><pre>$ node app.js</pre><p>3. In your web browser, enter the following address:</p><pre>http://localhost:8080</pre><p>You will see a page that looks&#160;&#160;like this:</p><p><img src="../img/cloud-nodejs/img-2.png" style="max-width: 256px"></p><p>The application currently displays a fake book.</p><p>Let&#8217;s fix that by querying for books from datastore!</p><h2>Summary</h2><p>In this step, you set up and ran the codelab sample application.</p><h2>Next up</h2><p>Next, you will setup Google Cloud Datastore and configure the application to begin querying it.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Set up your project" 
+        duration="3:00">
+        
+          <h1></h1><p>In this step, you will set up Google Cloud Datastore and configure the application to query from it.</p><h3>Create Project</h3><p>Projects are used to manage all of the Google Cloud Platform resources for your application. &#160;Creating a new project gives you access to Datastore to store your project&#8217;s data. &#160;Later, you will use the same project to configure Cloud Storage for image uploading and OAuth for login.</p><ol start="1">
+<li>Visit <a href="https://console.developers.google.com/">Google Developers Console</a>
+</li>
+<li>From the menu at the top, click <strong>Create Project</strong>
+</li>
+<li>Give your project a name</li>
+<li>Note the <strong>Project ID</strong>&#160;as it will be used for commands and configuration</li>
+<li>
+<a href="https://console.developers.google.com/project/_/settings">Enable Billing</a>&#160;for your project</li>
+</ol><h3>Create Credentials</h3><p>For the node.js application to access this project&#8217;s services, eg. Datastore and Cloud Storage, it needs to be authenticated. &#160;Create a Service Account for this project which will be used to authenticate the application.</p><ol start="1">
+<li>Open your project in the <a href="https://console.developers.google.com/">Google Developers Console</a>
+</li>
+<li>Navigate to <strong>APIs &amp; auth &gt; <a href="https://console.developers.google.com/project/_/apiui/credential">Credentials</a></strong>
+</li>
+<li>Click <strong>Create new Client ID</strong>
+</li>
+<li>Select <strong>Service Account</strong>&#160;and click <strong>Create Client ID</strong>
+</li>
+<li>The key should automatically download. Rename the key file to <strong>key.json</strong>&#160;and copy it to your project directory.</li>
+</ol><h3>Enable Datastore API</h3><p>The credentials you created allow your application to communicate with Google APIs that you enable for this project. &#160;Enable the Datastore API so the application can access Datastore.</p><ol start="1">
+<li>Under <strong>APIs &amp; auth &gt; <a href="https://console.developers.google.com/project/_/apiui/api">APIs</a></strong>, search for the &#8220;<em>Google Cloud Datastore API</em>&#8221;</li>
+<li>Click on <strong><a href="https://console.developers.google.com/project/_/apiui/apiview/datastore/overview">Google Cloud Datastore API</a></strong>
+</li>
+<li>Click <strong>Enable API</strong>
+</li>
+</ol><h3>Update configuration variables</h3><p>To configure the node.js sample application to authenticate with the project you created, edit the <code>config.js</code>&#160;file in the project directory and replace the placeholder value for <code>projectId</code>&#160;with the ID of the project that you created:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/config.js">config.js</a></h3><codelab-snippet>module.exports = {
+  projectId: '[your Google Developers Console project ID]',
+  keyFilename: './key.json',
+  // ...
+};</codelab-snippet><h2>Summary</h2><p>In this step, you created a Google Developer Console project and configured&#160;the node.js application with the credentials needed to query Datastore.</p><h2>Next up</h2><p>Next, you will update the application to query books from your project&#8217;s Datastore.</p>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="List all books" 
+        duration="5:00">
+        
+          <h1></h1><p>The sample application&#8217;s home page lists all books.</p><p>Books are retrieved&#160;by calling <code>books.getAllBooks</code>&#160;from the <code>books</code>&#160;module.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/app.js">app.js</a></h3><codelab-snippet>var config = require('./config');
+var books = require('./books')(config);
+// ...
+
+/* Fetch all books and display them */
+app.get('/', function(req, res, next) {
+  books.getAllBooks(function(err, books) {
+    if (err) return next(err);
+    res.render('index', { books: books, user: req.session.user });
+  });                                                                              
+});</codelab-snippet><p>The current implementation of <code>getAllBooks</code>&#160;found in <code>books.js</code>&#160;simply returns a fake book.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/books.js">books.js</a></h3><codelab-snippet>function getAllBooks(callback) {                                                
+  var error = null;
+  var books = [
+    {
+      key: { path: ['Book', 12345] },
+      data: { title: 'Fake Book', author: 'Fake Author' }
+    }
+  ];
+  callback(error, books);
+}</codelab-snippet><p>In this step, you will write the code for <code>getAllBooks</code>&#160;to query for Book entities from Datastore.</p><h3>Configure Datastore dataset</h3><p>To begin, install the <code><a href="https://www.npmjs.com/package/gcloud">gcloud</a></code>&#160;npm&#160;package, which you will use to interact with Cloud Datastore.</p><pre>&gt; npm install gcloud --save</pre><aside class="special"><p>The <code><a href="https://github.com/GoogleCloudPlatform/gcloud-node">gcloud</a></code>&#160;node package is an idiomatic node.js client library&#160;for <a href="https://cloud.google.com/">Google Cloud Platform</a>&#160;services.</p></aside><p>In the project directory, edit the <code>books.js</code>&#160;file and add the following code:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-1-retrieve-books/books.js">books.js</a></h3><codelab-snippet>module.exports = function(config) {
+
+  var gcloud = require('gcloud');
+
+  var dataset = gcloud.datastore.dataset({
+    projectId: config.projectId,
+    keyFilename: config.keyFilename
+  });
+
+  function getAllBooks(callback) {
+    // ...</codelab-snippet><p>This requires the <code>gcloud</code>&#160;module&#160;and creates a <code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/dataset">Dataset</a></code>&#160;object which provides the API you will use to interact with Datastore.</p><p>The <code>projectId</code>&#160;and <code>keyFilename</code>&#160;are read from the <code>config.js</code>&#160;file that you edited earlier.</p><h3>Query for entities</h3><p>Now replace the current <code>getAllBooks</code>&#160;function with the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-1-retrieve-books/books.js">books.js</a></h3><codelab-snippet>function getAllBooks(callback) {
+  var query = dataset.createQuery(['Book']);
+  dataset.runQuery(query, callback);                                                   
+}</codelab-snippet><p>Datastore queries are build with <code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/dataset?method=createQuery">dataset#createQuery</a></code>&#160;and run via <code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/dataset?method=runQuery">dataset#runQuery</a></code>.</p><p><code>createQuery</code>&#160;accepts an array containing the kinds of entities to query and returns a <code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/query">Query</a></code>&#160;object. </p><p>In our case, we want to query for all <code>'Book'</code>&#160;entities.</p><p><code>runQuery</code>&#160;returns a list of entities. &#160;Entities are returned in the following format:</p><codelab-snippet>{
+  key: { path: ['Book', &lt;Numeric entity ID&gt;] },
+  data: {
+    title: 'A Tale of Two Cities',
+    author: 'Charles Dickens',
+    imageUrl: 'http://books.google.com/books...'
+  }
+}</codelab-snippet><p>To view your changes, stop your running node.js web server by pressing <strong>CTRL-C</strong>&#160;and run it again.</p><pre>$ node app.js</pre><aside class="special"><p>To avoid restarting your node.js web server to view file changes during development, you can run your application using the <a href="http://nodemon.io/">nodemon</a>&#160;utility.</p>
+<p>$ npm install nodemon</p>
+<p>$ nodemon app.js</p></aside><p>Visit&#160;<code><a href="http://localhost:8080">http://localhost:8080</a></code>&#160;in your browser.</p><p>Now, you should see no books because there are none in your Datastore!</p><p><img src="../img/cloud-nodejs/img-3.png" style="max-width: 199px"></p><h3>Create Entity using the Developers Console</h3><p>To test the Datastore query and see data displayed, add a <code>Book</code>&#160;entity from the <a href="http://console.developers.google.com">Google Developers Console</a>.</p><ol start="1">
+<li>Visit <a href="https://console.developers.google.com/">Google Developers Console</a>
+</li>
+<li>Navigate to your Google Cloud Platform project</li>
+<li>From the left navigation, click <strong>Storage &gt; Cloud Datastore &gt; <a href="https://pantheon.corp.google.com/project/_/datastore/query">Query</a></strong>
+</li>
+<li>Click <strong>Create an entity</strong>
+</li>
+</ol><p>Fill out the <strong>Create a new entity</strong>&#160;form with the following:</p><ol start="1">
+<li>
+<strong>Kind:</strong>&#160;choose <em>New Kind</em><strong>&#160;</strong>from the dropdown and enter value <code>Book</code>
+</li>
+<li>
+<strong>Key Identifier Type:</strong>&#160;<em>leave the default value of ID (auto-generated)</em>
+</li>
+<li>Add a new string property <code>title</code>&#160;with the value <code>A Tale of Two Cities</code>
+</li>
+<li>Add a new string property <code>author</code>&#160;with the value <code>Charles Dickens</code>
+</li>
+<li>Click <strong>Create entity</strong>
+</li>
+</ol><p><img src="../img/cloud-nodejs/img-4.png" style="max-width: 624px"></p><p>Now refresh your browser and you should see the book listed!</p><p><img src="../img/cloud-nodejs/img-5.png" style="max-width: 172px"></p><h2>Summary</h2><p>In this step, you queried for all Book entities from Google Cloud Datastore.</p><h2>Next up</h2><p>Next, you will write the code to create and delete books.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create and delete books" 
+        duration="5:00">
+        
+          <h1></h1><h3>Create books</h3><p>The sample application includes a form for adding books. &#160;When the form is submitted, the application creates the book by calling <code>books.addBook</code>.</p><h3><a href="https://github.com/TODO/TODO/blob/master/TODO.js">app.js</a></h3><codelab-snippet>/* Add a new book */
+app.post('/books', function(req, res, next) {
+  // ...
+
+  books.addBook(req.body.title, req.body.author, coverImageData, userId, function(err) {
+    if (err) return next(err);
+    res.redirect(req.get('Referer') || '/');
+  })  
+});</codelab-snippet><p>The book title and author come from the <code>'title'</code>&#160;and <code>'body'</code>&#160;fields in the form.</p><p>You can ignore <code>coverImageData</code>&#160;and <code>userId</code>&#160;for now - we&#8217;ll come back to these later &#160;:)</p><p>Currently, if you try to add a book, you receive an error:</p><aside class="warning"><p>Error:&#160;books.addBook [Not Yet Implemented]</p></aside><p>Let&#8217;s fix that!</p><h3>Creating books</h3><p>In the project directory, edit the <code>books.js</code>&#160;file.</p><p>The current <code>addBook</code>&#160;function is a placeholder that simply returns an error.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-2-create-and-delete-books/books.js">books.js</a></h3><codelab-snippet>function addBook(title, author, coverImageData, userId, callback) {
+  if (coverImageData)
+    return callback(new Error("books.addBook image saving Not Yet Implemented"));
+
+  return callback(new Error("books.addBook datastore saving Not Yet Implemented"));
+}</codelab-snippet><p>To save a new <code>Book</code>&#160;entity in Datastore, replace the current <code>addBook</code>&#160;function with the following.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-2-create-and-delete-books/books.js">books.js</a></h3><codelab-snippet>function addBook(title, author, coverImageData, userId, callback) {
+  if (coverImageData)
+    return callback(new Error("books.addBook image saving Not Yet Implemented"));
+
+  var entity = {
+    key: dataset.key('Book'),
+    data: {
+      title: title,
+      author: author
+    }
+  };
+
+  dataset.save(entity, callback);                                               
+}</codelab-snippet><p><code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/dataset?method=save">Dataset#save</a></code>&#160;inserts or updates entity objects.</p><p>Entity objects are represented the following format:</p><codelab-snippet>{
+  key: dataset.key('Book', [Numeric entity ID]) },
+  data: {
+    title: 'A Tale of Two Cities',
+    author: 'Charles Dickens'
+    // ... properties ...
+  }
+}</codelab-snippet><p>If an entity ID is provided, calling <code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/dataset?method=save">#save</a></code>&#160;will update the entity in Datastore. &#160;In our example, the book entity is being added to Datastore for the first time, so no ID is necessary (<em>an ID will be auto-generated by Datastore</em>).</p><p>Restart the node application and try submitting the form again to add a new book.</p><p>You should now see your added book!</p><p><img src="../img/cloud-nodejs/img-6.png" style="max-width: 304px"></p><h3>Deleting books</h3><p>Now try deleting a book by clicking the delete&#160;link below any of the listed books. &#160;You will receive an error:</p><aside class="warning"><p>Error: books.deleteBook [Not Yet Implemented]</p></aside><p>The delete link in the sample application deletes books by calling <code>books.deleteBook</code>&#160;with the ID of the book to delete.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/app.js">app.js</a></h3><codelab-snippet>/* Delete book by key */
+app.get('/books/delete', function(req, res, next) {
+  books.deleteBook(req.query.id, function(err) {
+    if (err) return next(err);
+    res.redirect('/');
+  }); 
+});</codelab-snippet><p>The sample implementation of <code>books.deleteBook</code>&#160;is also a placeholder which simply returns an error:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-2-create-and-delete-books/books.js">books.js</a></h3><codelab-snippet>function deleteBook(bookId, callback) {
+  callback(new Error("books.deleteBook datastore deletion Not Yet Implemented"));
+}</codelab-snippet><p>To delete the book with the provided ID, replace the current <code>deleteBook</code>&#160;function with the following.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-2-create-and-delete-books/books.js">books.js</a></h3><codelab-snippet>function deleteBook(bookId, callback) {
+  var key = dataset.key(['Book', bookId]);
+  dataset.delete(key, callback);                                          
+}</codelab-snippet><p>Restart the node application and try deleting book again.</p><p>It should work!</p><h2>Summary</h2><p>In this step, you wrote the code to create and delete entities in Datastore.</p><h2>Next up</h2><p>Next, you will use Google Cloud Storage to upload book cover images.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Upload book images" 
+        duration="5:00">
+        
+          <h1></h1><p>The form for adding books also allows you to attach a cover image for a book.</p><p>If you try to create a new book with an attached image, you receive an error:</p><aside class="warning"><p>Error: books.addBook image saving Not Yet Implemented</p></aside><p>In this step, you will write the code to save book cover images in Google Cloud Storage.</p><h3>Set up Google Cloud Storage</h3><p>First, create a Cloud Storage bucket to store book cover images:</p><ol start="1">
+<li>Visit <a href="https://console.developers.google.com/">Google Developers Console</a>
+</li>
+<li>Navigate to your Google Cloud Platform project</li>
+<li>From the left navigation, click <strong>Storage &gt; Cloud Storage &gt; <a href="https://console.developers.google.com/project/_/storage/browser">Storage browser</a></strong>
+</li>
+<li>Click <strong>Create a bucket</strong>
+</li>
+<li>Choose a unique <strong>bucket name</strong>&#160;and click <strong>Create</strong>
+</li>
+<li>Note the <strong>bucket name</strong>&#160;since you&#8217;ll need it for configuration</li>
+</ol><p>In the project directory, edit the <code>config.js</code>&#160;file and replace the placeholder value for <code>bucketName</code>&#160;with the name of the bucket you created:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/config.js">config.js</a></h3><codelab-snippet>module.exports = {
+  // ...
+  bucketName: '[your Google Cloud Storage bucket name]',
+  // ...
+};</codelab-snippet><h3>Upload Images to Cloud Storage</h3><p>When the form is submitted with an image attached, the image data from the <code>&#8216;cover&#8217;</code>&#160;form field is passed to the <code>books.addBook</code>&#160;function:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/app.js">app.js</a></h3><codelab-snippet>app.use(multer({ inMemory: true })); // store upload data in-memory
+// ...
+
+/* Add a new book */
+app.post('/books', function(req, res, next) {
+  // ...
+
+  var coverImageData;
+  if (req.files['cover'])
+    coverImageData = req.files['cover'].buffer;
+
+  // ...
+
+  books.addBook(req.body.title, req.body.author, coverImageData, userId, function(err) {
+    if (err) return next(err);
+    res.redirect(req.get('Referer') || '/');
+  })                                                                            
+});</codelab-snippet><aside class="special"><p><a href="https://github.com/expressjs/multer">Multer</a>&#160;is a node.js middleware for handling <code>multipart/form-data</code>&#160;forms for uploading files.</p></aside><p>Currently, <code>addBook</code>&#160;returns an error when image data is provided:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-3-book-cover-images/books.js">books.js</a></h3><codelab-snippet>function addBook(title, author, coverImageData, userId, callback) {                        
+  if (coverImageData)                                                              
+    return callback(new Error("books.addBook image saving Not Yet Implemented"));
+                                                                                
+  // ...                                           
+}</codelab-snippet><p>Let&#8217;s fix this!</p><p>When <code>coverImageData</code>&#160;is passed in, we will save the book in Datastore with an <code>imageUrl</code>&#160;property specifying the URL to the uploaded book cover image.</p><p>To handle this scenario, replace the current <code>addBook</code>&#160;function in <code>books.js</code>&#160;with the following.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-3-book-cover-images/books.js">books.js</a></h3><codelab-snippet>function addBook(title, author, coverImageData, userId, callback) {                        
+  var entity = {                                                                   
+    key: dataset.key('Book'),                                                      
+    data: {                                                                        
+      title: title,                                                                
+      author: author                                                               
+    }                                                                              
+  };                                                                               
+                                                                                
+  if (coverImageData)                                                           
+    uploadCoverImage(coverImageData, function(err, imageUrl) {                  
+      if (err) return callback(err);                                            
+      entity.data.imageUrl = imageUrl;                                               
+      dataset.save(entity, callback);                                           
+    });                                                                         
+  else                                                                          
+    dataset.save(entity, callback);                                                
+}</codelab-snippet><p>We have not yet implemented <code>uploadCoverImage</code>&#160;so trying to add a book with an image still results in an error:</p><aside class="warning"><p>ReferenceError: uploadCoverImage is not defined</p></aside><p>Let&#8217;s fix this now!</p><h3>Uploading to Google Cloud Storage</h3><p>Edit the <code>books.js</code>&#160;file and add a new <code>storage</code>&#160;and <code>bucket</code>&#160;variables:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-3-book-cover-images/books.js">books.js</a></h3><codelab-snippet>module.exports = function(config) {
+
+  var gcloud = require('gcloud');                                                 
+                                                                                
+  var dataset = gcloud.datastore.dataset({                                        
+    projectId: config.projectId,                                                  
+    keyFilename: config.keyFilename                                               
+  });
+
+  var storage = gcloud.storage({                                                  
+    projectId: config.projectId,                                                         
+    keyFilename: config.keyFilename                                                   
+  });
+
+  var bucket = storage.bucket(config.bucketName);
+
+  // ...</codelab-snippet><p><code>bucketName</code>&#160;is read from the <code>config.js</code>&#160;file that you edited earlier.</p><p>The <code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/storage/bucket">bucket</a></code>&#160;object&#160;provides the API you will use to interact with your Google Cloud Storage bucket.</p><p>To upload the image to Cloud Storage and return a publicly accessible URL for displaying the image, add the following <code>uploadCoverImage</code>&#160;function to <code>books.js</code>:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-3-book-cover-images/books.js">books.js</a></h3><codelab-snippet>function uploadCoverImage(coverImageData, callback) {
+  // Generate a unique filename for this image
+  var filename = '' + new Date().getTime() + "-" + Math.random();
+  var file = bucket.file(filename);
+  var imageUrl = 'https://' + config.bucketName + '.storage.googleapis.com/' + filename;
+  var stream = file.createWriteStream();
+  stream.on('error', callback);
+  stream.on('complete', function() {
+    // Set this file to be publicly readable
+    file.makePublic(function(err) {
+      if (err) return callback(err);
+      callback(null, imageUrl);
+    });
+  });
+  stream.end(coverImageData);
+}</codelab-snippet><p><code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/storage/bucket?method=file">storage#file</a></code>&#160;returns a <code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/storage/file">File</a></code>&#160;object providing the API for a file in Cloud Storage.</p><p>The publicly accessible URL for the image file will be <code>https://&lt;bucket name&gt;.storage.googleapis.com/&lt;filename&gt;</code></p><p>Restart the node application and try adding a book with an image again.</p><p>It should work!</p><h3>Delete image</h3><p>Right now, if you delete a book that has a cover image, the image will remain in your Cloud Storage bucket.</p><p>Let&#8217;s fix this now by updating <code>deleteBook</code>&#160;to also delete saved cover images.</p><p>Replace the current <code>deleteBook</code>&#160;function with the following.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-3-book-cover-images/books.js">books.js</a></h3><codelab-snippet>function deleteBook(bookId, callback) {
+  var key = dataset.key(['Book', bookId]);
+
+  dataset.get(key, function(err, book) {
+    if (err) return callback(err);
+
+    if (book.data.imageUrl) {
+      var filename = url.parse(book.data.imageUrl).path.replace('/', '');
+      var file = bucket.file(filename);
+      file.delete(function(err) {
+        if (err) return callback(err);
+        dataset.delete(key, callback);
+      });
+    } else {
+      dataset.delete(key, callback);
+    }
+  });
+}</codelab-snippet><p>Before deleting a book, the book is retrieved from Datastore by ID via <code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/dataset?method=get">dataset#get</a></code>&#160;to determine whether or not it has a cover image.</p><p>If the book has a cover image, the file is deleted from Cloud Storage via <code><a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/storage/file?method=delete">File#delete</a></code>&#160;before deleting the entity from Datastore.</p><p>Now deleting books with cover images will also delete the images from your bucket!</p><h2>Summary</h2><p>In this step, you created a Google Cloud Storage bucket, uploaded images into it, and deleted images from it.</p><h2>Next up</h2><p>Next, you will use OAuth 2.0 to add user login to the application.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Authenticate users" 
+        duration="5:00">
+        
+          <h1></h1><p>The sample application includes a &#8216;Sign in&#8217;&#160;link so that users can login and see a list of only the books they have added.</p><p>Currently, clicking &#8216;Sign in&#8217; logs you in as &#8220;Fake User.&#8221;</p><p><img src="../img/cloud-nodejs/img-7.png" style="max-width: 213px"></p><p>Let&#8217;s fix this!</p><p>When a user logs in, the sample application redirects the user to an authentication URL, eg. the Google login screen.</p><p>Once the user is authenticated, they will&#160;be redirected back to your application with an authorization <code>code</code>&#160;you can use to get their profile information.</p><p>The application gets the authentication URL to redirect to by calling <code>auth.getAuthenticationUrl</code>&#160;from <code>auth.js</code>.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/app.js">app.js</a></h3><codelab-snippet>/* Redirect user to OAuth 2.0 login URL */
+app.get('/login', function(req, res) {
+  var authenticationUrl = auth.getAuthenticationUrl();
+  res.redirect(authenticationUrl);
+});</codelab-snippet><p>Right now, <code>getAuthenticationUrl</code>&#160;is a placeholder that simply redirects to the callback URL.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/auth.js">auth.js</a></h3><codelab-snippet>function getAuthenticationUrl() {
+  return "/oauth2callback";
+}</codelab-snippet><p>Let&#8217;s fix this by setting up Google OAuth 2.0 authentication and redirecting the user to the real Google sign in screen.</p><h3>Setup OAuth 2.0 client</h3><p>First, you need to create a web application client for authentication.</p><ol start="1">
+<li>Visit <a href="https://console.developers.google.com/">Google Developers Console</a>
+</li>
+<li>Navigate to project you created earlier</li>
+<li>From the left navigation, click <strong>APIs &amp; auth &gt; <a href="https://console.developers.google.com/project/_/apiui/credential">Credentials</a></strong>
+</li>
+<li>Click <strong>Create new Client ID</strong>
+</li>
+<li>Choose <strong>Web application </strong>for the Application type</li>
+<li>Click <strong>Configure consent screen</strong>
+</li>
+<li>Choose an <strong>email address</strong>
+</li>
+<li>Configure a <strong>Product name</strong>&#160;which identifies your application to users when they sign in</li>
+<li>Click <strong>Save</strong>
+</li>
+<li>Add <code>http://localhost:8080</code>&#160;and <code>https://&lt;your-project-id&gt;.appspot.com</code>&#160;to <strong>Authorized JavaScript origins</strong>
+</li>
+<li>Add <code>http://localhost:8080/oauth2callback</code>&#160;and <code>https://&lt;your-project-id&gt;.appspot.com/oauth2callback</code>&#160;to <strong>Authorized redirect URIs</strong>
+</li>
+<li>Click <strong>Create Client ID</strong>
+</li>
+<li>Note the <strong>Client ID</strong>&#160;and <strong>Client secret</strong>&#160;that are displayed since you&#8217;ll need them for configuration</li>
+</ol><h3>Update configuration</h3><p>The node.js application needs to be configured to use the Client ID you created.</p><p>In the project directory, edit the <code>config.js</code>&#160;file and replace the placeholder values for <code>clientId</code>&#160;and <code>clientSecret</code>:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/config.js">config.js</a></h3><codelab-snippet>module.exports = {
+  // ...
+  oauth2: {
+    clientId: '[Client ID for web application credentials]',
+    clientSecret: '[Client Secret for web application credentials]',
+    redirectUrl: process.env.REDIRECT_URL || 'http://localhost:8080/oauth2callback'
+  }
+};</codelab-snippet><h3>Redirect to sign in screen</h3><p>To begin, install the <code><a href="https://www.npmjs.com/package/googleapis">googleapis</a></code>&#160;npm package, which you will use to generate the authentication URL and fetch profile information for the logged in user.</p><pre>&gt; npm install googleapis --save</pre><aside class="special"><p>The <code><a href="https://github.com/google/google-api-nodejs-client/">googleapis</a></code>&#160;node package is Google's officially supported node.js client library for using Google APIs.</p></aside><p>In the project directory, edit the <code>auth.js</code>&#160;file and add the following code to require the <code>googleapis</code>&#160;package:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-4-user-login/auth.js">auth.js</a></h3><codelab-snippet>module.exports = function(config) {
+
+  var googleapis = require('googleapis');
+
+  function getAuthenticationUrl() {
+    // ...</codelab-snippet><p>Now, replace the current <code>getAuthenticationUrl</code>&#160;function with the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-4-user-login/auth.js">auth.js</a></h3><codelab-snippet>function getAuthenticationUrl() {
+  var client = new googleapis.auth.OAuth2(
+    config.oauth2.clientId,
+    config.oauth2.clientSecret,
+    config.oauth2.redirectUrl
+  );  
+  // Use 'profile' scope to authorize fetching the user's profile
+  return client.generateAuthUrl({ scope: ['profile'] }); 
+}</codelab-snippet><p>The <code>clientId</code>&#160;and <code>clientSecret </code>are read from the <code>config.js</code>&#160;file that you edited earlier.</p><p>Restart the node application and click &#8216;Sign in&#8217;. &#160;You should be redirected to the Google sign in page.</p><aside class="warning"><p>If you get a <code>redirect_uri_mismatch</code>&#160;error, you may need to wait a minute for the Web application client ID to become active.</p></aside><p>If you login, you will be redirected back to the sample application, but you will still appear to be signed in as &#8220;Fake User&#8221; because the callback is not implemented to fetch the user profile.</p><p>Let&#8217;s fix that!</p><h3>Fetch user profile</h3><p>Enable the Google+ API so the application can all the API to fetch user profiles.</p><ol start="1">
+<li>Under <strong>APIs &amp; auth &gt; <a href="https://console.developers.google.com/project/_/apiui/api">APIs</a></strong>, search for the &#8220;<em>Google+ API</em>&#8221;</li>
+<li>Click on <strong><a href="https://console.developers.google.com/project/_/apiui/apiview/plus/overview">Google+ API</a></strong>
+</li>
+<li>Click <strong>Enable API</strong>
+</li>
+</ol><p>To fetch the profile of the authenticated user, the <code>/oauth2callback</code>&#160;route that Google OAuth 2.0 redirects to calls <code>auth.getUser</code>&#160;from <code>auth.js</code>, passing it the provided <code>?code</code>&#160;query string that can be used to fetch the user&#8217;s profile.</p><p>The returned user profile is stored in the application session (via cookies).</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/app.js">app.js</a></h3><codelab-snippet>var session = require('cookie-session');
+app.use(session({ signed: true, secret: config.cookieSecret }));
+// ...
+
+/* Use OAuth 2.0 authorization code to fetch user's profile */
+app.get('/oauth2callback', function(req, res, next) {
+  auth.getUser(req.query.code, function(err, user) {
+    if (err) return next(err);
+    req.session.user = user;
+    res.redirect('/');
+  }); 
+});</codelab-snippet><aside class="special"><p><code><a href="https://github.com/expressjs/cookie-session">cookie-session</a></code>&#160;is a node.js middleware for providing signed cookie-based sessions.</p>
+<p>Cookies are signed with the value of <code>config.cookieSecret</code>&#160;to protect against forgery.</p></aside><p>Currently, <code>auth.getUser</code>&#160;always returns &#8220;Fake User.&#8221;</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-4-user-login/auth.js">auth.js</a></h3><codelab-snippet>function getUser(authorizationCode, callback) {
+  var error = null;
+  var fakeUser = { id: 123, name: 'Fake User' };
+  callback(error, fakeUser);
+}</codelab-snippet><p>Let&#8217;s fix this!</p><p>Replace the current <code>getUser</code>&#160;function with the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-4-user-login/auth.js">auth.js</a></h3><codelab-snippet>function getUser(authorizationCode, callback) {
+  var client = new googleapis.auth.OAuth2(
+    config.oauth2.clientId,
+    config.oauth2.clientSecret,
+    config.oauth2.redirectUrl
+  );  
+  // With the code returned from OAuth flow, get an access token
+  client.getToken(authorizationCode, function(err, tokens) {
+    if (err) return callback(err);
+    // Configure this Google API client to use the access token
+    client.setCredentials(tokens);
+    // Call the Google+ API to get the profile of the user who authenticated
+    googleapis.plus('v1').people.get({ userId: 'me', auth: client }, function(err, profile) {
+      if (err) return callback(err);
+      var user = { 
+        id: profile.id,
+        name: profile.displayName,
+        imageUrl: profile.image.url
+      };  
+      callback(null, user);
+    }); 
+  }); 
+}</codelab-snippet><p>This code gets an access token for the user who authenticated and then calls the the <code><a href="https://developers.google.com/+/api/latest/people/get">People.get</a></code>&#160;method of the <a href="https://developers.google.com/+/api/">Google+ API</a>&#160;using the user&#8217;s access token.</p><p>The sample application expects a user object in the following format:</p><codelab-snippet>{
+  id: &lt;unique ID of user&gt;,
+  name: &lt;display name&gt;,
+  imageUrl: &lt;publicly accessible URL to user&#8217;s profile image&gt;
+}</codelab-snippet><p>Restart the node application the try and Sign in&#160;again (you may need to Sign out&#160;first).</p><p>You should see your name and profile image displayed!</p><h2>Summary</h2><p>In this step, you implemented an OAuth 2.0 web authentication flow and fetched the authenticated user&#8217;s profile information.</p><h2>Next up</h2><p>Next, you will associated users with the books they add and query Datastore for only that user&#8217;s books.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Display a user’s books" 
+        duration="5:00">
+        
+          <h1></h1><p>When a user is signed in, the sample application passes the ID of the signed in user to <code>books.addBook</code>&#160;when new books are created.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/app.js">app.js</a></h3><codelab-snippet>/* Add a new book */
+app.post('/books', function(req, res, next) {
+  // ...
+
+  var userId;
+  if (req.session.user)
+    userId = req.session.user.id;
+
+  books.addBook(req.body.title, req.body.author, coverImageData, userId, function(err) {
+    if (err) return next(err);
+    res.redirect(req.get('Referer') || '/');
+  })
+});</codelab-snippet><p>Currently, we&#8217;re not tracking this <code>userId</code>&#160;when saving book entities.</p><p>To fix this, update the <code>entity</code>&#160;object in the <code>books.addBook</code>&#160;function <code>books.js</code>&#160;to include the <code>userId</code>&#160;when provided:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-5-user-books/books.js">books.js</a></h3><codelab-snippet>function addBook(title, author, coverImageData, userId, callback) {
+  var entity = {
+    key: dataset.key('Book'),
+    data: {
+      title: title,
+      author: author,
+    }
+  };
+  
+  if (userId)
+    entity.data.userId = userId;
+
+  if (coverImageData)
+    // ...</codelab-snippet><p>Now, books created by authenticated users will be associated with the books they add. &#160;This means we can query Datastore to list only the books added by that user.</p><p>The sample application displays a &#8216;My Library&#8217;&#160;link when a user is signed in. &#160;When clicked, only books owned by the user are displayed.</p><p>A user&#8217;s books are fetched by calling <code>books.getUserBooks</code>&#160;in <code>books.js</code>.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/start/app.js">app.js</a></h3><codelab-snippet>/* Fetch books created by the currently logged in user and display them */
+app.get('/mine', function(req, res, next) {
+  if (! req.session.user) return res.redirect('/');
+  books.getUsersBooks(req.session.user.id, function(err, books) {
+    if (err) return next(err);
+    res.render('index', { books: books, user: req.session.user }); 
+  }); 
+});</codelab-snippet><p>Sign into the application and click on the &#8216;My Library&#8217;&#160;link. &#160;You will receive an error:</p><aside class="warning"><p>Error: books.getUsersBooks [Not Yet Implemented]</p></aside><p>Let&#8217;s fix that!</p><p>Currently, the <code>getUserBooks</code>&#160;function in <code>books.js</code>&#160;is a placeholder that simply returns an error:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-5-user-books/books.js">books.js</a></h3><codelab-snippet>function getUserBooks(userId, callback) {
+  callback(new Error('books.getUserBooks [Not Yet Implemented]'));
+}</codelab-snippet><p>In the project directory, edit the <code>books.js</code>&#160;file and replace the <code>getUserBooks</code>&#160;function with the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cloud-nodejs/step-5-user-books/books.js">books.js</a></h3><codelab-snippet>function getUserBooks(userId, callback) {
+  var query = dataset.createQuery(['Book']).filter('userId =', userId);
+  dataset.runQuery(query, callback);
+}</codelab-snippet><aside class="special"><p>To refine queries, the Datastore <code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/query">Query</a></code>&#160;object provides functions such as <code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/query?method=filter">filter</a></code>, <code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/query?method=groupBy">groupBy</a></code>, <code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/query?method=limit">limit</a></code>, <code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/query?method=offset">offset</a></code>, and <code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/query?method=hasAncestor">hasAncestor</a></code>.</p></aside><p>Restart the node application, sign in, and click on the &#8216;My Library&#8217;&#160;link. &#160;This should now list your books!</p><p>If you haven&#8217;t added any books, you will see &#8220;<em>There are no books!</em>.&#8221; &#160;In this case, add a book as a signed in user and then click the &#8216;My Library&#8217;&#160;link again to view the list of only books you have added.</p><h2>Summary</h2><p>In this step, you associated books with the user who created them and queried books from Datastore, filtering them by the <code>userId</code>&#160;property.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:30">
+        
+          <h1></h1><p>You learned how to integrate Datastore and Cloud Storage into a node.js application and use OAuth 2.0 to authenticate users!</p><h3 class="checklist">What we've covered</h3><ul class="checklist">
+<li>Using the <code>gcloud</code>&#160;library to access Google Cloud Datastore</li>
+<li>Using the <code>gcloud</code>&#160;library to access Google Cloud Storage</li>
+<li>Using the <code>googleapis</code>&#160;library to authenticate users via OAuth 2.0</li>
+<li>Using the <code>googleapis</code>&#160;library to fetch user profiles from the Google+ API</li>
+</ul><h3>Next Steps</h3><ul>
+<li>Deploy your node.js application to Google App Engine using <a href="https://cloud.google.com/nodejs/getting-started/hello-world#running_hello_world">Managed VMs</a>.</li>
+<li>As an alternative to Datastore, follow the node.js documentation to store data in <a href="https://cloud.google.com/nodejs/getting-started/using-cloud-sql">Cloud SQL</a>&#160;(Google-hosted MySQL)</li>
+<li>As an alternative to Datastore, follow the node.js documentation to setup a <a href="https://cloud.google.com/nodejs/getting-started/deploy-mongodb">MongoDB database</a>&#160;to store your data</li>
+<li>Implement pagination using the endCursor returned by <code><a href="https://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/datastore/dataset?method=runQuery">dataset#runQuery</a></code>
+</li>
+<li>Fetch book cover images automatically using the <a href="https://developers.google.com/books/">Google Books API</a>&#160;(<a href="https://cloud.google.com/nodejs/getting-started/using-pub-sub">tutorial</a>)</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul>
+<li><a href="https://cloud.google.com/nodejs/">Getting started with Node.js on the Google Cloud Platform</a></li>
+<li><a href="https://googlecloudplatform.github.io/gcloud-node/">Google Cloud Client Library for Node.js</a></li>
+</ul><p>Watch these videos:</p><ul>
+<li><a href="https://www.youtube.com/watch?v=PZyDPthMMK8">Node.js Now @SFHTML5</a></li>
+<li><a href="https://www.youtube.com/watch?v=bvDtEcQdGs0">Node.js at Scale with Erik Toth</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Clean things up" 
+        duration="1:00">
+        
+          <h1></h1><p>To delete the project that you created for this codelab:</p><ol start="1">
+<li>Go to the <a href="https://console.developers.google.com/">Google Cloud Developer Console</a>.</li>
+<li>Click on the trash can icon next to the project that you created for this codelab<strong>.</strong>
+</li>
+</ol><p><img src="../img/cloud-nodejs/img-8.png" style="max-width: 624px"></p><p>Then follow the steps to confirm project deletion:</p><ol start="1">
+<li>Type your project ID.</li>
+<li>Click <strong>Delete project</strong>.</li>
+</ol><p><img src="../img/cloud-nodejs/img-9.png" style="max-width: 456px"></p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

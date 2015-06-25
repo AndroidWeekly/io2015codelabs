@@ -1,0 +1,644 @@
+/* Colors */
+/* Typography */
+/* Breakpoints */
+/* Common styles */
+a,
+a:visited {
+  color: #0097A7; }
+
+paper-fab {
+  background: #00BCD4; }
+
+h2, h3, h4 {
+  font-weight: 400;
+  margin: 0; }
+
+h2 {
+  font-weight: 300;
+  line-height: 1em;
+  font-size: 1.4em; }
+
+.default-bg {
+  background-color: #BDBDBD; }
+
+.about-bg {
+  background-color: #4285f4; }
+
+.ads-bg {
+  background-color: #4caf50; }
+
+.analytics-bg {
+  background-color: #fb8c00; }
+
+.android-bg,
+.android-auto-bg,
+.android-wear-bg {
+  background-color: #a0bd3a; }
+
+.cloud-bg {
+  background-color: #0097A7; }
+
+.chrome-bg {
+  background-color: #4285f4; }
+
+.games-bg,
+.play-games-bg {
+  background-color: #F2531C; }
+
+.geo-bg {
+  background-color: #4285f4; }
+
+.search-bg {
+  background-color: #4285f4; }
+
+.unity-bg {
+  background-color: #222C36; }
+
+.web-bg {
+  background-color: #4285f4; }
+
+.about-icon {
+  background-image: url("../../img/icons/search.png"); }
+
+.ads-icon {
+  background-image: url("../../img/icons/ads.png"); }
+
+.analytics-icon {
+  background-image: url("../../img/icons/analytics.png"); }
+
+.android-icon,
+.android-auto-icon,
+.android-wear-icon {
+  background-image: url("../../img/icons/android.svg"); }
+
+.chrome-icon {
+  background-image: url("../../img/icons/chrome.svg"); }
+
+.cloud-icon {
+  background-image: url("../../img/icons/cloud.png"); }
+
+.games-icon,
+.play-games-icon,
+.virtual-reality-games-icon {
+  background-image: url("../../img/icons/cardboard.png"); }
+
+.geo-icon {
+  background-image: url("../../img/icons/geo.png"); }
+
+.search-icon {
+  background-image: url("../../img/icons/search.png"); }
+
+.unity-icon {
+  background-image: url("../../img/icons/unity.png"); }
+
+.web-icon {
+  background-image: url("../../img/icons/web.svg"); }
+
+#drawer {
+  background-color: #f1f1f3; }
+
+#title {
+  padding-left: 12px; }
+
+core-header-panel.narrow #title {
+  padding-left: 0; }
+
+#menu_button {
+  display: inline-block; }
+
+core-header-panel.narrow #menu_button {
+  display: auto; }
+
+core-header-panel #icon {
+  background-color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  margin: 10px 10px 0 9px;
+  float: left;
+  display: none;
+  background-size: 24px;
+  background-position: 50% 50%;
+  background-repeat: no-repeat; }
+
+h3 {
+  font-weight: 400;
+  margin-bottom: 0; }
+
+core-header-panel {
+  width: 100%;
+  height: 100%;
+  position: inherit; }
+
+/* ******* Themes ******* */
+.core-header {
+  position: relative;
+  background-color: #BDBDBD; }
+
+.ads /deep/ .core-header {
+  background-color: #4caf50; }
+
+.analytics /deep/ .core-header {
+  background-color: #fb8c00; }
+
+.android /deep/ .core-header,
+.android_auto /deep/ .core-header,
+.android_wear /deep/ .core-header {
+  background-color: #a0bd3a; }
+
+.cloud /deep/ .core-header {
+  background-color: #0097A7; }
+
+.games /deep/ .core-header,
+.play_games /deep/ .core-header {
+  background-color: #F2531C; }
+
+.geo /deep/ .core-header {
+  background-color: #4285f4; }
+
+.search /deep/ .core-header {
+  background-color: #4285f4; }
+
+.unity /deep/ .core-header {
+  background-color: #222C36; }
+
+.web /deep/ .core-header {
+  background-color: #4285f4; }
+
+/* ******* End Themes ******* */
+.core-header h1 {
+  position: relative;
+  font-size: 1.4em;
+  font-weight: 300;
+  line-height: 1em;
+  padding-left: 0;
+  padding: 2px 0;
+  color: white;
+  margin: 0.67em 67px 0.67em 12px; }
+
+.drawer__back {
+  margin: 16px; }
+
+.drawer__back core-icon {
+  margin: auto 16px; }
+
+.core-header /deep/ paper-icon-button {
+  /* display: none;*/ }
+
+.core-header /deep/ core-icon {
+  fill: rgba(255, 255, 255, 0.8); }
+
+.core-header h1 strong {
+  font-weight: 400;
+  color: white; }
+
+.core-header.tall h1 {
+  font-size: 2em;
+  background-size: 48px 48px;
+  padding-left: 55px; }
+
+.core-header a {
+  color: currentcolor;
+  text-decoration: none; }
+
+.core-header img {
+  height: 50px;
+  width: 144px; }
+
+a {
+  color: #3f7bdf; }
+
+/*#maincontent {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+}
+
+h2.completed {
+  font-size: 2.5em;
+}*/
+ol.next {
+  counter-reset: li;
+  list-style: none;
+  margin-top: 40px; }
+
+ol.next > li {
+  margin-bottom: 25px;
+  font-size: 1.1em; }
+
+#progress {
+  position: absolute;
+  width: 100%;
+  top: inherit;
+  bottom: 0;
+  left: 0;
+  z-index: 0; }
+
+#progress /deep/ #progressContainer {
+  background-color: rgba(255, 255, 255, 0.2); }
+
+#progress /deep/ #activeProgress {
+  /*background: rgb(13, 168, 97);*/
+  /*background-color: #00B95F;*/
+  /*background-color: #1D5CBD;*/
+  /*background-color: #A8BEE0;*/
+  background-color: rgba(255, 255, 255, 0.5); }
+
+core-selector {
+  display: block;
+  width: 100%;
+  /*max-width: 800px;*/
+  z-index: 0; }
+
+/deep/ .core-selected {
+  display: block;
+  z-index: 0; }
+
+.core-selected {
+  visibility: visible !important; }
+
+aside.callout {
+  background-color: #f4f8fa;
+  margin: 20px 0;
+  padding: 15px;
+  border-left: 3px solid #4f7dc9;
+  font-size: 14px;
+  line-height: 1.5; }
+
+aside.callout b {
+  color: #4f7dc9; }
+
+figure {
+  text-align: center; }
+
+figure img {
+  max-width: 100%;
+  border: 1px solid #eee; }
+
+figcaption {
+  font-style: italic; }
+
+img.icon {
+  height: 30px;
+  width: auto;
+  vertical-align: middle; }
+
+#pages header {
+  margin: 2em 0 0 0; }
+
+#pages h1, #pages h3 {
+  font-weight: 400;
+  margin: 0; }
+
+#pages h2 {
+  font-weight: normal;
+  color: #444;
+  margin-top: 1.5em;
+  margin-bottom: 0;
+  font-size: 1.4em; }
+
+#pages h3 {
+  font-weight: 400; }
+
+#pages h3.label {
+  font-size: 1.4em;
+  color: #aaa; }
+
+#pages h1.step-title:before {
+  content: attr(data-step) ".";
+  margin-right: 10px; }
+
+paper-button[raisedButton] {
+  background: #4285f4;
+  color: #fff; }
+
+paper-button[raisedButton]:hover {
+  background: #3367d6; }
+
+paper-button[raisedButton]::shadow #ripple {
+  color: #fff; }
+
+paper-button[raisedButton]::shadow #focusBg {
+  background: #3367d6; }
+
+paper-button[autofocus] {
+  color: #03a9f4; }
+
+.navbutton {
+  z-index: 9;
+  position: fixed;
+  bottom: 32px; }
+  .navbutton.prevbutton {
+    background: #999;
+    left: 32px; }
+    .navbutton.prevbutton[disabled] {
+      visibility: hidden; }
+  .navbutton.nextbutton,
+  .navbutton.donebutton {
+    right: 32px; }
+
+.navbutton-buffer {
+  height: 90px; }
+
+paper-progress {
+  width: 100%;
+  position: relative;
+  top: 4px;
+  z-index: -1; }
+
+table code,
+h2 code,
+h3 code,
+h4 code {
+  line-height: inherit;
+  padding: inherit;
+  background: none; }
+
+.hidden {
+  visibility: hidden; }
+
+codelab-step li {
+  margin: 0.5em 0; }
+
+ul.checklist {
+  list-style: none;
+  padding: 0 0 0 1em; }
+
+ul.checklist li {
+  background-image: url("../../img/check.png");
+  background-size: 16px;
+  background-repeat: no-repeat;
+  padding-left: 20px; }
+
+.stackoverflow-tag {
+  color: #3e6d8e;
+  background-color: #e0eaf1;
+  border-bottom: 1px solid #b3cee1;
+  border-right: 1px solid #b3cee1;
+  padding: 3px 4px 3px 4px;
+  margin: 2px 2px 2px 0;
+  text-decoration: none;
+  font-size: 90%;
+  line-height: 1.4;
+  white-space: nowrap;
+  display: inline-block; }
+
+/*p,
+li {
+  max-width: 600px;
+}*/
+img {
+  width: 100%;
+  max-width: 600px; }
+
+strong.gradle_sync,
+strong.run {
+  background-repeat: no-repeat;
+  background-size: 12px;
+  padding-left: 20px;
+  background-position: 4px 0; }
+
+strong.gradle_sync {
+  background-image: url("../../img/gradle_sync.png"); }
+
+strong.run {
+  background-image: url("../../img/run.png"); }
+
+#qr_code {
+  max-width: 250px;
+  min-width: 150px;
+  width: 100%; }
+
+#qr_query {
+  font-size: 1.0em;
+  padding: 0.4em;
+  color: #4f7dc9;
+  border-radius: 2px;
+  margin: 0;
+  border: 1px solid #ccc;
+  box-sizing: border-box; }
+
+#qr_link {
+  width: 100%;
+  font-size: 1.0em;
+  padding: 0.4em;
+  color: #4f7dc9;
+  border-radius: 2px;
+  margin: 1em 0;
+  border: 1px solid #ccc;
+  box-sizing: border-box; }
+
+input {
+  font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial;
+  font-weight: 300; }
+
+table {
+  font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial;
+  font-weight: 300;
+  font-size: 1em;
+  color: #444; }
+
+paper-action-dialog /deep/ h1 {
+  font-weight: 400; }
+
+paper-action-dialog /deep/ em {
+  font-weight: 300; }
+
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+collapsable-instructions ol {
+  margin-top: 0; }
+
+#countdown {
+  position: absolute;
+  right: 1.4em;
+  top: 0.8em;
+  font-size: 0.65em;
+  color: white;
+  font-weight: 300;
+  border-radius: 40px;
+  width: 40px;
+  text-align: center;
+  height: 40px; }
+
+#countdown svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  webkit-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+          transform: rotate(-90deg); }
+
+#countdown strong {
+  display: block;
+  font-size: 0.9em; }
+
+#countdown strong:first-of-type {
+  font-weight: 500;
+  font-size: 1.2em;
+  line-height: 2px;
+  padding-top: 11px;
+  margin: 0; }
+
+#countdown_progress {
+  stroke-dasharray: 113; }
+
+table {
+  border-spacing: 0; }
+
+td {
+  vertical-align: top;
+  border: 0px solid #CCC;
+  border-bottom-width: 1px;
+  padding: 0.4em 0.6em; }
+
+thead td {
+  font-weight: 300;
+  background: #a0a2a8;
+  color: white;
+  border-bottom: none; }
+
+core-drawer-panel[narrow] /deep/ codelab-step /deep/ .inner {
+  margin: 0; }
+
+strong {
+  font-weight: 500; }
+
+/* ********************** */
+/* ToC */
+.toc-item {
+  font-size: 14px;
+  color: #8f8f8f;
+  overflow: hidden;
+  border-radius: 2px; }
+  .toc-item i {
+    display: inline-block;
+    width: 30px;
+    min-width: 30px;
+    background: #fff;
+    border-radius: 50%;
+    text-align: center;
+    height: 30px;
+    vertical-align: middle;
+    line-height: 30px;
+    border: 1px solid #BDBDBD;
+    margin-right: 8px; }
+    .toc-item i::before,
+    .toc-item i::after {
+      content: '';
+      display: block;
+      border-left: 1px solid #BDBDBD;
+      width: 0;
+      height: 50px; }
+    .toc-item i::before {
+      margin-top: -50px;
+      margin-left: 14px; }
+    .toc-item i::after {
+      margin-left: 14px; }
+  .toc-item.completed,
+  .toc-item.core-selected {
+    color: #333333; }
+  .toc-item.core-selected {
+    background-color: #E0E0E0; }
+  .toc-item.completed i,
+  .toc-item.completed i::before,
+  .toc-item.completed i::after,
+  .toc-item.core-selected i,
+  .toc-item.core-selected i:before {
+    border-color: #00BCD4; }
+  .toc-item.toc-item-first i::before,
+  .toc-item.toc-item-last i::after {
+    display: none; }
+
+paper-button {
+  font-weight: 400; }
+  paper-button[dismissive] {
+    color: #8f8f8f; }
+
+.default-bg {
+  background-color: #BDBDBD; }
+
+.about-bg {
+  background-color: #4285f4; }
+
+.ads-bg {
+  background-color: #4caf50; }
+
+.analytics-bg {
+  background-color: #fb8c00; }
+
+.android-bg,
+.android-auto-bg,
+.android-wear-bg {
+  background-color: #a0bd3a; }
+
+.cloud-bg {
+  background-color: #0097A7; }
+
+.chrome-bg {
+  background-color: #4285f4; }
+
+.games-bg,
+.play-games-bg {
+  background-color: #F2531C; }
+
+.geo-bg {
+  background-color: #4285f4; }
+
+.search-bg {
+  background-color: #4285f4; }
+
+.unity-bg {
+  background-color: #222C36; }
+
+.web-bg {
+  background-color: #4285f4; }
+
+.about-icon {
+  background-image: url("../../img/icons/search.png"); }
+
+.ads-icon {
+  background-image: url("../../img/icons/ads.png"); }
+
+.analytics-icon {
+  background-image: url("../../img/icons/analytics.png"); }
+
+.android-icon,
+.android-auto-icon,
+.android-wear-icon {
+  background-image: url("../../img/icons/android.svg"); }
+
+.chrome-icon {
+  background-image: url("../../img/icons/chrome.svg"); }
+
+.cloud-icon {
+  background-image: url("../../img/icons/cloud.png"); }
+
+.games-icon,
+.play-games-icon,
+.virtual-reality-games-icon {
+  background-image: url("../../img/icons/cardboard.png"); }
+
+.geo-icon {
+  background-image: url("../../img/icons/geo.png"); }
+
+.search-icon {
+  background-image: url("../../img/icons/search.png"); }
+
+.unity-icon {
+  background-image: url("../../img/icons/unity.png"); }
+
+.web-icon {
+  background-image: url("../../img/icons/web.svg"); }

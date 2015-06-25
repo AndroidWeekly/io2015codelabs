@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/core-icons/av-icons.html">
+
+<link rel="import" href="../../bower_components/highlightjs-element/highlightjs-element.html">
+
+<link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
+
+<polymer-element name="collapsable-instructions" attributes="heading opened">
+<template>
+  <link rel="stylesheet" href="collapsable-instructions.css">
+  <div class="collapse-heading" on-click="{{expandInstructions}}">
+    <template if="{{opened}}">
+      <core-icon icon="arrow-drop-up"></core-icon>
+    </template>
+    <template if="{{!opened}}">
+      <core-icon icon="arrow-drop-up" class="rotated"></core-icon>
+    </template>
+    {{heading}}
+  </div>
+      <core-collapse id="collapse2" opened="{{opened}}">
+        <div id="collapsed_content">
+      	  <content></content>
+        </div>
+      </core-collapse>
+</template>
+<script>
+  Polymer('collapsable-instructions', {
+    heading: '',
+    lang: 'html',
+    code: '',
+    opened: false,
+    selected: false,
+    ready: function() {
+      
+      
+    },
+    expandInstructions: function() {
+      this.$.collapse2.toggle();
+    }
+  });
+</script>
+</polymer-element>
+
+

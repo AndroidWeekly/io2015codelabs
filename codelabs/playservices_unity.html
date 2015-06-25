@@ -1,0 +1,670 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Play Game Services in Unity"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Unity, Virtual Reality, Games"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p>This codelab will teach you how to extend an existing Unity game to support Play Game Services on Android devices. &#160;In this section, we will set up the Unity environment with all of the materials you will need to complete this codelab.</p><p><img src="../img/playservices_unity/img-1.png" style="max-width: 460px"></p><h2 class="checklist">What you’ll learn</h2><ul class="checklist">
+<li>Development tools and configuration to build Unity projects targeted for Android.</li>
+<li>How to configure a game and application in the Google Play Console.</li>
+<li>How to add Google signin to your game.</li>
+<li>How to configure, add, and trigger achievements for your game.</li>
+<li>How to configure, add, and post scores to leaderboards for your game.</li>
+</ul><h2>What you’ll need</h2><ul>
+<li>Android developer account (register at <a href="https://play.google.com/apps/publish/">https://play.google.com/apps/publish/</a>).</li>
+<li>An Android Device running Android 4.4+ (KitKat) or greater.</li>
+<li>Unity 4.6.1 or greater. &#160;The personal edition will work for this codelab.</li>
+<li>Android SDK (and have Unity pointing to the installation) including the latest Google Play Services SDK (found in the "Extras" section in the SDK Manager).</li>
+<li>The <a href="https://github.com/playgameservices/play-games-plugin-for-unity">Play Game Services plugin for Unity</a>&#160;</li>
+<li>Game assets: <a href="https://github.com/googlesamples/io2015-codelabs/tree/master/playgames-unity">Lollygagger Sample game</a>
+</li>
+<li>A USB micro to USB cable to connect the device to the computer.</li>
+</ul><h2>Game Summary</h2><p>For this codelab, we'll be using a simple and entertaining game, called "Lollygagger". The main game play is to travel along a path, atop a robot, shooting Lollipop "cannonballs" at the Androids that are lollygagging around. Key features of note are:</p><ul>
+<li>Two different Unity scenes, one for the main menu, and one for game play.</li>
+<li>Shooting cannonballs at the targets, triggered by touch.</li>
+<li>Super flexible and simple game level logic to allow infinite possibilities of hours of fun!</li>
+</ul><codelab-survey><h4>How&#160;will you use use this tutorial?</h4>
+<select><option>Read it through only</option>
+<option>Read it and complete the exercises</option></select><h4>How&#160;would you rate your experience with building Unity apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>How&#160;would you rate your experience with building Android apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>How&#160;would you rate your experience with Google Play Game Services?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="5:00">
+        
+          <h1></h1><p>First you need the Play Game Services plugin for Unity.</p><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/playgameservices/play-games-plugin-for-unity/blob/master/current-build/GooglePlayGamesPlugin-0.9.20.unitypackage">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/playgameservices/play-games-plugin-for-unity.git</pre><p>Next you need the unity asset package containing the sample game. &#160;You can download this here:</p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download codelab sample code zip file</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/googlesamples/io2015-codelabs.git</pre>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run the starter game" 
+        duration="10:00">
+        
+          <h1></h1><p>First, let's build and run the game. &#160;From there, we'll add Play Game services.</p><h2>Start Unity</h2><ol start="1"><li>Start Unity! &#160;If you have not developed an Android application with Unity before, make sure you configure the Android SDK within Unity. &#160;In Unity, click <strong>Preferences &gt; External Tools &gt; Android SDK Location, </strong>then select the folder where you downloaded and unzipped the Android SDK.</li></ol><aside class="special"><p><strong>Note</strong>: The location of the Android SDK depends on your installation. &#160;For more information see: <a href="http://developer.android.com/sdk/index.html">http://developer.android.com/sdk/index.html</a></p></aside><h2>Import the game assets</h2><p>Import the sample game scenes and assets into your project:</p><ol start="1">
+<li>Click <strong>Assets &gt; Import Package &gt; Custom Package</strong>.</li>
+<li>Select the <code>lollygagger_step0.unitypackage</code>&#160;file you downloaded</li>
+<li>Click <strong>Import</strong>.</li>
+</ol><h2>Configure the Android player </h2><ol start="1"><li>Configure Unity to build an Android application:</li></ol><ul>
+<li>Click <strong>File &gt; Build Settings&#8230;</strong>&#160;to open the Build Settings window.</li>
+<li>Select Android in the platform list, if it isn&#8217;t selected already.</li>
+<li>Click the <strong>Switch Platform</strong>&#160;to make Android your default build target.</li>
+</ul><ol start="2"><li>Add the game scenes to the build:</li></ol><ul>
+<li>In the Project explorer, select the <strong>Assets</strong>&#160;folder.</li>
+<li>Drag and drop the <code>MainMenu.unity</code>&#160;scene to the <strong>Scenes In Build</strong>&#160;list within the Build Settings dialog.</li>
+<li>Then drag and drop the <code>GameScene.unity</code>&#160;scene into the list under <code>MainMenu.unity</code>. &#160;<code>MainMenu.unity</code>&#160;must be the first one on the list.</li>
+</ul><p><img src="../img/playservices_unity/img-3.png.gif" style="max-width: 347px"></p><ol start="6"><li>Configure the Unity player settings:</li></ol><ul>
+<li>Click the <strong>Player Settings&#8230;</strong>&#160;button in the Build Settings window. &#160;This opens the <strong>PlayerSettings</strong>&#160;Inspector panel back in the Unity Editor.</li>
+<li>Click on the <strong>Resolution and Presentation</strong>&#160;section to expand it.</li>
+<li>Find the <strong>Default Orientation </strong>drop-down and set it to Landscape Left. &#160;This is the correct orientation for applications on a Project Tango device.</li>
+</ul><p><img src="../img/playservices_unity/img-4.png" style="max-width: 343px"></p><h2>Configure Bundle and Code Signing</h2><p>Still in the player settings, expand the &#8220;Other Settings&#8221; section by clicking on it.</p><p>Enter the bundle identifier. &#160;This identifier needs to match the application configuration in the Play Console (we'll look at that in the next step).</p><p>Enter a unique Bundle ID, this follows .Net namespace (or Java package) naming rules. &#160;Typically this is of the form: com.&lt;yourcompany&gt;.&lt;appname&gt;. &#160;<img src="../img/playservices_unity/img-7.png" style="max-width: 400px"></p><p>At the bottom of the Player Settings, expand the Publish Settings section.</p><p>Make sure "Use Existing Keys" is checked.</p><p>Select the debug keystore that is created as part of Android Studio, or the Android SDK. &#160;For Mac/Linux this should be named $HOME/.android/debug.keystore</p><p>For Windows this should be named &#160;C:\Users\&lt;USERNAME&gt;\.android\debug.keystore</p><aside class="special"><p><strong>Note</strong>:</p>
+<p>If you can't find the key debug.keystore, or if you want to create a new one, change directory to .android (as explained above) and run the following command:</p>
+<p>keytool -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999</p></aside><p>Enter the keystore password: android</p><p>Select the alias: androiddebugkey</p><p>Enter the password: android</p><h2>Save and Run</h2><ol start="1">
+<li>Save your project! &#160;Better safe than sorry&#160;:)</li>
+<li>Connect a device&#160;build and run! &#160;When prompted for a name for the APK file, enter Lollygagger.apk.</li>
+</ol><p>Congratulations! If you can play the starter project game on your Android device, you are now ready to achievements, leaderboards, and other Play Game Services that will help engage and retain your players.</p><h2>Troubleshooting</h2><p>Even the most simple things can have gotchas! &#160;Here are a couple and what to do about it. &#160;If you&#8217;re still having problems ask for help!</p><p><strong>Issue</strong></p><ul><li>I'm only seeing the Unity splash screen and then a blue screen with nothing happening</li></ul><p><strong>Solution</strong></p><ul><li>Make sure you have added MainMenu.unity and GameScene.unity scenes to the Build settings</li></ul><p><img src="../img/playservices_unity/img-8.png" style="max-width: 454px"></p><p><strong>Issue:</strong>&#160;Error building Player: UnityException: Bundle Identifier has not been set up correctly</p><p><strong>Solution:</strong>&#160;Set the bundle identifier to something other than the default. &#160;This is in the player settings &gt; Other Settings section.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Register the Game in the Developer Console" 
+        duration="5:00">
+        
+          <h1></h1><h2>Create Your Game Project</h2><p>Before your users can sign in and use Play Game Services features, you need to register your game with the Developer Console. &#160;In this section, you will create a Play Game Services project in the Developer Console and link it to your Unity project.</p><ol start="1">
+<li>Navigate to the <a href="https://play.google.com/apps/publish/">Google Play Developer Console</a>&#160;and sign in. &#160;If you don&#8217;t have an account yet, you will need to create one.</li>
+<li>Click <strong>Game Services</strong>&#160;and then click the&#160;<strong>Add new game</strong>&#160;button in the upper right.</li>
+</ol><ul>
+<li>Select the tab titled &#8216;I don&#8217;t use any Google APIs in my game yet&#8217;.</li>
+<li>Enter &#8216;Lollygagger&#8217; as the name of your game, and choose &#8216;Casual&#8217; for the category. &#160;Click <strong>Continue</strong>.</li>
+</ul><ol start="3">
+<li>You are presented with the &#8216;Game Details&#8217; screen. &#160;At the top you will see &#8216;Lollygagger&#8217;, and under that is your app ID (a 10+ digit number). &#160;Make a note of this ID, you will need it later.<br><img src="../img/playservices_unity/img-9.png" style="max-width: 218px">
+</li>
+<li>Using the toggle, turn <strong>Saved Games</strong>&#160;to <strong>ON</strong>. &#160;This is a very important step, you will need to have this feature enabled to complete the codelab.</li>
+<li>&#160;Finally, save your settings for this game by clicking on Save at the top of the form.</li>
+</ol><h2>Link Your Android App</h2><ol start="1">
+<li>Click on the <strong>Linked Apps</strong>&#160;tab in the left sidebar, then click <strong>Android</strong>. &#160;Note: If you don&#8217;t see a &#8216;Linked Apps&#8217; button, resize your window to fullscreen or click the &#8216;hamburger&#8217; button on the left-hand side.</li>
+<li>Under <strong>Package Name</strong>, put the Bundle Identifier you chose when setting up your Unity project&#160;(which you can find by opening <strong>File&gt;Build Settings</strong>&#160;and clicking <strong>Player Settings</strong>). &#160;Make sure you use the same string in both places. &#160;Then click <strong>Save and continue</strong>.</li>
+<li>On the next screen, click <strong>Authorize your app now</strong>. &#160;You may be presented with a &#8216;Branding Information&#8217; dialog. &#160;This is where you would control the information that appears on the sign-in screen, but we&#8217;ll skip this for now. &#160;Just click <strong>&#8216;Continue&#8217;</strong>.</li>
+<li>On the <strong>Client ID Settings</strong>&#160;dialog, you will be asked for a &#8216;Signing certificate fingerprint (SHA1)&#8217;. &#160;You will need to generate this from your Android debug keystore. &#160;Use the following <code>keytool</code>&#160;command&#160;(<code>keytool</code>&#160;is part of the Oracle JDK and should already be installed on your machine in the <code>bin</code>&#160;directory of your JDK):</li>
+</ol><pre># Replace $DEBUG_KEYSTORE with the location of your android debug keystore
+# which is normally $HOME/.android/debug.keystore on Mac/Linux and 
+# C:\Users\&lt;USERNAME&gt;\.android\debug.keystore on Windows
+keytool -list -v -keystore $DEBUG_KEYSTORE -alias androiddebugkey -storepass android -keypass android</pre><ol start="5">
+<li>Copy the <code>SHA1</code>&#160;fingerprint from the <code>Certificate fingerprints</code>&#160;section of the output. &#160;Then click <strong>Create Client</strong>. &#160;If you did everything correctly, you should see the message &#8216;Successfully linked your Client ID&#8217;, followed by a Client ID string. &#160;You won&#8217;t need this string, so don&#8217;t bother writing it down.</li>
+<li>Click the <strong>Testing</strong>&#160;tab in the left sidebar. &#160;Then click <strong>Add Testers</strong>&#160;and add any Google accounts that you will be using to test this game. &#160;These should be the same as the accounts on your Android development device, and they should be Google+ enabled.&#160; If you are not sure if your account is Google+ enabled, go to <a href="https://plus.google.com/">plus.google.com</a>&#160;and sign in as that account, you will be prompted to create a Google+ profile if necessary.</li>
+</ol>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Configure the Play Games Unity Plugin" 
+        duration="2:00">
+        
+          <h1></h1><p>Now that you have created a game project in the Developer Console, you are ready to configure your Unity project to interact with Play Game Services.</p><h2>Import the Play Game Services plugin</h2><ol start="1">
+<li>Open Unity and import&#160;the Play Game Services plugin for Unity, click <strong>Assets &gt; Import Package &gt; Custom Package</strong>&#160;and select <code>current-build/GooglePlayGamesPlugin-*.unitypackage</code>&#160;from the <code>play-games-plugin-for-unity</code>&#160;folder where you downloaded the Play Games Unity plugin.</li>
+<li>Open the project in Unity and click <strong>Window &gt; Google Play Games &gt; Setup &gt; Android Setup...</strong>. &#160;In the Application ID field, enter your app ID from earlier, then click <strong>Setup</strong>.&#160; If you are presented with a dialog about Google Play Services, click <strong>OK</strong>.</li>
+</ol><h2>Setup the plugin for the Application</h2><ol start="1">
+<li>Open the project in Unity and click <strong>Window &gt; Google Play Games &gt; Setup &gt; Android Setup...</strong>. </li>
+<li>&#160;In the Application ID field, enter your app ID from earlier, then click <strong>Setup</strong>.&#160;</li>
+<li>&#160;If you are presented with a dialog about Google Play Services, click <strong>OK</strong>.</li>
+</ol>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Sign in with Google" 
+        duration="10:00">
+        
+          <h1></h1><p>Now that you have registered your game in the Developer Console, you are ready to start integrating Play Game Services into your app. &#160;In this section, we will add a sign-in button to your game&#8217;s main menu and authenticate the user for Google Play Games.</p><h2>Initialize Play Game Services</h2><p>We are going to start by adding sign-in functionality to the game&#8217;s main menu. &#160;First open the <strong>MainMenu.unity</strong>&#160;scene in the Unity editor. &#160;If you press <strong>Play</strong>, you should see the following:</p><p><img src="../img/playservices_unity/img-14.png" style="max-width: 399px"></p><p>In the Hierarchy, click on <strong>Main Camera</strong>. &#160;In the Inspector view on the right-hand side, scroll down to find the &#8216;Main Menu Events&#8217; script component that is attached to Main Camera. &#160;Double click the script to open it in the editor. &#160;To initialize Play Game Services, we will need to add a <code>Start()</code>&#160;method, like this:</p><codelab-snippet>using System.Collections;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+using UnityEngine;
+
+public class MainMenuEvents : MonoBehaviour {
+
+    // ... other code here... 
+    public void Start() {
+
+        mFader.color = Color.black;
+        mFader.gameObject.SetActive(true);
+        toClear = true;
+
+        //  ADD THIS CODE BETWEEN THESE COMMENTS
+
+        // Create client configuration
+        PlayGamesClientConfiguration config = new 
+            PlayGamesClientConfiguration.Builder()
+            .Build();
+
+        // Enable debugging output (recommended)
+        PlayGamesPlatform.DebugLogEnabled = true;
+        
+        // Initialize and activate the platform
+        PlayGamesPlatform.InitializeInstance(config);
+        PlayGamesPlatform.Activate();
+       // END THE CODE TO PASTE INTO START
+    }
+
+    // ...
+}</codelab-snippet><p>Make sure to add the <code>using</code>&#160;statements so that the necessary classes are defined. &#160;The code above will initialize the Play Games platform in your script with the saved games feature enabled.</p><h2>Add the sign-in UI</h2><p>Add a button to the GUI by right-clicking on <strong>Project</strong>&#160;at the bottom of your screen and selecting the <strong>Prefabs</strong>&#160;folder.</p><p><img src="../img/playservices_unity/img-15.png" style="max-width: 123px"></p><p>In the <strong>Prefabs</strong>&#160;folder find the <strong>signInButton</strong>&#160;prefab and drag it onto the <strong>Panel</strong>&#160;element of the hierarchy, like below:</p><p><img src="../img/playservices_unity/img-16.png.gif" style="max-width: 624px"></p><p>Now add the <strong>authStatus</strong>&#160;prefab to the hierarchy with the same click-and-drag method. &#160;Don&#8217;t worry if there is no visual result, the content of authStatus is currently the empty string, we will update the content in code. &#160;When you have added authStatus you should have the following hierarchy:</p><p><img src="../img/playservices_unity/img-17.png" style="max-width: 250px"></p><h2>Add sign-in functionality</h2><p>Re-open the <code>MainMenuEvents</code>&#160;script (attached to the &#8216;Main Camera&#8217; object) where&#160;we activated the Play Games platform. &#160;Add a new <code>SignIn</code>&#160;function like below:</p><codelab-snippet>public void SignIn() {
+        Debug.Log("signInButton clicked!");
+}</codelab-snippet><p>Now we have to link this function to the OnClick event of the button:</p><ul>
+<li>Click on the <strong>signinButton</strong>&#160;in the Hierarchy to open the Inspector. &#160;</li>
+<li>Scroll down to the &#8216;On Click()&#8217; panel and click the <strong>+</strong>&#160;button. &#160;</li>
+<li>From the Hierarchy, click and drag the <strong>Main Camera</strong>&#160;element onto the &#8216;None ...&#8217; field in the button&#8217;s On Click panel. &#160;</li>
+<li>Then select <strong>MainMenuEvents &gt; SignIn</strong>&#160;from the &#8216;No function&#8217; dropdown. &#160;</li>
+</ul><p>These steps are illustrated in the clip below:</p><p><img src="../img/playservices_unity/img-18.png.gif" style="max-width: 531px"></p><p>The final result should look like this:</p><p><img src="../img/playservices_unity/img-19.png" style="max-width: 251px"></p><p>To ensure that you linked the event correctly, click <strong>Play</strong>&#160;in the Unity Editor and click the signinButton when the main menu loads. &#160;If you added the button correctly, you should see messages appear in the debug logs.</p><p>Now we will make the button actually useful. &#160;First we need to add some boilerplate&#160;to access the signInButton and authStatus elements from your code. &#160;Open the MainMenuEvents script and add the following lines:</p><p>First add member variables to reference the Text elements on the UI, paste them in the MainMenuEvents class at the top</p><tbody>
+<tr><td colspan="1" rowspan="1">
+<p><code>using UnityEngine.UI;</code></p>
+<p><code>public class MainMenuEvents : MonoBehaviour {</code></p>
+<p><code>&#160; &#160; &#160;// ADD THESE TWO LINES</code></p>
+<p><code>&#160; &#160; private Text signInButtonText;</code></p>
+<p><code>&#160; &#160; private Text authStatus;</code></p>
+<p><code>}</code></p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"></td></tr>
+</tbody><p>Next, add the code that assigns values to these variables by pasting these lines at the top of the Start() method:</p><codelab-snippet>using UnityEngine.UI;
+
+public class MainMenuEvents : MonoBehaviour {
+    
+    private Text signInButtonText;
+    private Text authStatus;
+
+    public void Start() {
+
+        // ADD THESE LINES
+        // Get object instances
+        signInButtonText =
+            GameObject.Find("signInButton").GetComponentInChildren&lt;Text&gt;();
+        authStatus = GameObject.Find("authStatus").GetComponent&lt;Text&gt;();
+    }
+    // ...
+}</codelab-snippet><aside class="special"><p><strong>Pro Tip:</strong>&#160;GameObject.Find() is a very expensive method to call. &#160;Using public Text members and setting them from the scene inspector is much more efficient. (But distracts us from the goal of this codelab!)</p></aside><p>Next, add a function called <code>SignInCallback</code>, and modify the <code>SignIn</code>&#160;function so that it matches the code below:</p><codelab-snippet>public void SignInCallback(bool success) {
+        if (success) {
+            Debug.Log("(Lollygagger) Signed in!");
+            
+            // Change sign-in button text
+            signInButtonText.text = "Sign out";
+            
+            // Show the user's name
+            authStatus.text = "Signed in as: " + Social.localUser.userName;
+        } else {
+            Debug.Log("(Lollygagger) Sign-in failed...");
+            
+            // Show failure message
+            signInButtonText.text = "Sign in";
+            authStatus.text = "Sign-in failed";
+        }
+    }
+    
+    public void SignIn() {
+        if (!PlayGamesPlatform.Instance.localUser.authenticated) {
+            // Sign in with Play Game Services, showing the consent dialog
+            // by setting the second parameter to isSilent=false.
+            PlayGamesPlatform.Instance.Authenticate(SignInCallback, false);
+        } else {
+            // Sign out of play games
+            PlayGamesPlatform.Instance.SignOut();
+            
+            // Reset UI
+            signInButtonText.text = "Sign In";
+            authStatus.text = "";
+        }
+    }</codelab-snippet><p>The code above implements both sign-in and sign-out, depending on the user&#8217;s state. &#160;However the code above only triggers sign-in when the user presses the sign-in button. &#160;We&#8217;d like to have returning users silently signed in when they open the app. &#160;Add the following line to <code>Start()</code>&#160;to attempt silent sign-in when the app is opened:</p><codelab-snippet>public void Start() {
+        // ...
+
+        // PASTE THESE LINES AT THE END OF Start()
+        // Try silent sign-in (second parameter is isSilent)
+        PlayGamesPlatform.Instance.Authenticate(SignInCallback, true);
+}</codelab-snippet><h2>Test signing in</h2><p>Now let&#8217;s test the sign-in process. &#160;This step requires you to run the game on your Android device. &#160;</p><ol start="1">
+<li>
+<strong>File &gt;Build and Run</strong>&#160;the app.</li>
+<li>When the app starts, click the &#8216;Sign in&#8217; button. &#160;Once you have accepted all of the consent screens, you should see the button text change to &#8220;Sign Out&#8221; and your name appear below the&#160;button.</li>
+</ol><aside class="warning"><p><strong>Troubleshooting tip:</strong>&#160;If your UI is not behaving as expected, make sure that the names of objects passed to <code>GameObject.Find()</code>&#160;are <em>exactly</em>&#160;the same as the as the name you entered when creating the Button/Text in the Unity hierarchy.</p>
+<p>If signin fails check the configuration of:</p>
+<ul>
+<li>AppID (copied from the play console and used when running "Android Setup&#8230;")</li>
+<li>package ID (copied from player&gt;other settings into the play console &gt; linked apps)</li>
+<li>SHA1 fingerprint (using keytool on the command line and set in the linked apps)</li>
+</ul></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Achievements" 
+        duration="15:00">
+        
+          <h1></h1><p>Now that your users are signed in with access to Play Game Services, it is time to start adding awesome features to your game. &#160;In this section, we will add achievements to the game for hitting enemies and a UI for users to view their progress.</p><h2>Create Achievements in the Developer Console</h2><p>We are going to create two achievements for this game. &#160;One that rewards the user for shooting her first target, and another that rewards the user for shooting 10 total targets. &#160;The latter will be an &#8220;incremental&#8221; achievement, which means the user needs to take multiple steps to unlock it.</p><ol start="1">
+<li>Navigate back to the Lollygagger project in the <a href="https://play.google.com/apps/publish/">Google Play Developer Console</a>&#160;and click on the <strong>Achievements</strong>&#160;tab.</li>
+<li>Click on<strong>&#160;Add Achievement</strong>&#160;and enter the following information:</li>
+</ol><ul>
+<li>
+<strong>Name</strong>: &#8220;Welcome to Lollygagger&#8221;</li>
+<li>
+<strong>Description</strong>: &#8220;Get your first hit!&#8221;</li>
+</ul><ol start="3"><li>Next click <strong>Save and add another achievement</strong>, then enter the following information for the second achievement:</li></ol><ul>
+<li>
+<strong>Name</strong>: &#8220;Sharpshooter&#8221;</li>
+<li>
+<strong>Description</strong>: &#8220;Get 10 hits!&#8221;</li>
+<li>
+<strong>Incremental Achievements</strong>: checked, 10 steps are needed</li>
+</ul><ol start="4"><li>Click <strong>Save</strong>&#160;to finish entering achievements.</li></ol><p>You should now be at the Achievements screen, which will display the IDs of the two achievements you just created:</p><p><img src="../img/playservices_unity/img-20.png" style="max-width: 624px"></p><p>Make a note of these IDs, we will need them when unlocking/incrementing achievements in code.</p><h2>View Achievements</h2><p>Now that your game has achievements in the Developer Console, your players may want to be able to check their progress on all of the achievements in your game and see which achievements they have not yet completed. &#160;Let&#8217;s add a button to the main menu that brings up the achievements list UI.</p><p>First, let&#8217;s add the code to show achievements. &#160;Open the <code>MainMenuEvents</code>&#160;script and add the following function:</p><codelab-snippet>public void ShowAchievements() {
+        if (PlayGamesPlatform.Instance.localUser.authenticated) {
+            PlayGamesPlatform.Instance.ShowAchievementsUI();
+        }
+        else {
+          Debug.Log("Cannot show Achievements, not logged in");
+        }
+    }</codelab-snippet><p>Now create an Achievements button in the MainMenu scene by adding the <strong>achButton</strong>&#160;prefab to the hierarchy in the same way that you added the signInButton prefab earlier:</p><p><img src="../img/playservices_unity/img-22.png.gif" style="max-width: 624px"></p><p>Finally, link the On Click event of the button to the <code>ShowAchievements()</code>&#160;method in the <code>MainMenuEvents</code>&#160;script, using the same method as you used to link the Sign In button to the <code>SignIn()</code>&#160;method:</p><p><img src="../img/playservices_unity/img-23.png" style="max-width: 253px"></p><p>The last step is to configure the button not to display unless the user is signed in with Play Game Services. &#160;Modify <code>MainMenuEvents</code>&#160;to add the following code to Start(), <code>SignIn()</code>, and <code>SignInCallback()</code>:</p><codelab-snippet>public class MainMenuEvents : MonoBehaviour {
+    
+    // ...
+    private GameObject achButton;
+
+    public void Start() {
+        // ...
+        // Get object instances
+        // ...
+        achButton = GameObject.Find("achButton");
+
+        // Hide the achievements button to start
+        achButton.SetActive(false);
+
+        // Try silent sign-in (second parameter is isSilent)
+        // ...
+    }
+
+    public void Update() {
+            // ...
+         // ADD TO THE BOTTOM OF Update()
+         achButton.SetActive(Social.localUser.authenticated);
+    }
+
+ }</codelab-snippet><p>Now save your progress and &#8216;<strong>Build and Run</strong>&#8217; the game on your Android device. &#160;When you sign in at the main menu you your UI should look like this:</p><p><img src="../img/playservices_unity/img-24.png" style="max-width: 365px"></p><p>And after clicking &#8216;Achievements&#8217;, you should see a screen like this:</p><p><img src="../img/playservices_unity/img-25.png" style="max-width: 366px"></p><p>Now your users can check the status of their achievements at any time! &#160;If&#160;you add more achievements via the Developer Console, they will show up on this screen.</p><h2>Trigger Achievements</h2><p>Now that you can check the progress of your achievements, we need to add code to trigger them when the user hits targets in the game.</p><p>First, open the <code>Shooting.cs</code>&#160;script and add a tag to each projectile so we can track collisions:</p><codelab-snippet>public class Shooting : MonoBehaviour
+{
+    void Update ()
+    {
+        if (Input.GetButtonUp ("Fire1") &amp;&amp; 
+                           !GameManager.Instance.IsMenuShowing) {
+            if (waitTilFire &lt;= 0) {
+                if (bullet) {
+                    GameObject obj = Instantiate (bullet, 
+                        spawnBullet.transform.position,
+                        spawnBullet.transform.localRotation) as GameObject;
+
+
+                    obj.name = obj.name + "-" + shot;
+                    // ADD THIS LINE
+                    obj.tag = "Projectile";
+
+                    // ...
+    }
+}</codelab-snippet><p>Next, open&#160;the <code>DroidController.cs</code>&#160;script from the scripts folder and add the following variables and modify it to match the code below, making sure you enter&#160;your achievement IDs where necessary:</p><codelab-snippet>public class DroidController : MonoBehaviour {
+
+    // Note: replace these strings with your achievement IDs or the code will not work
+    private static string WELCOME_ID = "YOUR_WELCOME_ID";
+    private static string SHARPSHOOTER_ID = "YOUR_SHARPSHOOTER_ID";
+
+    // ..
+
+    void OnCollisionEnter (Collision col)
+    {
+        // if we are alive and hit by a projectile, then die.
+        // and turn off the constraint to stand up so we bounce around.
+        if (!isDead &amp;&amp; col.gameObject.tag.Equals ("Projectile")) {
+             Debug.Log("(Lollygagger) Droid hit!");
+            Rigidbody rb = GetComponent&lt;Rigidbody&gt; ();
+            rb.constraints = RigidbodyConstraints.None;
+            rb.useGravity = true;
+            Die ();
+        
+            //START CODE TO COPY FOR ACHIEVEMENT TRACKING
+            
+            // Only do achievements if the user is signed in
+            if (Social.localUser.authenticated) {
+               // Unlock the "welcome" achievement, it is OK to
+               // unlock multiple times, only the first time matters.
+                PlayGamesPlatform.Instance.ReportProgress(WELCOME_ID, 
+                    100.0f, (bool success) =&gt; {
+                           Debug.Log("(Lollygagger) Welcome Unlock: " +
+                                 success);
+                });
+
+                // Increment the "sharpshooter" achievement
+               PlayGamesPlatform.Instance.IncrementAchievement(
+                      SHARPSHOOTER_ID, 1,
+                      (bool success) =&gt; {
+                        Debug.Log("(Lollygagger) Sharpshooter Increment: " +
+                           success);
+               });
+            } // end of isAuthenticated
+          
+            // END CODE TO COPY
+
+       } // end of is not dead and a projectile hit
+   } // end of OnCollisionEnter
+} // end of class</codelab-snippet><p>Now <strong>Build and Run</strong>&#160;the game on your Android device. &#160;At the main menu, first sign in then begin a game. &#160;When you hit your first (and later, 10th) target you will see an &#8216;Achievement Unlocked&#8217; dialog appear at the top of the screen.</p><p>Congratulations!, you just got your first Play Game Services achievement!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Leaderboards" 
+        duration="15:00">
+        
+          <h1></h1><p>Once you have finished adding achievements to your game, leaderboards are the natural next step. &#160;In this section, we will add a global high score leaderboard to the game and a UI for users to view their scores.</p><h2>Create Leaderboards in the Developer Console</h2><p>We are going to create one leaderboard for this game that tracks the number of targets hit in a single level. </p><ol start="4">
+<li>Navigate back to the Lollygagger project in the <a href="https://play.google.com/apps/publish/">Google Play Developer Console</a>&#160;and click on the <strong>Leaderboards</strong>&#160;tab.</li>
+<li>Click on <strong>Add Leaderboard</strong>&#160;and enter the following information:</li>
+</ol><ul>
+<li>
+<strong>Name</strong>: &#8220;Targets Hit in One Level&#8221;</li>
+<li>
+<strong>Score Formatting:</strong>&#160;Numeric</li>
+<li>
+<strong>Number of Decimal places:</strong>&#160;0</li>
+<li>
+<strong>Ordering</strong>: &#8220;Larger is better&#8221;.</li>
+</ul><ol start="6"><li>Click <strong>Save</strong>&#160;to finish entering leaderboards.</li></ol><p>You should now be at the Leaderboards screen, which will display the ID of the leaderboard &#160;you just created:</p><p><img src="../img/playservices_unity/img-27.png" style="max-width: 624px"></p><p>Make a note of this ID, we will need it when submitting scores in code.</p><h2>View Leaderboards</h2><p>Let&#8217;s add a button to the main menu that brings up the leaderboards list UI, just like the Achievements button we added earlier.</p><p>First, let&#8217;s add the code to bring up the leaderboards UI. &#160;Open the MainMenuEvents script and add the following function:</p><codelab-snippet>    public void ShowLeaderboards() {
+        if (PlayGamesPlatform.Instance.localUser.authenticated) {
+            PlayGamesPlatform.Instance.ShowLeaderboardUI();
+        }
+        else {
+          Debug.Log("Cannot show leaderboard: not authenticated");
+        }
+    }</codelab-snippet><p>Now create a button in the main menu scene by adding the <strong>ldrButton</strong>&#160;prefab to the hierarchy in the same way that you added the achButton and signInButton prefabs:</p><p><img src="../img/playservices_unity/img-28.png.gif" style="max-width: 624px"></p><p>Finally, link the On Click event of the button to the <code>ShowLeaderboards()</code>&#160;method in the <code>MainMenuEvents</code>&#160;script, using the same method as you used to link the Achievements button to the <code>ShowAchievements()</code>&#160;method:</p><p><img src="../img/playservices_unity/img-29.png" style="max-width: 252px"></p><p>The last step is to configure the button not to display unless the user is signed in with Play Game Services. &#160;Modify <code>MainMenuEvents</code>&#160;to add the following code, mimicking the code used for the Achievements button:</p><ol start="1">
+<li>Declare the member variable ldrButton</li>
+<li>Initialize ldrButton by calling GameObject.Find()</li>
+<li>Initially set ldrButton to inactive</li>
+<li>Update the active state of ldrButton in Update()</li>
+</ol><codelab-snippet>public class MainMenuEvents : MonoBehaviour {
+    
+    // ...
+    private GameObject ldrButton;
+
+    public void Start() {
+        // ...
+        achButton = GameObject.Find("achButton");
+        ldrButton = GameObject.Find ("ldrButton");
+
+        // Hide the achievement and leaderboards buttons to start
+        achButton.SetActive(false);
+        ldrButton.SetActive(false);
+
+        // Try silent sign-in (second parameter is isSilent)
+        // This should always be the last line of Start()
+        PlayGamesPlatform.Instance.Authenticate(SignInCallback, true);
+    }
+
+    public void Update() {
+
+        // ... 
+
+        // Hide or show the achievement and leaderboards buttons
+        achButton.SetActive(Social.localUser.authenticated);
+        ldrButton.SetActive(Social.localUser.authenticated);
+    }
+
+}</codelab-snippet><p>Now save your progress and &#8216;<strong>Build and Run</strong>&#8217; the game on your Android device. &#160;When you sign in at the main menu you your UI should look like this:</p><p><img src="../img/playservices_unity/img-30.png" style="max-width: 369px"></p><p>And after clicking &#8216;Leaderboards&#8217; and then clicking on the &#8216;Targets Hit in One Level&#8217;, you should see a screen like this:</p><p><img src="../img/playservices_unity/img-31.png" style="max-width: 369px"></p><p>Now your users can check the status of the leaderboards at any time! &#160;If you add more leaderboards via the Developer Console, they will show up on this screen.</p><h2>Update Leaderboard Scores</h2><p>We will update the user&#8217;s score at the end of each level, rather than with each enemy killed in order to cut down on the number of requests we have to make to the leaderboards API. &#160;First, let&#8217;s add some accounting to keep track of targets hit. &#160;Open&#160;<code>GameManager</code>&#160;from within the scripts folder and add the following code, modifying <code>RestartLevel</code>&#160;and <code>NextLevel</code>&#160;and adding <code>IncrementHits</code>:</p><codelab-snippet>public class GameManager : MonoBehaviour {
+
+    //...  existing code
+
+    // number of hits scored.
+    private int mHits;
+    
+    public GameManager() {
+        // ... existing code 
+        // start with no hits.
+        mHits = 0;
+    }
+
+       public void RestartLevel() {
+        // restarting the level, reset the hits
+        mHits = 0;
+    }
+
+    public void NextLevel () {
+        // moving to the next level, reset the hits
+        mHits = 0;
+    }
+
+    // . . . existing code
+
+
+    public void IncrementHits() {
+        mHits = mHits + 1;
+    }
+}</codelab-snippet><p>Then open <code>DroidController</code>&#160;and add a call to <code>IncrementHits</code>&#160;in the collision logic:</p><codelab-snippet>void OnCollisionEnter (Collision col)
+    {
+        // ...
+        if (!isDead &amp;&amp; col.gameObject.tag.Equals ("Projectile")) {
+            GameManager.Instance.IncrementHits();
+            // ...
+        }
+    }</codelab-snippet><p>Now that we are keeping track of the user&#8217;s hits, we will add the code to update the leaderboard. &#160;Open <code>GameManager</code>, adding a <code>TARGETS_HIT_ID</code>&#160;variable and modifying the <code>ShowEndMenu</code>&#160;function using the code below (make sure to replace the <code>TARGETS_HIT_ID</code>):</p><codelab-snippet>using GooglePlayGames;
+
+public class GameManager : MonoBehaviour {
+
+    // Note: replace this
+    private static string TARGETS_HIT_ID = "YOUR_TARGETS_HIT_ID";  
+
+    // ...
+
+    public void ShowEndMenu() {
+        // Only do these actions once (ShowEndMenu called every frame)
+        if (!mEndMenu.activeSelf) {
+            // Submit leaderboard scores, if authenticated
+            if (PlayGamesPlatform.Instance.localUser.authenticated) {
+                // Note: make sure to add 'using GooglePlayGames'
+                PlayGamesPlatform.Instance.ReportScore(mHits,
+                    TARGETS_HIT_ID, (bool success) =&gt; {
+                    Debug.Log ("(Lollygagger) Leaderboard update success: " + success);
+                });
+            }
+        }
+
+        mEndMenu.SetActive(true);
+    }
+}</codelab-snippet><p>Run the game on your Android device and play a level&#160;(make sure you hit a few targets!). &#160;This&#160;will submit a score to the leaderboard. &#160;</p><p>Go back to the main menu and hit the Leaderboards button to check your score and make sure the submission was successful!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Extra Credit: Saved Games" 
+        duration="15:00">
+        
+          <h1></h1><p>Pat yourself on the back! &#160;You just added sign-in, achievements, and leaderboards to your Unity game. &#160;That&#8217;s only the beginning of the cool features Play Game Services has to offer. &#160;This section will show you how to use the saved games API to persist game data to the cloud and share it across devices.</p><h2>Enable Saved Games</h2><p>Enabling saved games involves two steps: turning the feature on in the Developer Console, and enabling the feature when activating the platform in your code.</p><p>First, navigate back to the Lollygagger project in the Google Play Developer Console. &#160;In the <strong>Game Details</strong>&#160;tab, confirm that turn&#160;<strong>Saved Games</strong>&#160;is turned to <strong>ON</strong>&#160;and matches the image below (you should have done this earlier). &#160;Then click the blue <strong>Save</strong>&#160;button at the top of the screen.</p><p><img src="../img/playservices_unity/img-32.png" style="max-width: 489px"></p><h2>Enable Saved Games API</h2><p>Next, open the <code>MainMenuEvents</code>&#160;script and edit the <code>Start</code>&#160;method to enable saved games on your <code>PlayGamesClientConfiguration</code>:</p><codelab-snippet>public void Start() {
+        // Create client configuration with saved games enabled
+        PlayGamesClientConfiguration config = new
+            PlayGamesClientConfiguration.Builder()
+            .EnableSavedGames()
+            .Build();
+
+        // ...
+    }</codelab-snippet><p>Now <strong>Build and Run</strong>&#160;your app and try to sign in. &#160;If you get the &#8216;Sign In Failed&#8217; message, this is due to caching the game configuration in Google Play Services. &#160;Re-open your game and attempt to sign in again, if it succeeds then you have successfully enabled saved games.</p><h2>Save Your Score</h2><p>Writing data to the saved games API is a two-step process. &#160;The first is opening the saved games &#8216;snapshot&#8217; where you would like to save the data. &#160;The second is writing to the file, and committing the update. &#160;Open <code>GameManager</code>&#160;and add the following code which adds the <code>ReadSavedGame</code>&#160;and <code>WriteSavedGame</code>&#160;functions:</p><codelab-snippet>using System;
+using GooglePlayGames.BasicApi.SavedGame;
+
+public class GameManager : MonoBehaviour {
+
+    // ...
+
+    public void ReadSavedGame(string filename, 
+                             Action&lt;SavedGameRequestStatus, ISavedGameMetadata&gt; callback) {
+        
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.OpenWithAutomaticConflictResolution(
+            filename, 
+            DataSource.ReadCacheOrNetwork, 
+            ConflictResolutionStrategy.UseLongestPlaytime, 
+            callback);
+    }
+    
+    public void WriteSavedGame(ISavedGameMetadata game, byte[] savedData, 
+                               Action&lt;SavedGameRequestStatus, ISavedGameMetadata&gt; callback) {
+        
+        SavedGameMetadataUpdate.Builder builder = new SavedGameMetadataUpdate.Builder()
+            .WithUpdatedPlayedTime(TimeSpan.FromMinutes(game.TotalTimePlayed.Minutes + 1))
+            .WithUpdatedDescription("Saved at: " + System.DateTime.Now);
+        
+        // You can add an image to saved game data (such as as screenshot)
+        // byte[] pngData = &lt;PNG AS BYTES&gt;;
+        // builder = builder.WithUpdatedPngCoverImage(pngData);
+        
+        SavedGameMetadataUpdate updatedMetadata = builder.Build();
+        
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.CommitUpdate(game, updatedMetadata, savedData, callback);
+    }
+}</codelab-snippet><p>Now let&#8217;s modify <code>ShowEndMenu</code>&#160;to update the total number of targets hit at the end of each level by calling <code>WriteUpdatedScore()</code>:</p><codelab-snippet>public void ShowEndMenu() {
+        // Only do these actions once (ShowEndMenu called on a loop)
+        if (!mEndMenu.activeSelf) {
+            
+            if (PlayGamesPlatform.Instance.localUser.authenticated) {
+                // Note: make sure to add a 'using GooglePlayGames'
+                //  statement to this script
+                PlayGamesPlatform.Instance.ReportScore(mHits,
+                    TARGETS_HIT_ID, (bool success) =&gt; {
+                    Debug.Log ("(Lollygagger) Leaderboard update success: " + success);
+                });
+
+                // Read saved game data and update
+                WriteUpdatedScore();
+            }
+        }
+
+        mEndMenu.SetActive(true);
+    }</codelab-snippet><p>Finally, we need to implement <code>WriteUpdatedScore</code>:</p><codelab-snippet>public void WriteUpdatedScore() {
+        // Local variable
+        ISavedGameMetadata currentGame = null;
+
+        // CALLBACK: Handle the result of a write
+        Action&lt;SavedGameRequestStatus, ISavedGameMetadata&gt; writeCallback = 
+        (SavedGameRequestStatus status, ISavedGameMetadata game) =&gt; {
+            Debug.Log("(Lollygagger) Saved Game Write: " + status.ToString());
+        };
+
+        // CALLBACK: Handle the result of a binary read
+        Action&lt;SavedGameRequestStatus, byte[]&gt; readBinaryCallback = 
+        (SavedGameRequestStatus status, byte[] data) =&gt; {
+            Debug.Log("(Lollygagger) Saved Game Binary Read: " + status.ToString());
+            if (status == SavedGameRequestStatus.Success) {
+                // Read score from the Saved Game
+                int score = 0;
+                try {
+                    string scoreString = System.Text.Encoding.UTF8.GetString(data);
+                    score = Convert.ToInt32(scoreString);
+                } catch (Exception e) {
+                    Debug.Log("(Lollygagger) Saved Game Write: convert exception");
+                }
+                
+                // Increment score, convert to byte[]
+                int newScore = score + mHits;
+                string newScoreString = Convert.ToString(newScore);
+                byte[] newData = System.Text.Encoding.UTF8.GetBytes(newScoreString);
+                
+                // Write new data
+                Debug.Log("(Lollygagger) Old Score: " + score.ToString());
+                Debug.Log("(Lollygagger) mHits: " + mHits.ToString());
+                Debug.Log("(Lollygagger) New Score: " + newScore.ToString());
+                WriteSavedGame(currentGame, newData, writeCallback);
+            }
+        };
+
+        // CALLBACK: Handle the result of a read, which should return metadata
+        Action&lt;SavedGameRequestStatus, ISavedGameMetadata&gt; readCallback = 
+        (SavedGameRequestStatus status, ISavedGameMetadata game) =&gt; {
+            Debug.Log("(Lollygagger) Saved Game Read: " + status.ToString());
+            if (status == SavedGameRequestStatus.Success) {
+                // Read the binary game data
+                currentGame = game;
+                PlayGamesPlatform.Instance.SavedGame.ReadBinaryData(game, 
+                                                    readBinaryCallback);
+            }
+        };
+
+        // Read the current data and kick off the callback chain
+        Debug.Log("(Lollygagger) Saved Game: Reading");
+        ReadSavedGame("file_total_hits", readCallback);
+    }</codelab-snippet><p>Now let&#8217;s see if it all worked. &#160;Run the game on your device, and on your machine run:</p><pre>adb logcat | grep "Lollygagger"</pre><p>Play a level and hit some targets. &#160;At the end of the level, you should see some Logcat output like this:</p><pre>I/Unity   ( 5911): (Lollygagger) Saved Game: Reading
+I/Unity   ( 5911): (Lollygagger) Leaderboard update success: True
+I/Unity   ( 5911): (Lollygagger) Saved Game Read: Success
+I/Unity   ( 5911): (Lollygagger) Saved Game Binary Read: Success
+I/Unity   ( 5911): (Lollygagger) Old Score: 0
+I/Unity   ( 5911): (Lollygagger) mHits: 7
+I/Unity   ( 5911): (Lollygagger) New Score: 7
+I/Unity   ( 5911): (Lollygagger) Saved Game Write: Success</pre><p>If you play again, you will see that the score increases over time (rather than re-setting every level). &#160;You may be thinking &#8220;big deal, all I did was persist an integer and I had to write a ton of code!&#8221;. &#160;So far, you would be right. &#160;But now let&#8217;s demonstrate the real power of Saved Games. &#160;Uninstall the game from your Android device, then re-install the game from Unity. &#160;After you sign in and play through a level, your scores will be intact! &#160;This will work across devices as well, as long as you sign in with the same Google account.</p><h2>Exercise: Post High Scores</h2><p>If you made it all the way here, you are well on your way to becoming a master of Play Game Services. &#160;This section will be an exercise for you to see what you have learned:</p><p><em>Create a new leaderboard called &#8220;All Time Hits&#8221;, and update it every time you write a new score to the saved games API.</em></p><p>If you complete this task, you will be able to display all time hit counts for all of your users, even combining hits from multiple devices! &#160;Pretty cool, right?</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Next Steps" 
+        duration="1:00">
+        
+          <h1></h1><p>Now that you&#8217;ve finished the code lab, there are a few more things you can do before you are ready to publish your awesome game. &#160;This section will describe what is left and point you to some resources where you can continue learning.</p><h2>Publishing Requirements</h2><p>Your game is currently in the &#8216;Ready for Testing&#8217; state, but you need to fill in some more metadata on the Google Play Developer Console in order to publish the game. &#160;Here is a list of what you still need to do:</p><ul>
+<li>
+<strong>Add More Achievements</strong>&#160;- we only added two achievements in this codelab, but the minimum for publishing is five. &#160;Add some more cool achievements, like &#8220;Hit 2 targets in one second&#8221; or &#8220;Complete 3 levels&#8221;.</li>
+<li>
+<strong>Add Icon Images</strong>&#160;- you will need to add icons for your game, as well as for each achievement and leaderboard. &#160;Adding unique images for each achievement is a great way to delight the user.</li>
+<li>
+<strong>Link Your Production Keystore</strong>&#160;- right now you only have one &#8216;Linked App&#8217;, and it is tied to your debug keystore. &#160;If you want to publish on the Play Store, you will need to add another Linked App that has the SHA1 of your production keystore.</li>
+</ul><h2>More Features</h2><p>There are many more great features of Play Game Services that were not covered by this codelab such as:</p><ul>
+<li><a href="https://developers.google.com/games/services/common/concepts/quests">Events and Quests</a></li>
+<li><a href="https://developers.google.com/games/services/common/concepts/realtimeMultiplayer">Real-Time Multiplayer</a></li>
+<li><a href="https://developers.google.com/games/services/common/concepts/turnbasedMultiplayer">Turn-Based Multiplayer</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

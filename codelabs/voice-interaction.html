@@ -1,0 +1,520 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Add Voice Interactions to Your App"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Search, Android"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p><img src="../img/voice-interaction/img-1.png" style="max-width: 356px"></p><p>In this codelab, you'll learn how to add voice interactions to your app with the Voice Interaction API. The Voice Interaction API allows users of your app to confirm actions and select from a list of options using only their voice.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Updating the Android manifest to support voice actions.</li>
+<li>Triggering a voice confirmation in your app.</li>
+<li>Adding custom aliases for voice confirmations.</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>
+<a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>&#160;version 1.0+</li>
+<li>The sample code.</li>
+<li>The <a href="https://play.google.com/store/apps/details?id=com.google.android.googlequicksearchbox">Google app</a>&#160;version 5+</li>
+<li>A test device with <a href="https://developers.google.com/android/nexus/images">Android&#160;M Preview</a>.</li>
+<li>A USB micro to USB cable.</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="1:00">
+        
+          <h1></h1><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/googlesamples/io2015-codelabs.git</pre><aside class="special"><p>The <code>io2015-codelabs</code>&#160;repository contains many sample projects. This codelab only uses one:</p>
+<ul><li>
+<img src="../img/voice-interaction/img-2.png" style="max-width: 20px"><strong>voice-interactions </strong>&#8212;This Voice Interactions codelab.</li></ul></aside>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Try voice interaction" 
+        duration="2:00">
+        
+          <h1></h1><aside class="warning"><p><strong>Warning:</strong>&#160;The &#8220;take a selfie&#8221; step currently requires multiple attempts before it starts working. This is a known configuration issue.</p></aside><p>Let&#8217;s start off&#160;by trying the finished sample. This will help illustrate what we&#8217;re building and show you the interaction between the Google app and your own app.</p><ol start="1">
+<li>Select the <img src="../img/voice-interaction/img-3.png" style="max-width: 20px"><code>voice-interaction-end</code>&#160;directory from your sample code download (<strong>File</strong>&#160;&gt; &#160;<strong>Import Project&#8230; </strong>&gt; <code>voice-interaction-end</code>).</li>
+<li>Click the <img src="../img/voice-interaction/img-4.png" style="max-width: 20px"><strong>Gradle sync </strong>button.</li>
+<li>Click the <img src="../img/voice-interaction/img-5.png" style="max-width: 20px"><strong>Run</strong>&#160;button.</li>
+<li>Open the Google app.</li>
+<li>Say &#8220;OK Google&#8221;.</li>
+<li>When the voice prompt appears, say &#8220;Take a selfie&#8221;. <strong>Remember: due to a known config issue, you may have to try this multiple times before it starts working.</strong>
+</li>
+<li>The Voice Camera app should open and you should be prompted to take a photo.</li>
+<li>Answer &#8220;cheese&#8221;.</li>
+</ol><p>That&#8217;s it! You&#8217;ve taken your first voice-powered selfie using the Voice Interaction API.</p><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="https://developer.android.com/sdk/installing/studio.html">How do I install Android Studio?</a></li>
+<li><a href="http://developer.android.com/tools/device.html">How do I enable USB debugging?</a></li>
+<li><a href="http://stackoverflow.com/a/16598454">Why doesn't Android Studio see my device?</a></li>
+<li><a href="http://stackoverflow.com/a/4786299">Android error: Failed to install *.apk on device *: timeout?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Build the starter app" 
+        duration="1:30">
+        
+          <h1></h1><p><img src="../img/voice-interaction/img-6.png" style="max-width: 199px"></p><p>Now let&#8217;s open the starter app and learn how to add voice interaction to it so that it has all the features that you just saw in the finished sample app.</p><ol start="1">
+<li>Select the <img src="../img/voice-interaction/img-3.png" style="max-width: 20px"><code>voice-interaction-start</code>&#160;directory from your sample code download (<strong>File</strong>&#160;&gt; &#160;<strong>Import Project&#8230; </strong>&gt; <code>voice-interaction-start</code>).</li>
+<li>Click the <img src="../img/voice-interaction/img-4.png" style="max-width: 20px"><strong>Gradle sync </strong>button.</li>
+<li>Click the <img src="../img/voice-interaction/img-5.png" style="max-width: 20px"><strong>Run</strong>&#160;button.</li>
+</ol><p>You should see a camera app appear after a few seconds. That&#8217;s all that our app does so far. In the following steps,&#160;we&#8217;ll be adding voice interaction to this starter app.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Switch app to Android M Preview" 
+        duration="0:30">
+        
+          <h1></h1><p>The first thing that you need to do to prepare your project for the Voice Interaction API is to update your Gradle build settings to use Android M. </p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/build.gradle">Application/build.gradle</a></h3><codelab-snippet>compileSdkVersion "android-MNC"
+buildToolsVersion "21.1.1"
+
+defaultConfig {
+    minSdkVersion "android-MNC"
+    targetSdkVersion "android-MNC"
+}</codelab-snippet><p>Once you&#8217;ve changed your build settings, make sure to do a<img src="../img/voice-interaction/img-4.png" style="max-width: 20px"><strong>Gradle sync</strong>.</p><h3 class="faq">Frequently Asked Questions</h3><ul class="faq"><li><a href="https://developers.google.com/android/nexus/images">How do I get the Android M Preview SDK?</a></li></ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add voice interaction intent" 
+        duration="1:00">
+        
+          <h1></h1><p>Now it&#8217;s time to add some voice intents to your application. We&#8217;ll be using the <code>android.media.action.IMAGE_CAPTURE</code>&#160;and <code>android.media.action.STILL_IMAGE_CAMERA</code>&#160;system actions which are already supported in Android.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/AndroidManifest.xml">Application/src/main/AndroidManifest.xml</a></h3><codelab-snippet>&lt;activity           
+    android:name="com.example.android.voicecamera.TakePictureActivity"
+    android:label="@string/app_name" &gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name="android.media.action.IMAGE_CAPTURE" /&gt;
+        &lt;category android:name="android.intent.category.DEFAULT" /&gt;
+        &lt;category android:name="android.intent.category.VOICE" /&gt;
+    &lt;/intent-filter&gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name="android.media.action.STILL_IMAGE_CAMERA" /&gt;
+        &lt;category android:name="android.intent.category.DEFAULT" /&gt;
+        &lt;category android:name="android.intent.category.VOICE" /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;</codelab-snippet><p>Notice that we need to specify the <code>android.intent.category.VOICE</code>&#160;and <code>android.intent.category.DEFAULT</code>&#160;categories for both intents in order for them to be called by the Voice Interaction API.</p><aside class="warning"><p><strong>Note:</strong>&#160;The DEFAULT&#160;category is required for Android intent disambiguation to work successfully. The Google app will <strong>always</strong>&#160;prefer a voice interaction over a non-voice interaction when the user is interacting through voice.</p></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Handle Voice Interaction intents">
+        
+          <h1></h1><p>Once you have declared some voice intents for your application, you&#8217;ll need to add an activity to handle them.</p><p>Create a new class called <code>TakePictureActivity</code>&#160;in the <code>com.example.android.voicecamera </code>package and add the following code to it.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/TakePictureActivity.java">TakePictureActivity.java</a></h3><codelab-snippet>package com.example.android.voicecamera;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+
+public class TakePictureActivity extends Activity {
+    private static String TAG = "TakePictureActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: ");
+        Intent intent = getIntent();
+        if (intent == null) {
+            finish();
+        } else if (CameraActivity.needPermissions(this)) {
+            startActivity(new Intent(this, CameraActivity.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            finish();
+            return;
+        } else if (!isVoiceInteraction()) {
+            Log.e(TAG, "Not voice interaction");
+            if (intent != null) {
+                intent.setComponent(null);
+                intent.setPackage("com.google.android.GoogleCamera");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+            finish();
+            return;
+        }
+
+        setContentView(R.layout.activity_camera);
+        CameraFragment fragment = CameraFragment.newInstance();
+        fragment.setArguments(getIntent().getExtras());
+
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+    }
+}</codelab-snippet><p>In this activity you can see that the <code>onCreate()</code>&#160;method is inspecting the intent that triggers the activity and looking for a voice interaction intent with the <code>isVoiceInteraction()</code>&#160;helper method. You will also notice that it checks whether camera permissions are needed. This is another new feature in Android M which allows applications to obtain new permissions at runtime.</p><p>If all of the checks pass, the activitydisplays a camera using the <code>CameraFragment</code>. In a few more steps, you&#8217;ll see how we add voice interaction to that fragment.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Obtain camera permissions" 
+        duration="2:00">
+        
+          <h1></h1><p>In the previous step, you saw how <code>TakePictureActivity</code>&#160;checked for &#160;camera permissions,&#160;and if it didn&#8217;t find them, it redirected the user to the <code>CameraActivity</code>.</p><p>You&#8217;ll need to make some changes&#160;to <code>CameraActivity</code>&#160;in order to allow the user to give the app permissions at runtime. First, add a couple of imports to the file:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraActivity.java">CameraActivity.java</a></h3><codelab-snippet>import android.Manifest;
+import android.content.pm.PackageManager;
+import android.provider.MediaStore;
+import android.widget.Toast;</codelab-snippet><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraActivity.java">CameraActivity.java</a></h3><codelab-snippet>private static final int PERMISSIONS_REQUEST_ALL_PERMISSIONS = 1;
+private Bundle mSavedInstanceState;</codelab-snippet><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraActivity.java">CameraActivity.java</a></h3><codelab-snippet>protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    Intent intent = getIntent();
+
+    if (needPermissions(this)) {
+        requestPermissions();
+    } else if (intent != null) {
+        intent.setComponent(null);
+        intent.setPackage("com.google.android.GoogleCamera");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    } else {
+        finish();
+    }
+}</codelab-snippet><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraActivity.java">CameraActivity.java</a></h3><codelab-snippet>static public boolean needPermissions(Activity activity) {
+    Log.d(TAG, "needPermissions: ");
+    return activity.checkSelfPermission(Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+            || activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED;
+}</codelab-snippet><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraActivity.java">CameraActivity.java</a></h3><codelab-snippet>private void requestPermissions() {
+    Log.d(TAG, "requestPermissions: ");
+    String[] permissions = new String[] {
+        Manifest.permission.CAMERA,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    };
+    requestPermissions(permissions, PERMISSIONS_REQUEST_ALL_PERMISSIONS);
+}</codelab-snippet><p>When <code>requestPermissions() </code>has completed, it will make a callback to the <code>onRequestPermissionsResult</code>&#160;method,&#160;which is where you'll&#160;need to record whether or not all of the permissions were granted.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraActivity.java">CameraActivity.java</a></h3><codelab-snippet>public void onRequestPermissionsResult(int requestCode, String permissions[],
+                                           int[] grantResults) {
+    switch (requestCode) {
+        case PERMISSIONS_REQUEST_ALL_PERMISSIONS:
+            boolean hasAllPermissions = true;
+            for (int i = 0; i &lt; grantResults.length; ++i) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    hasAllPermissions = false;
+                    Log.e(TAG, "Unable to get permission " + permissions[i]);
+                }
+            }
+            if (hasAllPermissions) {
+                finish();
+            } else {
+                Toast.makeText(this,
+                        "Unable to get all required permissions", Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+            break;
+        default:
+            Log.e(TAG, "Unexpected request code");
+    }
+}</codelab-snippet><p>Now, you&#8217;ve made sure that your app has access to the camera and,&#160;if it doesn&#8217;t, the user is prompted to decide whether they want to grant camera access to your app.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Implement “Say cheese” to take photo" 
+        duration="1:30">
+        
+          <h1></h1><p>Let&#8217;s get to the fun part: defining the voice interaction between your app and the assistant. First we&#8217;ll add some imports.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>import android.app.VoiceInteractor;
+import android.app.VoiceInteractor.PickOptionRequest;
+import android.app.VoiceInteractor.PickOptionRequest.Option;
+import android.view.Gravity;
+import android.widget.TextView;
+import java.util.Timer;
+import java.util.TimerTask;</codelab-snippet><p>After the assistant has captured the user&#8217;s response,&#160;the focus returns to your app and you can proceed to take a photo. In order to do this, add an if statement to the end of your <code>onResume()</code>&#160;method which checks for a voice interaction. If it finds one, it checks&#160;whether a timer has been specified and calls <code>startVoiceTimer()</code>, otherwise it calls the <code>startVoiceTrigger()</code>&#160;method.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>@Override
+public void onResume() {
+    super.onResume();
+    Log.d(TAG, "onResume: ");
+    startBackgroundThread();
+
+    // When the screen is turned off and turned back on, the SurfaceTexture is already
+    // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
+    // a camera and start preview from here (otherwise, we wait until the surface is ready in
+    // the SurfaceTextureListener).
+    if (mTextureView.isAvailable()) {
+        openCamera(mTextureView.getWidth(), mTextureView.getHeight());
+    } else {
+        mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+    }
+
+    if (mOrientationListener.canDetectOrientation()) {
+        mOrientationListener.enable();
+    }
+
+    if (getActivity().isVoiceInteraction()) {
+        if (isTimerSpecified()) {
+            startVoiceTimer();
+        } else {
+            startVoiceTrigger();
+        }
+    }
+}</codelab-snippet><p>Now create the&#160;<code>startVoiceTrigger()</code>&#160;method.&#160;Create a voice interaction by&#160;getting the <code>VoiceInteractor</code>&#160;from the activity. As you can see, you can easily customize the <code>Option</code>&#160;that gets offered to the user. Add synonyms for &#8220;cheese&#8221;, &#8220;ready&#8221;, &#8220;go&#8221;, &#8220;take it&#8221;,&#160;and&#160;&#8220;ok&#8221;.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>private void startVoiceTrigger() {
+    Log.d(TAG, "startVoiceTrigger: ");
+    Option option = new Option("cheese");
+    option.addSynonym("ready");
+    option.addSynonym("go");
+    option.addSynonym("take it");
+    option.addSynonym("ok");
+
+    getActivity().getVoiceInteractor()
+        .submitRequest(new PickOptionRequest("Say Cheese", new Option[]{option}, null) {
+            @Override
+            public void onPickOptionResult(boolean finished, Option[] selections, Bundle result) {
+                if (finished &amp;&amp; selections.length == 1) {
+                    Message message = Message.obtain();
+                    message.obj = result;
+                    takePicture();
+                } else {
+                    getActivity().finish();
+                }
+            }
+            @Override
+            public void onCancel() {
+                getActivity().finish();
+            }
+        });
+}</codelab-snippet><p>If the user chooses your <code>Option</code>&#160;using any one of those synonyms, the <code>takePicture()</code>&#160;method will be called; otherwise we exit the activity.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add voice interaction to the camera" 
+        duration="2:00">
+        
+          <h1></h1><p>The next step is to add the voice interaction capabilities to your camera fragment. First, add the <code>newInstance()</code>&#160;method to help create new instances of this fragment.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>public static CameraFragment newInstance() {
+    Log.d(TAG, "newInstance: ");
+    CameraFragment fragment = new CameraFragment();
+    fragment.setRetainInstance(true);
+    return fragment;
+}</codelab-snippet><p>In the <code>onCreateView()</code>&#160;method, you should check for voice interactions and hide the camera controls if the user is interacting through voice.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>@Override
+public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                         Bundle savedInstanceState) {
+    Log.d(TAG, "onCreateView: ");
+    View view = inflater.inflate(R.layout.fragment_camera2_basic, container, false);
+    if (getActivity().isVoiceInteraction()) {
+        View controls = view.findViewById(R.id.controls);
+        if (controls != null) {
+            controls.setVisibility(View.GONE);
+        }
+    }
+    return view;
+}</codelab-snippet><p>Finally, we&#8217;ll enhance the <code>showToast()</code>&#160;method so that it not only shows a visual confirmation that a photo was taken,&#160;but also confirms through voice by saying <em>&#8220;Here it is&#8221;</em>.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>private void showToast(String text) {
+    // We show a Toast by sending request message to mMessageHandler. This makes sure that the
+    // Toast is shown on the UI thread.
+    Activity activity = getActivity();
+    if (activity.isVoiceInteraction()) {
+        Message message = Message.obtain();
+        message.obj = text;
+        //mSharingHandler.sendMessage(message);
+
+        Uri contextUri = Uri.fromFile(mFile);
+        Log.e(TAG, "PHOTO URI: " + contextUri);
+        Log.e(TAG, "PHOTO LOCATION: " + mFile.getAbsolutePath());
+        Log.e(TAG, "showToast:" + Log.getStackTraceString(new Exception()));
+
+        Bundle extras = new Bundle();
+        extras.putParcelable("context_uri", contextUri);
+        activity.getVoiceInteractor().submitRequest(
+                new VoiceInteractor.CompleteVoiceRequest("Here it is", extras) {
+            @Override
+            public void onCompleteResult(Bundle result) {
+                super.onCompleteResult(result);
+                Log.d(TAG, "OnCompleteResult:" + Log.getStackTraceString(new Exception()));
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.parse("file://" + mFile.getAbsolutePath()), "image/*");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                getActivity().finish();
+                startActivity(intent);
+            }
+        });
+   } else {
+        Message message = Message.obtain();
+        message.obj = text;
+        mMessageHandler.sendMessage(message);
+    }
+}</codelab-snippet><p>Now the camera fragment is ready to handle voice interactions.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add a countdown timer" 
+        duration="2:00">
+        
+          <h1></h1><p>When the camera is taking a photo in hands-free mode, it&#8217;s helpful to have a counter so that you know when to smile. &#160;First, you need to add a couple of attributes to <code>CameraFragment</code>.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>private static final String EXTRA_TIMER_DURATION_SECONDS = "android.intent.extra.TIMER_DURATION_SECONDS";
+
+private TextView mTimerCountdownLabel = null;
+private Toast mTimerCountdownToast = null;</codelab-snippet><p>Then, the <code>startVoiceTime()</code>&#160;method needs to be added to handle create the toast and start the timer.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>private void startVoiceTimer() {
+    Log.d(TAG, "startVoiceTimer: ");
+    final int countdown = getArguments().getInt(EXTRA_TIMER_DURATION_SECONDS);
+
+    mTimerCountdownToast = new Toast(getActivity().getApplicationContext());
+    mTimerCountdownToast.setGravity(Gravity.CENTER, 0, 0);
+    mTimerCountdownToast.setDuration(Toast.LENGTH_SHORT);
+
+    LayoutInflater inflater = getActivity().getLayoutInflater();
+    View layout = inflater.inflate(R.layout.toast_timer,
+        (ViewGroup) getActivity().findViewById(R.id.toast_layout_root));
+    mTimerCountdownToast.setView(layout);
+    final TextView label = (TextView) layout.findViewById(R.id.countdown_text);
+
+    Timer timer = new Timer("camera_timer");
+    timer.scheduleAtFixedRate(new TimerTask() {
+        private int mCountdown = countdown;
+
+        @Override
+        public void run() {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mCountdown &lt; 0) {
+                        Log.e(TAG, "Take photo: " + mCountdown);
+                        mTimerCountdownToast.cancel();
+                        takePicture();
+                    } else {
+                        Log.e(TAG, "Execute timer: " + mCountdown);
+                        label.setText(String.format("Photo in %d", mCountdown));
+                        mTimerCountdownToast.show();
+                    }
+                }
+            });
+            mCountdown--;
+            if (mCountdown &lt; 0) {
+                cancel();
+            }
+        }
+    }, 1000, 1000);
+}</codelab-snippet><p>We also need to create a helper method to check for the presence of a timer and </p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/java/com/example/android/voicecamera/CameraFragment.java">CameraFragment.java</a></h3><codelab-snippet>private boolean isTimerSpecified() {
+    Log.d(TAG, "isTimerSpecified: ");
+    return getArguments() != null &amp;&amp; getArguments().containsKey(EXTRA_TIMER_DURATION_SECONDS);
+}</codelab-snippet><h3>That’s all the code that you need to add. There are a few layouts that you need to add and then you’re done!</h3>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Update the UI" 
+        duration="1:00">
+        
+          <h1></h1><p>Weneed to make some updates to the UI. First,&#160;let&#8217;s create a layout for the <code>MainActivity</code>. This is a very simple layout with a <code>TextView</code>&#160;that shows an intro message.</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/res/layout/activity_main.xml">layout/activity_main.xml</a></h3><codelab-snippet>&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"&gt;
+
+    &lt;LinearLayout style="@style/Widget.SampleMessageTile"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"&gt;
+
+        &lt;TextView style="@style/Widget.SampleMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/horizontal_page_margin"
+            android:layout_marginRight="@dimen/horizontal_page_margin"
+            android:layout_marginTop="@dimen/vertical_page_margin"
+            android:layout_marginBottom="@dimen/vertical_page_margin"
+            android:text="@string/intro_message" /&gt;
+    &lt;/LinearLayout&gt;
+&lt;/LinearLayout&gt;</codelab-snippet><p>We also need to create a layout for the toast that shows our countdown time. Here&#8217;s what that looks like:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/voice-interaction-api/voice-interaction-end/Application/src/main/res/layout/toast_timer.xml">layout/toast_timer.xml</a></h3><codelab-snippet>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toast_layout_root"
+    android:background="@drawable/bg_toast"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"&gt;
+    &lt;TextView
+        android:id="@+id/countdown_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAppearance="?android:attr/textAppearanceLarge"/&gt;
+&lt;/LinearLayout&gt;</codelab-snippet><p>And that&#8217;s it, we&#8217;re ready to try taking a photo with&#160;only our voice!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Test voice interaction" 
+        duration="2:00">
+        
+          <h1></h1><p><img src="../img/voice-interaction/img-6.png" style="max-width: 199px"></p><p>Now you&#8217;re test your app to make sure that the voice interaction works properly.</p><ol start="1">
+<li>Click the <img src="../img/voice-interaction/img-4.png" style="max-width: 20px"><strong>Gradle sync </strong>button.</li>
+<li>Click the <img src="../img/voice-interaction/img-5.png" style="max-width: 20px"><strong>Run</strong>&#160;button.</li>
+<li>Open the Google app.</li>
+<li>Say &#8220;OK Google&#8221;.</li>
+<li>When the voice prompt appears, say &#8220;Take a selfie&#8221;.</li>
+<li>The Voice Camera app should open and you should be prompted to take a photo.</li>
+<li>Answer &#8220;cheese&#8221;.</li>
+</ol><p>That&#8217;s it! You&#8217;ve built your first voice-powered camera app using the Voice Interaction API, and taken a pretty sweet photo</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:00">
+        
+          <h1></h1><p><img src="../img/voice-interaction/img-1.png" style="max-width: 356px"></p><p>Your app is now ready to handle support voice interaction in your app. As you can see there are many areas where a hands-free interface like this could make your app easier to use and more fun for users.</p><h3 class="checklist">What we've covered</h3><ul class="checklist">
+<li>Updated the Android manifest to support voice actions.</li>
+<li>Triggered a voice confirmation in your app.</li>
+<li>Added custom aliases for voice confirmations.</li>
+</ul><h3>Next Steps</h3><ul>
+<li>Add voice interaction to your own app.</li>
+<li>Read through the list of <a href="https://developer.android.com/guide/components/intents-common.html">system actions</a>&#160;to see which voice actions are already built into Android.</li>
+<li>Learn about creating <a href="https://devsite.googleplex.com/voice-actions/custom-actions">custom voice actions</a>.</li>
+</ul><p>If you would like to find out more about the Voice Interaction API, please see the <a href="https://developers.google.com/voice-actions/interaction/">full developer documentation</a>.</p><p>You can post questions and find answers on Stackoverflow under the <a href="http://stackoverflow.com/questions/tagged/google-search" class="stackoverflow-tag">google-search</a>&#160;tag.</p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

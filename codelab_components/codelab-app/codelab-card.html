@@ -1,0 +1,89 @@
+<link rel="import" href="../../bower_components/core-icons/image-icons.html">
+<link rel="import" href="../../bower_components/core-media-query/core-media-query.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-shadow/paper-shadow.html">
+
+<polymer-element name="codelab-card"
+    attributes="label url category icon visible duration"
+    on-mouseenter="{{mouseenter}}"
+    on-mouseleave="{{mouseleave}}">
+  <template>
+    <link rel="stylesheet" type="text/css" href="codelab-card.css"/>
+    <core-media-query query="(max-width:767px)"
+                      queryMatches="{{isPhoneSize}}"></core-media-query>
+    <paper-shadow id="cover">
+      <div class="card" layout vertical?="{{!isPhoneSize}}"
+          horizontal?="{{isPhoneSize}}">
+        <div class="title {{categories[0] | formatThemeClass}}-bg"
+          on-tap="{{open}}" layout horizontal center>
+          <div id="icon" class="category-icon {{categories[0] | formatThemeClass}}-icon"></div>
+          <h2 flex class="card-title" hidden?="{{isPhoneSize}}">{{label}}</h2>
+        </div>
+        <div flex?="{{isPhoneSize}}">
+          <div class="description">
+            <h2 class="card-title" hidden?="{{!isPhoneSize}}">{{label}}</h2>
+            {{description}}
+          </div>
+          <div class="action" layout horizontal center>
+            <div flex>
+              <span hidden?="{{duration == 0}}">
+              <core-icon icon="image:timelapse" style="height: 24px; width: 24px;"></core-icon>
+               {{duration/60 | roundUp }} min
+               </span>
+            </div>
+            <div>
+              <paper-button noink on-tap="{{open}}">Start</paper-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </paper-shadow>
+  </template>
+  <script>
+  (function() {
+    Polymer('codelab-card', {
+      visible: true,
+      ready: function() {
+        this.description = this.textContent;
+        this.categories = this.category.split(',').map(function(category) {
+          return category.trim();
+        });
+      },
+      isPhoneSizeChanged: function() {
+        var shadowDepth = this.isPhoneSize ? 0 : 1;
+        if (this.$.cover.setZ) {
+          this.$.cover.setZ(shadowDepth);
+        }
+        this.$.cover.z = shadowDepth;
+      },
+      visibleChanged: function() {
+        this.style.display = this.visible ? '' : 'none';
+      },
+      mouseenter: function() {
+        if (this.$.cover.setZ) {
+          this.$.cover.setZ(2);
+        }
+        this.$.cover.z = 2;
+      },
+      mouseleave: function() {
+        if (this.$.cover.setZ) {
+          this.$.cover.setZ(1);
+        }
+        this.$.cover.z = 1;
+      },
+      open: function(){
+        window.location = this.url + '#1';
+      },
+      matchesCategory: function(category){
+        return this.categories.indexOf(category) >= 0;
+      },
+      formatThemeClass: function(value) {
+        return value ? value.toLowerCase().replace(/\s/g, '-') : 'default';
+      },
+      roundUp: function(value) {
+        return Math.ceil(value);
+      }
+    });
+  })();
+  </script>
+</polymer-element>

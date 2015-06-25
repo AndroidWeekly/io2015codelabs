@@ -1,0 +1,496 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Building a gRPC service with Node.js"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Cloud"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="1:00">
+        
+          <h1></h1><p><a href="http://www.grpc.io/">gRPC</a>&#160;is a language-neutral, platform-neutral remote procedure call (RPC) framework and toolset developed at Google. It lets you define a service using Protocol Buffers, a particularly powerful binary serialization toolset and language. It then lets you generate idiomatic client and server stubs from your service definition in a variety of languages.</p><p>In this codelab, you&#8217;ll learn how to build a Node.js service that exposes an API using the gRPC framework. You'll interact with this service using a command line client written in Go that uses the same service description as the Node.js service. &#160;Finally, you will write a Node.js command line client for the gRPC service.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>The Protocol Buffer Language</li>
+<li>How to implement a gRPC service using Node.js</li>
+<li>How to implement a gRPC client using Node.js</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>Node.js</li>
+<li>Go</li>
+<li>gRPC C++ library</li>
+<li>Protobuf C++ library</li>
+<li>Protobuf bindings for Go</li>
+</ul><codelab-survey><h4>How&#160;will you use&#160;use this tutorial?</h4>
+<select><option>Read it through only</option>
+<option>Read it and complete the exercises</option></select><h4>How&#160;would&#160;you rate your experience with building Node.js apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>How&#160;would&#160;you rate your experience with building Go apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get things set up" 
+        duration="5:00">
+        
+          <h1></h1><p>To run the sample application, you need to install the following dependencies:</p><ul>
+<li><a href="https://git-scm.com/">Git</a></li>
+<li><a href="https://nodejs.org/">Node.js</a></li>
+<li><a href="https://golang.org/">Go</a></li>
+<li><a href="https://github.com/grpc/grpc/blob/master/INSTALL">gRPC C++ library</a></li>
+<li>
+<a href="https://github.com/google/protobuf/blob/master/INSTALL.txt">Protobuf C++ library</a>&#160;&gt;= 3.0.0-alpha-2</li>
+<li><a href="https://github.com/golang/protobuf">Protobuf bindings for Go</a></li>
+</ul><p>A Compute Engine image that has all of these dependencies pre-installed is available for you to use so you can get started right away!</p><h3>Set up your Compute Engine Virtual Machine</h3><ol start="1">
+<li>Go to the <a href="https://console.developers.google.com/">Google Cloud Developer Console</a>.</li>
+<li>Click <strong>Create Project.</strong>
+</li>
+<li>Give your project a unique name.</li>
+<li>Click <strong>Create</strong>.</li>
+</ol><p><img src="../img/gRPC/img-1.png" style="max-width: 226px"></p><p>Now add the gRPC codelab image to your project:</p><ol start="1">
+<li>Navigate to <strong>Compute &gt; Compute Engine &gt; <a href="https://console.developers.google.com/project/_/compute/images">Images</a></strong>.</li>
+<li>Click <strong>New image</strong>.</li>
+<li>Give your image a name.</li>
+<li>Choose <em>Source type</em>: <strong>Cloud Storage object</strong>
+</li>
+<li>Set <em>Cloud Storage object&#160;path</em>&#160;to<strong>:</strong>&#160;<strong>grpc-codelab/grpc-codelab-image.tar.gz</strong>
+</li>
+<li>Click <strong>Create.</strong>
+</li>
+</ol><p><img src="../img/gRPC/img-2.png" style="max-width: 458px"></p><p>This imports the Virtual Machine image for the gRPC codelab into your project.</p><p>Wait a couple of seconds while the image is imported and then create a Virtual Machine instance from the gRPC codelab image:</p><ol start="1">
+<li>Select the image you just created.</li>
+<li>Click <strong>Create instance</strong>:</li>
+</ol><p><img src="../img/gRPC/img-3.png" style="max-width: 338px"></p><p>To create the Virtual Machine instance:</p><ol start="1">
+<li>Give your new instance a name.</li>
+<li>Click <strong>Create</strong>.</li>
+</ol><p><img src="../img/gRPC/img-4.png" style="max-width: 459px"></p><p>Once the instance is created, click <strong>SSH</strong>&#160;to connect&#160;to it.</p><p><img src="../img/gRPC/img-5.png" style="max-width: 76px"></p><p><img src="../img/gRPC/img-6.png" style="max-width: 624px"></p><aside class="special"><p>This codelab requires 2 open SSH sessions, one to run your Node.js gRPC server and another to call it using the command-line client.</p></aside><p>Now you&#8217;re ready to get started!</p><h2>Summary</h2><p>In this step, you set up your development environment.</p><h2>Next up</h2><p>Next, you will download and run the sample application.</p>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Get the sample" 
+        duration="3:00">
+        
+          <h1></h1><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line:</p><pre>git clone https://github.com/googlesamples/io2015-codelabs</pre><aside class="special"><p>The source for this codelab is in <code>io2015-codelabs/gRPC/start</code>.</p></aside><p>Sample project layout:</p><table>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1"><p><strong>Name</strong></p></td>
+<td colspan="1" rowspan="1"><p><strong>Description</strong></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p>client.go</p></td>
+<td colspan="1" rowspan="1"><p>Command-line client for the server API.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p>books/books.pb.go</p></td>
+<td colspan="1" rowspan="1"><p>go library for the books gRPC service.</p></td>
+</tr>
+</tbody>
+<tbody></tbody>
+</table><h3>Run the sample application</h3><p>The sample application folder contains <code><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/start/client.go">client.go</a></code>, a command-line client for interacting with the gRPC service that you will create in this codelab.</p><p>To run the command-line client, first install the Go <code>grpc</code>&#160;package:</p><pre>$ go get google.golang.org/grpc</pre><p>Now, from the project directory, run the command-line client with no arguments to view the available commands:</p><pre>$ go run client.go 
+client.go is a command-line client for this codelab's gRPC service
+
+Usage:
+  client.go list                            List all books
+  client.go insert &lt;id&gt; &lt;title&gt; &lt;author&gt;    Insert a book
+  client.go get &lt;id&gt;                        Get a book by its ID
+  client.go delete &lt;id&gt;                     Delete a book by its ID
+  client.go watch                           Watch for inserted books</pre><p>Try calling one of the available commands:</p><pre>$ go run client.go list</pre><p>You will see an error after a few seconds because the node gRPC server does not yet exist!</p><aside class="warning"><p>did not connect: grpc: timed out trying to connect</p></aside><p>Let&#8217;s fix this!</p><h2>Summary</h2><p>In this step, you set up and ran the codelab sample application.</p><h2>Next up</h2><p>Next, you will implement a Node.js gRPC service that lists books.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="List all books" 
+        duration="10:00">
+        
+          <h1></h1><p>In this step you will write the code to implement a Node.js gRPC service that lists books.</p><p>gRPC services are defined in <code>.proto</code>&#160;files using the protocol buffer language.</p><aside class="special"><p>The <a href="https://developers.google.com/protocol-buffers/docs/proto3">Protocol Buffers Language Guide</a>&#160;documents the <code>.proto</code>&#160;file format.</p></aside><p>The protocol buffer language is used to define services and message types.</p><p>Let&#8217;s start by defining a service for books!</p><p>In the project directory, create a new file called <code>books.proto</code>&#160;and add the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-1-list-books/books.proto">books.proto</a></h3><codelab-snippet>syntax = "proto3";
+
+package books;
+
+service BookService {}</codelab-snippet><p>This defines a new service named <code>BookService</code>&#160;using the <strong>proto3</strong>&#160;version of the protocol buffers language. &#160;This is the latest version of protocol buffers and is recommended for use with gRPC.</p><p>To run this service with node, first install the <code><a href="https://www.npmjs.com/package/grpc">grpc</a></code>&#160;npm package:</p><pre>$ npm install grpc</pre><aside class="special"><p>The <code><a href="https://github.com/grpc/grpc/tree/master/src/node">grpc</a></code>&#160;node package is gRPC library for Node.js.</p></aside><p>Now create a new file called <code>server.js</code>&#160;and add the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-1-list-books/server.js">server.js</a></h3><codelab-snippet>var grpc = require('grpc');
+
+var booksProto = grpc.load('books.proto');
+
+var BooksServer = grpc.buildServer([booksProto.books.BookService.service]);
+
+var server = new BooksServer({
+  'books.BookService': { } 
+});
+
+server.bind('127.0.0.1:50051');
+server.listen();</codelab-snippet><p><code><a href="https://github.com/grpc/grpc/blob/00943fcd32c4d4ea1e0b036ea3f30d1a1749d988/src/node/index.js#L67-L88">grpc.load</a></code>&#160;returns an object representing the <code>.proto</code>.</p><p><code><a href="https://github.com/grpc/grpc/blob/353d422a7628002b8d821cf49c4ab1aeea712237/src/node/src/server.js#L653-L679">grpc.buildServer</a></code>&#160;accepts an array of gRPC service objects and returns a constructor for a <code>Server</code>&#160;object that will serve the services provided.</p><p>Once you have a server for your service(s), you can <a href="https://github.com/grpc/grpc/blob/353d422a7628002b8d821cf49c4ab1aeea712237/src/node/src/server.js#L562-L620">instantiate it</a>&#160;providing a map of each service to its methods handlers.</p><p>Finally, bind the <code>server</code>&#160;to port <code>50051</code>&#160;and call <code>listen()</code>&#160;to begin listening for incoming requests!</p><aside class="special"><p>gRPC services work on any port but <code>50051</code>&#160;is conventional to use. &#160;See: <a href="https://github.com/grpc/grpc/tree/master/src/node/examples">Node.js gRPC service examples</a>.</p></aside><p>Run the server:</p><pre>$ node server.js</pre><p>Now run the go gRPC command-line client again to test the server API:</p><pre>$ go run client.go list</pre><p>This time, you will see a new error:</p><aside class="warning"><p>List books: rpc error: code = 12 desc = "<a href="https://github.com/grpc/grpc/blob/04589a7e0cbdb22c3fe10d2a1e2b7e698091f10d/src/node/src/server.js#L521">This method is not available on this server.</a>"</p></aside><p>Great! &#160;This means that the server is running and the go client communicated with it over gRPC!</p><p>Let&#8217;s fix this by implementing a <code>List</code>&#160;method!</p><h3>List books</h3><p>In the project directory, edit <code>books.proto</code>&#160;and update <code>BookService</code>&#160;with the following code:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-1-list-books/books.proto">books.proto</a></h3><codelab-snippet>service BookService {
+  rpc List (Empty) returns (BookList) {}
+}
+
+message Empty {} 
+
+message Book {
+  int32 id = 1;
+  string title = 2;
+  string author = 3;
+}
+
+message BookList {
+  repeated Book books = 1;
+}</codelab-snippet><p>Each service <code>rpc</code>&#160;method accepts a <code>(request)</code>&#160;message and returns a <code>(response)</code>&#160;message.</p><p>Making a request to <code>List</code>&#160;books requires no parameters so the request message for <code>List</code>&#160;has no fields (as defined by the <code>Empty</code>&#160;message).</p><p>The <code>Book</code>&#160;message represents a single book object with <code>id</code>, <code>title,</code>&#160;and <code>author</code>&#160;fields.</p><aside class="special"><p>The numbers assigned to each field are <a href="https://developers.google.com/protocol-buffers/docs/proto3#assigning-tags">unique numbered tags</a>. &#160;These tags are used to identify your fields in the message binary format.</p>
+<p>Two scalar types, <code>int32</code>&#160;and <code>string</code>, are used in this example. &#160;<a href="https://developers.google.com/protocol-buffers/docs/proto3#scalar">Scalar Value Types</a>&#160;lists all available types.</p></aside><p><code>List</code>&#160;returns a <code>repeated</code>&#160;list of <code>Book</code>&#160;messages. &#160;<code><a href="https://developers.google.com/protocol-buffers/docs/proto3#specifying-field-rules">repeated</a></code>&#160;specifies that this message can be repeated any number of times.</p><p>Now update the Node.js application to respond to calls to the <code>List</code>&#160;method of the <code>BookService</code>.</p><p>Edit the <code>server.js</code>&#160;file and add the following code, replacing the current <code>var server</code>&#160;with the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-1-list-books/server.js">server.js</a></h3><codelab-snippet>// In-memory array of book objects
+var books = [ 
+  { id: 123, title: 'A Tale of Two Cities', author: 'Charles Dickens' }
+];
+
+var server = new BooksServer({
+  'books.BookService': {
+    list: function(call, callback) {
+      callback(null, books);
+    }
+  }
+});</codelab-snippet><p>To register handlers for gRPC service methods, handler functions are passed into the <code>Server</code>&#160;constructor for each method. &#160;When the service method is invoked, the handler function is called with a <code>call</code>&#160;object representing the request message. &#160;To respond to the method, call <code>callback</code>&#160;providing an error object (or <code>null</code>) and an object representing the response message. &#160;In this case, we return a JavaScript object with fields matching those defined in <code>book.proto</code>&#160;for the <code>Book</code>&#160;message type.</p><p>This implements the <code>List</code>&#160;rpc call, returning a <code>Book</code>&#160;message.</p><p>To test this, stop your running node process by pressing <strong>CTRL-C</strong>&#160;and run it again:</p><pre>$ node server.js</pre><aside class="special"><p>To avoid restarting your node process to view file changes during development, you can run your application using the <a href="http://nodemon.io/">nodemon</a>&#160;utility.</p>
+<p>$ npm install nodemon</p>
+<p>$ nodemon server.js</p></aside><p>Now run the go gRPC command-line client again:</p><pre>$ go run client.go list</pre><p>You should now see this book listed!</p><codelab-snippet>Got 1 books.
+{
+  "books": [
+    {
+      "id": 123,
+      "title": "A Tale of Two Cities",
+      "author": "Charles Dickens"
+    }
+  ]
+}</codelab-snippet><h2>Summary</h2><p>In this step, you implemented a gRPC service that lists books.</p><h2>Next up</h2><p>Next, you will insert new books via gRPC calls.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Insert new books" 
+        duration="5:00">
+        
+          <h1></h1><p>In this step you will write the code to implement adding new <code>Book</code>&#160;objects via the gRPC service.</p><p>To begin, edit <code>books.proto</code>&#160;and update <code>BookService</code>&#160;to the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-2-insert-books/books.proto">books.proto</a></h3><codelab-snippet>service BookService {
+  rpc List (Empty) returns (BookList) {}
+  rpc Insert (Book) returns (Empty) {}
+}</codelab-snippet><p>This defines a new <code>Insert</code>&#160;rpc call that takes a <code>Book</code>&#160;message as its request and returns an <code>Empty</code>&#160;response.</p><p>To implement the <code>Insert</code>&#160;method in the server, edit <code>server.js</code>&#160;and update <code>var server</code>&#160;to the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-2-insert-books/server.js">server.js</a></h3><codelab-snippet>var server = new BooksServer({
+  'books.BookService': {
+    list: function(call, callback) {
+      callback(null, books);
+    },
+    insert: function(call, callback) {
+      books.push(call.request);
+      callback(null, {});
+    }
+  }
+});</codelab-snippet><p>The added <code>insert</code>&#160;function implements the <code>Insert</code>&#160;rpc call, adding the received <code>Book</code>&#160;message to the <code>books</code>&#160;array and returning an <code>Empty</code>&#160;message.</p><p>Handler functions access the request message via <code>call.request</code>. &#160;In this case, <code>call.request</code>&#160;is a JavaScript object with <code>id</code>, <code>title</code>, and <code>author</code>&#160;fields representing a <code>Book</code>&#160;message.</p><aside class="warning"><p>Note: because <code>books</code>&#160;is a simple in-memory array, it will be reset every time the node process is restarted.</p></aside><p>To test this, restart the node server and then run the go gRPC command-line client&#8217;s <code>insert</code>&#160;command, passing <code>id</code>, <code>title</code>, and <code>author</code>&#160;as arguments:</p><pre>$ go run client.go insert 2 "The Three Musketeers" "Alexandre Dumas"</pre><p>You should see an empty response:</p><codelab-snippet>Server response:
+{}</codelab-snippet><p>To verify that the book was inserted, run the <code>list</code>&#160;command again to see all books:</p><pre>$ go run client.go list</pre><p>You should now see 2 books listed!</p><codelab-snippet>Got 2 books.
+{
+  "books": [
+    {
+      "id": 123,
+      "title": "A Tale of Two Cities",
+      "author": "Charles Dickens"
+    },
+    {
+      "id": 2,
+      "title": "The Three Musketeers",
+      "author": "Alexandre Dumas"
+    }
+  ]
+}</codelab-snippet><h2>Summary</h2><p>In this step, you extended the gRPC service to support adding books.</p><h2>Next up</h2><p>Next, you will extend the gRPC service further to support getting and deleting individual books.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get and delete books" 
+        duration="5:00">
+        
+          <h1></h1><p>In this step you will write the code to get and delete <code>Book</code>&#160;objects by <code>id</code>&#160;via the gRPC service.</p><p>To begin, edit <code>books.proto</code>&#160;and update <code>BookService</code>&#160;with the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-3-get-and-delete-books/books.proto">books.proto</a></h3><codelab-snippet>service BookService {
+  rpc List (Empty) returns (BookList) {}
+  rpc Insert (Book) returns (Empty) {}
+  rpc Get (BookIdRequest) returns (Book) {}
+}
+
+message BookIdRequest {
+  int32 id = 1;
+}</codelab-snippet><p>This defines a new <code>Get</code>&#160;rpc call that takes a <code>BookIdRequest</code>&#160;as its request and returns a <code>Book</code>&#160;as its response.</p><p>A <code>BookIdRequest</code>&#160;message type is defined for requests containing only a book&#8217;s <code>id</code>.</p><p>To implement the <code>Get</code>&#160;method in the server, edit <code>server.js</code>&#160;and add the following <code>get</code>&#160;handler function:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-3-get-and-delete-books/server.js">server.js</a></h3><codelab-snippet>var server = new BooksServer({
+  'books.BookService': {
+    // ...
+    get: function(call, callback) {
+      for (var i = 0; i &lt; books.length; i++)
+        if (books[i].id == call.request.id)
+          return callback(null, books[i]);
+      callback({ code: grpc.status.NOT_FOUND, details: 'Not found' });
+    }
+  }
+});</codelab-snippet><p>If the <code>books</code>&#160;array contains a book with the <code>id</code>&#160;requested, the book is returned. &#160;If no book is found with the requested <code>id</code>, a <code>NOT_FOUND</code>&#160;error is returned.</p><aside class="special"><p><code>grpc</code>&#160;provides build-in status codes for errors, eg. <code>NOT_FOUND</code>, <code>INVALID_ARGUMENT</code>, <code>PERMISSION_DENIED</code>&#160;and more.</p>
+<p>You can view a list of available status names <a href="https://github.com/grpc/grpc/blob/2e165e34010e44f20c6ecea63b20a6996810313f/src/node/test/constant_test.js#L39-L62">here</a>.</p></aside><p>To test this, restart the node server and then run the go gRPC command-line client&#8217;s <code>get</code>&#160;command, passing <code>id</code>&#160;as an argument:</p><pre>$ go run client.go get 123</pre><p>You should see the book response!</p><codelab-snippet>Server response:
+{
+  "id": 123,
+  "title": "A Tale of Two Cities",
+  "author": "Charles Dickens"
+}</codelab-snippet><p>Now try getting a book that doesn&#8217;t exist:</p><pre>$ go run client.go get 404</pre><p>You should see the error message returned:</p><aside class="warning"><p>Get book (404): rpc error: code = 5 desc = "Not found"</p></aside><h3>Delete books</h3><p>Now you will write the code to delete a book by <code>id</code>.</p><p>Edit <code>books.proto</code>&#160;and add the following <code>Delete</code>&#160;rpc method:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-3-get-and-delete-books/books.proto">books.proto</a></h3><codelab-snippet>service BookService {
+  // ...
+  rpc Delete (BookIdRequest) returns (Empty) {}
+}</codelab-snippet><p>Now edit <code>server.js</code>&#160;and add the following <code>delete</code>&#160;handler function:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-3-get-and-delete-books/server.js">server.js</a></h3><codelab-snippet>var server = new BooksServer({
+  'books.BookService': {
+    // ...
+    delete: function(call, callback) {
+      for (var i = 0; i &lt; books.length; i++) {
+        if (books[i].id == call.request.id) {
+          books.splice(i, 1);
+          return callback(null, {});
+        }
+      }
+      callback({ code: grpc.status.NOT_FOUND, details: 'Not found' });
+    }
+  }
+});</codelab-snippet><p>If the <code>books</code>&#160;array contains a book with the <code>id</code>&#160;requested, the book is removed, otherwise a <code>NOT_FOUND</code>&#160;error is returned.</p><p>To test this, restart the node server and then run the go gRPC command-line client to delete a book:</p><pre>$ go run client.go list
+Server sent 1 book(s).
+{
+  "books": [
+    {
+      "id": 123,
+      "title": "A Tale of Two Cities",
+      "author": "Charles Dickens"
+    }
+  ]
+}
+
+$ go run client.go delete 123
+Server response:
+{}
+
+$ go run client.go list
+Server sent 0 book(s).
+{}
+
+$ go run client.go delete 123
+Get book (123): rpc error: code = 5 desc = "Not found"</pre><p>Great!</p><p>You implemented a fully functioning gRPC service that can list, insert, get, and delete books!</p><h2>Summary</h2><p>In this step, you extended the gRPC service to support getting and deleting books.</p><h2>Next up</h2><p>Next, you will add the ability for the client to connect to a stream that will receive books when they are inserted.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Stream added books" 
+        duration="5:00">
+        
+          <h1></h1><p>In this step you will write the code to add a streaming endpoint to the service so the client can establish a stream to the server and listen for added books.</p><p>gRPC supports <a href="https://github.com/grpc/grpc#streaming">streaming semantics</a>, where either the client or the server (or both) send a stream of messages on a single RPC call. The most general case is Bidirectional Streaming where a single gRPC call establishes a stream where both the client and the server can send a stream of messages to each other.</p><p>To begin, edit <code>books.proto</code>&#160;and add the following <code>Watch</code>&#160;rpc method to <code>BookService</code>:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-4-stream-books/books.proto">books.proto</a></h3><codelab-snippet>service BookService {
+  // ...
+  rpc Watch (Empty) returns (stream Book) {}
+}</codelab-snippet><p>When the client calls the <code>Watch</code>&#160;method, it will establish a stream and server will be able to stream <code>Book</code>&#160;messages when books are inserted.</p><p>To implement the <code>Watch</code>&#160;method in the server, edit <code>server.js</code>&#160;and add the following bookStream variable and <code>watch</code>&#160;handler function:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-4-stream-books/server.js">server.js</a></h3><codelab-snippet>var bookStream;
+
+var server = new BooksServer({
+  'books.BookService': {
+    // ...
+    watch: function(stream) {
+      bookStream = stream;
+    }
+  }
+});</codelab-snippet><p>Handler functions for streaming rpc methods are invoked with a writable <code><a href="https://nodejs.org/api/stream.html#stream_class_stream_writable">stream</a></code>&#160;object.</p><p>To stream messages to the client, the stream&#8217;s <code>write()</code>&#160;function is called.</p><p>Edit <code>server.js</code>&#160;and update the <code>insert</code>&#160;function to stream <code>Book</code>&#160;messages to the client when books are inserted:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-4-stream-books/server.js">server.js</a></h3><codelab-snippet>var bookStream;
+
+var server = new BooksServer({
+  'books.BookService': {
+    // ...
+    insert: function(call, callback) {
+      var book = call.request;
+      books.push(book);
+      if (bookStream)
+        bookStream.write(book);
+      callback(null, {});
+    },
+    // ...
+    watch: function(stream) {
+      bookStream = stream;
+    }
+  }
+});</codelab-snippet><p>To test this, restart the node server and then run the go gRPC command-line client&#8217;s <code>watch</code>&#160;command:</p><pre>$ go run client.go watch</pre><p>Now, in another terminal, run the go gRPC command-line client&#8217;s <code>insert</code>&#160;command to insert a book:</p><pre>$ go run client.go insert 2 "The Three Musketeers" "Alexandre Dumas"</pre><p>Check the terminal <code>client.go watch</code>&#160;where is running. &#160;It should have printed out the inserted book!</p><pre>$ go run client.go watch
+Server stream data received:
+{
+  "id": 2,
+  "title": "The Three Musketeers",
+  "author": "Alexandre Dumas"
+}</pre><aside class="warning"><p>Note: because this sample uses 1 <code>bookStream</code>&#160;object, if an additional client connects to the <code>Watch</code>&#160;stream, it will overwrite the first and the first client will no longer receive updates.</p></aside><h2>Summary</h2><p>In this step, you added a streaming gRPC endpoint to the service to stream inserted books to a connected client.</p><h2>Next up</h2><p>Next, you will write a command-line client to interact with your gRPC service.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create gRPC client" 
+        duration="5:00">
+        
+          <h1></h1><p>In this step, you will write the code to implement a Node.js command-line client that calls your gRPC service.</p><p>The result will be functionally equivalent to the <code>client.go</code>&#160;script that you have been using so far in this codelab!</p><p>Start by running the gRPC server:</p><pre>$ node server.js</pre><p>Now, in another terminal, create a new file called <code>client.js</code>&#160;in the project directory and add the following:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-5-node-client/client.js">client.js</a></h3><codelab-snippet>var grpc = require('grpc');
+
+var booksProto = grpc.load('books.proto');
+
+var client = new booksProto.books.BookService('127.0.0.1:50051');
+
+client.list({}, function(error, books) {
+  if (error)
+    console.log('Error: ', error);
+  else
+    console.log(books);
+});</codelab-snippet><p>This requires the <code>grpc</code>&#160;node module and loads <code>books.proto</code>&#160;(<em>exactly like you did in server.js previously</em>).</p><p>The <code>client</code>&#160;object for the gRPC service is created by calling the <code>BookService</code>&#160;constructor, which is dynamically created from the service definition found in <code>books.proto</code>.</p><p>The <code>list()</code>&#160;function takes a request message object as a parameter (<code>{}</code>&#160;in this case to represent an <code>Empty</code>&#160;message), followed by a callback function that will be invoked with an <code>error</code>&#160;object (or <code>null</code>) and a response message object (a <code>Book</code>&#160;message in this case).</p><p>The service <code>client</code>&#160;provides functions for each of the <code>rpc</code>&#160;methods defined in the protocol buffer:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/complete/books.proto">books.proto</a></h3><codelab-snippet>service BookService {
+  rpc List (Empty) returns (BookList) {}
+  rpc Insert (Book) returns (Empty) {}
+  rpc Get (BookIdRequest) returns (Book) {}
+  rpc Delete (BookIdRequest) returns (Empty) {}
+  rpc Watch (Empty) returns (stream Book) {}
+}</codelab-snippet><p>This means that you can now <code>list()</code>, <code>insert()</code>, <code>get()</code>, <code>delete()</code>, and <code>watch()</code>&#160;books!</p><p>Now run the command-line client:</p><pre>$ node client.js list
+{ books: 
+   [ { id: 123,
+       title: 'A Tale of Two Cities',
+       author: 'Charles Dickens' } ] }</pre><p>You should see books listed!</p><p>Next, to implement the command-line client, update client.js with functions for <code>list()</code>, <code>insert()</code>, <code>get()</code>, and <code>delete()</code>:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-5-node-client/client.js">client.js</a></h3><codelab-snippet>var grpc = require('grpc');
+
+var booksProto = grpc.load('books.proto');
+
+var client = new booksProto.books.BookService('127.0.0.1:50051');
+
+function printResponse(error, response) {
+  if (error)
+    console.log('Error: ', error);
+  else
+    console.log(response);
+}
+
+function listBooks() {
+  client.list({}, function(error, books) {
+    printResponse(error, books);
+  });
+}
+
+function insertBook(id, title, author) {
+  var book = { id: parseInt(id), title: title, author: author };
+  client.insert(book, function(error, empty) {
+    printResponse(error, empty);
+  });
+}
+
+function getBook(id) {
+  client.get({ id: parseInt(id) }, function(error, book) {
+    printResponse(error, book);
+  });
+}
+
+function deleteBook(id) {
+  client.delete({ id: parseInt(id) }, function(error, empty) {
+    printResponse(error, empty);
+  });
+}</codelab-snippet><p>To implement the watch() function, which receives a stream of Book messages, an event handler is registered:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-5-node-client/client.js">client.js</a></h3><codelab-snippet>function watchBooks() {
+  var call = client.watch({});
+  call.on('data', function(book) {
+    console.log(book);
+  });
+}</codelab-snippet><p>The <code>on('data')</code>&#160;function callback will be called with a <code>Book</code>&#160;message object whenever a book is inserted.</p><p>Finally, add code to parse command-line arguments:</p><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/gRPC/step-5-node-client/client.js">client.js</a></h3><codelab-snippet>var processName = process.argv.shift();
+var scriptName = process.argv.shift();
+var command = process.argv.shift();
+
+if (command == 'list')
+  listBooks();
+else if (command == 'insert')
+  insertBook(process.argv[0], process.argv[1], process.argv[2]);
+else if (command == 'get')
+  getBook(process.argv[0]);
+else if (command == 'delete')
+  deleteBook(process.argv[0]);
+else if (command == 'watch')
+  watchBooks();</codelab-snippet><aside class="special"><p><code><a href="https://nodejs.org/docs/latest/api/process.html#process_process_argv">process.argv</a></code>&#160;is an array containing the command line arguments. The first element will be <code>'node'</code>, the second element will be the name of the JavaScript file.</p></aside><p>Now run the command-line client:</p><pre>$ node client.js list
+{ books: 
+   [ { id: 123,
+       title: 'A Tale of Two Cities',
+       author: 'Charles Dickens' } ] }</pre><p>All of the commands you previously ran via client.go should now be available via your Node.js gRPC command-line client!</p><pre>$ node client.js insert 2 "The Three Musketeers" "Alexandre Dumas"
+{}
+
+$ node client.js list
+{ books: 
+   [ { id: 123,
+       title: 'A Tale of Two Cities',
+       author: 'Charles Dickens' },
+     { id: 2,
+       title: 'The Three Musketeers',
+       author: 'Alexandre Dumas' } ] }
+
+$ node client.js delete 123
+{}
+
+$ node client.js list
+{ books: 
+   [ { id: 2,
+       title: 'The Three Musketeers',
+       author: 'Alexandre Dumas' } ] }
+
+$ node client.js get 2
+{ id: 2,
+  title: 'The Three Musketeers',
+  author: 'Alexandre Dumas' }</pre><h2>Summary</h2><p>In this step, you wrote a command-line client in Node.js that interacts with your gRPC service.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:01">
+        
+          <h1></h1><h3>What we've covered:</h3><ul>
+<li>The Protocol Buffer Language</li>
+<li>How to implement a gRPC server using Node.js</li>
+<li>How to implement a gRPC client using Node.js</li>
+</ul><h3>Next Steps:</h3><ul>
+<li>Learn to implement a gRPC client for your service using <a href="https://github.com/grpc/grpc-common#quick-start">another language</a>.</li>
+<li>Learn to deploy your Node.js service on <a href="https://cloud.google.com/appengine/docs/managed-vms/">GCP's Managed VMs</a>
+</li>
+<li>Learn to persist your data to <a href="https://cloud.google.com/datastore/docs/concepts/overview">Cloud Datastore</a>
+</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Clean things up" 
+        duration="1:00">
+        
+          <h1></h1><p>If you created a Compute Engine Virtual Machine, you can delete it now.</p><p>To delete the project that you created for this codelab:</p><ol start="1">
+<li>Go to the <a href="https://console.developers.google.com/">Google Cloud Developer Console</a>.</li>
+<li>Click on the trash can icon next to the project that you created for this codelab<strong>.</strong>
+</li>
+</ol><p><img src="../img/gRPC/img-7.png" style="max-width: 624px"></p><p>Then follow the steps to confirm project deletion:</p><ol start="1">
+<li>Type your project ID.</li>
+<li>Click <strong>Delete project</strong>.</li>
+</ol><p><img src="../img/gRPC/img-8.png" style="max-width: 460px"></p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

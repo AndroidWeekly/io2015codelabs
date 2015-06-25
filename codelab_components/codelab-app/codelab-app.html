@@ -1,0 +1,165 @@
+<link rel="import" href="../../bower_components/core-drawer-panel/core-drawer-panel.html">
+<link rel="import" href="../../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/core-media-query/core-media-query.html">
+
+<link rel="import" href="codelab-card.html">
+
+<polymer-element name="codelab-app">
+  <template>
+    <link href="../../bower_components/highlightjs/styles/railscasts.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="codelab-app.css" media="screen, handheld" />
+
+    <core-media-query query="(max-width:767px)"
+                      queryMatches="{{isPhoneSize}}"></core-media-query>
+
+    <core-drawer-panel id="drawer" responsiveWidth="767px"
+      drawerWidth="30%">
+      <core-header-panel mode="waterfall" drawer>
+        <core-toolbar class="tall" middleJustify="end" hidden?="{{isPhoneSize}}">
+          <span class="middle logo">
+            <img src="../../img/io-logo@2x_2.png" id="logo">
+            <h1>Codelabs</h1>
+          </span>
+        </core-toolbar>
+        <core-menu selected="{{selectedCategory}}" valueattr="label" class="menu" on-core-select="{{selectCategory}}">
+          <template repeat="{{category, i in categories}}">
+            <paper-item class="{{ { first: i == 0, last: i == categories.length - 1} | tokenList }}" label="{{category}}">{{category}}</paper-item>
+          </template>
+        </core-menu>
+      </core-header-panel>
+      <core-header-panel
+          mode="{{{cover: !isPhoneSize, waterfall: isPhoneSize} | tokenList}}"
+          main id="main">
+        <core-toolbar class="{{{tall: !isPhoneSize} | tokenList}}">
+          <span class="logo" layout horizontal center hidden?="{{!isPhoneSize}}">
+            <paper-icon-button id="menu_button" icon="menu" noink on-click="{{toggleDrawer}}"></paper-icon-button>
+            <img src="../../img/io-logo@2x_2.png" id="logo">
+            <h1>Codelabs</h1>
+          </span>
+        </core-toolbar>
+        <div class="content">
+          <content id="cards"></content>
+        </div>
+      </core-header-panel>
+    </core-drawer-panel>
+  </template>
+  <script>
+  (function() {
+    function getElementNodes(_nodes) {
+      return [].filter.call(_nodes, function(node) {
+        return node.nodeType === Node.ELEMENT_NODE;
+      });
+    };
+
+    // From http://en.wikipedia.org/wiki/Smoothstep
+    function smoothStep(start, end, point) {
+      if (point <= start) {
+        return 0;
+      }
+      if (point >= end) {
+        return 1;
+      }
+      var x = (point - start) / (end - start); // interpolation
+      return x * x * (3 - 2 * x);
+    }
+
+    function smoothScroll(scrollContainer, el, opt_duration,
+        opt_offset, opt_callback) {
+      var duration = opt_duration || 1;
+
+      var startTime = performance.now();
+      var endTime = startTime + duration;
+      var startTop = scrollContainer.scrollTop;
+      var offset = opt_offset || 0;
+      var destY = el.getBoundingClientRect().top - offset;
+
+      if (destY === 0) {
+        if (opt_callback) {
+          opt_callback();
+        }
+        return; // already at top of element.
+      }
+      var callback = function(timestamp) {
+        if (timestamp < endTime) {
+          requestAnimationFrame(callback);
+        }
+
+        var point = smoothStep(startTime, endTime, timestamp);
+        var scrollTop = Math.round(startTop + (destY * point));
+        scrollContainer.scrollTop = scrollTop;
+
+        // All done scrolling.
+        if (point === 1 && opt_callback) {
+          opt_callback();
+        }
+      };
+      callback(startTime);
+    }
+
+    var DEFAULT_CATEGORY = 'Back to top';
+
+    Polymer('codelab-app', {
+      category: DEFAULT_CATEGORY,
+      ready: function() {
+        var categoryPositions = {};
+        this.cards_ = getElementNodes(this.$.cards.getDistributedNodes());
+        this.categories = [].reduce.call(this.cards_, function(prev, card, i) {
+          var mainCategory = card.getAttribute('category').split(',').map(function(category) {
+            return category.trim();
+          })[0];
+          if (categoryPositions[mainCategory] === undefined) {
+            categoryPositions[mainCategory] = i;
+          }
+          if (prev.indexOf(mainCategory) === -1) {
+            prev.push(mainCategory);
+          }
+          /*
+            This was for hiding cards instead of scrolling.
+            card.categories.forEach(function(category) {
+            if (prev.indexOf(category) === -1) {
+              prev.push(category);
+            }
+          });*/
+          return prev;
+        }, []).sort();
+        this.categories.push(DEFAULT_CATEGORY);
+        this.categoryPositions_ = categoryPositions;
+      },
+      selectedCategoryChanged: function() {
+        var scrollContainer = this.$.main.$.mainContainer;
+        var scrollTarget = (this.selectedCategory === DEFAULT_CATEGORY) ?
+            this.cards_[0] :
+            this.cards_[this.categoryPositions_[this.selectedCategory]];
+        smoothScroll(scrollContainer, scrollTarget, 1000, 60);
+        /*
+        This was for hiding cards instead of scrilling.
+        for (var i = 0; i < this.cards_.length; i++) {
+          var card = this.cards_[i];
+          if (this.selectedCategory === DEFAULT_CATEGORY ||
+              card.matchesCategory(this.selectedCategory)) {
+            card.removeAttribute('hidden');
+          } else {
+            card.setAttribute('hidden', true);
+          }
+        }*/
+      },
+      isPhoneSizeChanged: function() {
+        this.$.drawer.drawerWidth = this.isPhoneSize ? '40%' : '30%';
+      },
+      selectCategory: function(e) {
+        if (e.detail.isSelected) {
+          this.$.drawer.togglePanel();
+        }
+      },
+      toggleDrawer: function() {
+        this.$.drawer.togglePanel();
+      }
+    });
+  })();
+  </script>
+</polymer-element>

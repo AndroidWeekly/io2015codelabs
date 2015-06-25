@@ -1,0 +1,117 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="AdMob for iOS Apps Codelab"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Ads"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p>This codelab shows you how to create a new iOS project, include the Google Mobile Ads SDK, and add a banner and interstitial ad.</p><p><img src="../img/admob-ios/img-1.png" style="max-width: 346px"></p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Adding Google Mobile Ads SDK&#160;to an iOS project</li>
+<li>Creating a banner ad</li>
+<li>Creating an interstitial ad</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>Xcode 5.1 or higher</li>
+<li>A minimum iOS deployment target of&#160;6.0 or higher</li>
+<li>The <a href="https://github.com/googlesamples/io2015-codelabs/tree/master/admob-ios">sample code</a>
+</li>
+<li>
+<a href="http://guides.cocoapods.org/using/getting-started.html">CocoaPods</a>&#160;to simplify dependency management</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="1:00">
+        
+          <h1></h1><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/googlesamples/io2015-codelabs.git</pre><aside class="special"><p>The <code>io2015-codelabs</code>&#160;repository contains many sample projects. This codelab only uses one:</p>
+<ul><li>
+<img src="../img/admob-ios/img-2.png" style="max-width: 20px"><strong>admob-ios</strong>&#8212;This AdMob codelab.</li></ul></aside>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Open the sample project" 
+        duration="0:30">
+        
+          <h1></h1><p>Open&#160;the terminal and navigate to the directory with the sample code. Run <code>pod install</code>&#160;to make sure you&#8217;re up to date with the latest dependencies, and then open <code>AdMobExample.xcworkspace</code>.</p><codelab-snippet>$ cd io2015-codelabs/admob-ios
+$ pod install
+$ open AdMobExample.xcworkspace</codelab-snippet><p>Here you&#8217;ll see the frame of the project, with the UI set-up. There&#8217;s a storyboard with a Banner View and a button. Currently they don&#8217;t do anything, they&#8217;re just so you don&#8217;t have to set-up the user interface.</p><p><img src="../img/admob-ios/img-3.png" style="max-width: 624px"></p><p>You&#8217;ll see&#160;that&#160;running pod install took care of adding in all the dependencies you needed, including the AdMob SDK.&#160; Currently the app will build but will crash on running.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add the AdMob API calls" 
+        duration="2:00">
+        
+          <h1></h1><p>By adding in only a few lines of code, we can get to a working app that has ads in it.</p><h2>AppDelegate.m</h2><p>First import the core Google SDK:</p><codelab-snippet>#import &lt;Google/Core.h&gt;</codelab-snippet><p>Then, in AppDelegate.m, add the following line to the <code>application:didFinishLaunchingWithOptions:</code>&#160;method:</p><codelab-snippet>[[GGLContext sharedInstance] configureWithError:&amp;configureError];</codelab-snippet><h2>ViewController.m</h2><h3>Interface</h3><p>In <code>ViewController.m</code>, take the following steps:</p><ol start="1"><li>Import the correct header:<br>
+</li></ol><codelab-snippet>#import &lt;Google/Admob.h&gt;</codelab-snippet><ol start="2"><li>Declare that&#160;<code>ViewController</code>&#160;implements <code>GADInterstitialDelegate</code>.<br>
+</li></ol><codelab-snippet>@interface ViewController () &lt;GADInterstitialDelegate&gt;</codelab-snippet><ol start="3"><li>Add in these two properties, to handle the banner and interstitial ads:</li></ol><h3></h3><codelab-snippet>@property(nonatomic, weak) IBOutlet GADBannerView *bannerView;
+@property(nonatomic, strong) GADInterstitial *interstitial;</codelab-snippet><h3>Implementation</h3><p>In <code>viewDidLoad</code>, add the banner and interstitial ads:</p><codelab-snippet>- (void)viewDidLoad {
+  [super viewDidLoad];
+
+  self.bannerView.adUnitID = [GGLContext sharedInstance].adUnitIDForBannerTest;
+  self.bannerView.rootViewController = self;
+  [self.bannerView loadRequest:[GADRequest request]];
+
+  self.interstitial = [self createAndLoadInterstitial];
+}</codelab-snippet><p>The interstitial will be off screen until you press the button.</p><p>Speaking of which, add a method to handle the button click, so the interstitial loads:</p><codelab-snippet>- (IBAction)didTapInterstitialButton:(id)sender {
+  if ([self.interstitial isReady]) {
+    [self.interstitial presentFromRootViewController:self];
+  }
+}</codelab-snippet><p>And code so the interstitial&#160;can be loaded and dismissed:</p><codelab-snippet>- (void)interstitialDidDismissScreen:(GADInterstitial *)interstitial {
+  self.interstitial = [self createAndLoadInterstitial];
+}
+- (GADInterstitial *)createAndLoadInterstitial {
+  GADInterstitial *interstitial = [[GADInterstitial alloc]
+      initWithAdUnitID:[GGLContext sharedInstance].adUnitIDForInterstitialTest];
+  interstitial.delegate = self;
+  [interstitial loadRequest:[GADRequest request]];
+  return interstitial;
+}</codelab-snippet>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run the app" 
+        duration="0:30">
+        
+          <h1></h1><p>Naturally we&#8217;re only running with test ads. If you want to use real ads, you would have to create an AdMob account, which is out of scope for this codelab. But by using the Ad Unit Ids provided in the GoogleService-Info.plist file in the sample app, you&#8217;re able to run test apps. In this case, the ads go to developers.google.com.</p><p>Here&#8217;s what it looks like in the simulator.</p><p><img src="../img/admob-ios/img-4.png" style="max-width: 368px"></p><p>You can see the banner ad along the bottom. If you click the Show Interstitial Ad button, it brings up the ad:</p><p><img src="../img/admob-ios/img-5.png" style="max-width: 376px"></p><p>You can dismiss the ad by clicking on the upper left close button.</p><p>Congratulations! You&#8217;re now done adding AdMob to your&#160;iOS&#160;application!</p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

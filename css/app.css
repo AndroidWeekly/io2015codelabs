@@ -1,0 +1,93 @@
+/* @import url('https://fonts.useso.com/css?family=Roboto:100,200,400,300,300italic,700,500%7CSource+Code+Pro:400,700'); */
+@import url("roboto-font-face.css");
+
+html, body {
+  box-sizing: border-box;
+  height: 100%;
+}
+body {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+  font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial;
+  font-weight: 400;
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  -moz-osx-font-smoothing: grayscae;
+  -webkit-font-smoothing: antialiased;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+
+  /*background: url("https://io2015codelabs.appspot.com/static/img/colorbar.png") repeat-x 50% 100%,
+              url("https://io2015codelabs.appspot.com/static/img/iowall_1920x1440.png") no-repeat 51% 0%;
+  background-size: 100% 5px, cover;*/
+  /*background: url("https://io2015codelabs.appspot.com/static/img/colorbar.png") repeat-x 50% 100%;*/
+  /*background-size: 100% 5px;*/
+  background-color: #f1f1f3;
+}
+
+io-codelab {
+  width: 100%;
+}
+
+html /deep/ paper-dialog {
+    font-size: 0.9em;
+    max-width: 400px;
+}
+
+html /deep/ paper-dialog /deep/ h1 {
+  color: #383;
+  font-weight: 300;
+  margin: 0.2em 0 0.5em 0;
+  font-style: italic;
+  background-image: url('../img/book-icon-md.png');
+  background-repeat: no-repeat;
+  background-size: 35px;
+  padding-left: 45px;
+}
+
+.core-overlay-backdrop.core-opened {
+    opacity: 0.4;
+}
+
+/* Homepage */
+
+*[drawer] {
+  background-color: #ddd;
+}
+
+[main] {
+  background-color: #eee;
+}
+
+footer {
+    position: relative;
+    background-color: #fafafa;
+    padding: 100px 0;
+    padding-left: 64px;
+}
+
+footer .links {
+    margin-bottom: 56px;
+}
+
+footer paper-button {
+    margin-right: 30px;
+    color: #666666;
+}
+
+footer #copyright {
+    color: #757575;
+    font-size: 14px;
+}
+
+footer #copyright a {
+    color: #666666;
+}

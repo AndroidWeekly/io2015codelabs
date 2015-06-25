@@ -1,0 +1,297 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Cardboard Unity Codelab"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Unity, Virtual Reality, Games"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview">
+        
+          <h1></h1><p>This codelab is an introduction to how to take a first person game made in Unity and enhance it to have a Virtual Reality mode using the Google Cardboard plugin powered by Unity.</p><p><img src="../img/cardboard-unity/img-1.png" style="max-width: 335px"></p><table>
+<tbody><tr>
+<td colspan="1" rowspan="1"><p><img src="../img/cardboard-unity/img-2.png" style="max-width: 297px"></p></td>
+<td colspan="1" rowspan="1"><p><img src="../img/cardboard-unity/img-3.png" style="max-width: 297px"></p></td>
+</tr></tbody>
+<tbody></tbody>
+</table><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Development tools and configuration to build Unity projects targeted for Android.</li>
+<li>How to design a game that can be used in Cardboard and out of Cardboard.</li>
+<li>What the key motivations are to incorporate Cardboard into your next game.</li>
+<li>Knowledge of best-practices for mobile VR.</li>
+<li>Links to key information for developing and publishing great Cardboard applications.</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>Cardboard&#160;VR Viewer</li>
+<li>Device compatible with Cardboard (such as Nexus 5, Nexus 4, Samsung Galaxy S5, Samsung Galaxy S4, Samsung Galaxy S3, HTC One M8, HTC One M7, LG G3, or Moto X)</li>
+<li>Unity 4.6.1 or greater. &#160;The free version will work for this codelab, Pro Version and Android Pro Add-on needed to enable distortion correction.</li>
+<li>Android SDK (and have Unity pointing to the installation)</li>
+<li>The cardboard plugin <a href="https://google.com/url?sa=D&q=https://github.com/googlesamples/cardboard-unity/archive/master.zip">https://github.com/googlesamples/cardboard-unity/archive/master.zip</a>&#160;</li>
+<li>Game assets downloaded from GitHub: <a href="https://github.com/googlesamples/io2015-codelabs/tree/master/cardboard-unity">Lollygagger Sample game</a>
+</li>
+<li>A USB micro to USB cable to connect the device to the computer.</li>
+</ul><h3>Game Summary</h3><p>For this codelab, we'll be using a simple and entertaining game, called&#160;"Lollygagger".&#160;The main game play is to travel along a path, atop a robot, shooting Lollipop "cannonballs" at&#160;the Androids that are lollygagging around. Key features of note are:</p><ul>
+<li>Two different Unity scenes, one for the main menu, and one for game play.</li>
+<li>Ability to play in &#8220;2D&#8221; mode as well as be able to start in Cardboard mode.</li>
+<li>Flinging lollipops to the targets, triggered by touch in 2D mode, or by the trigger on the side of Cardboard in VR mode.</li>
+<li>Super flexible and simple game level logic to allow infinite possibilities of hours of Cardboard fun!</li>
+</ul><codelab-survey><h4>How&#160;will you use this tutorial?</h4>
+<select><option>Read through it only</option>
+<option>Read it and complete the exercises</option></select><h4>How&#160;would you rate your experience with building Unity apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>How&#160;would you rate your experience with building Android apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="5:00">
+        
+          <h1></h1><p>First you need the Cardboard SDK for unity</p><p>You can either download all the sample code to your computer...&#160;</p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/cardboard-unity/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/googlesamples/cardboard-unity.git</pre><p>Next you need the unity asset package containing the sample game. &#160;You can download this here:</p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/cardboard-unity/assets/lollygagger_step0.unitypackage?raw=true">Download lollygagger_step0.unitypackage</a></paper-button></p>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Run the starter game" 
+        duration="20:00">
+        
+          <h1></h1><p>First, let's build and run the non-Cardboard version of the game. &#160;From there, we'll add Cardboard support.</p><h2>Configure Unity</h2><ol start="1">
+<li>Start Unity. &#160;If you have not developed an Android application with Unity before, make sure you configure the Android SDK within Unity. &#160;In Unity, click <strong>Preferences &gt; External Tools &gt; Android SDK Location, </strong>then select the folder where you downloaded and unzipped the Android SDK.</li>
+<li>Click <strong>File &gt; New Project </strong>and create a new project named &#8216;Lollygagger_cardboard&#8217;. </li>
+</ol><h2>Import the game assets</h2><p>Import the sample game scenes and assets into your project:</p><ul>
+<li>Click <strong>Assets &gt; Import Package &gt; Custom Package</strong>.</li>
+<li>Select the <code>lollygagger_step0.unitypackage</code>&#160;file you downloaded</li>
+<li>Click <strong>Import</strong>.</li>
+</ul><h2>Configure the Android player </h2><ol start="1">
+<li>Configure Unity to build an Android application</li>
+<li>From the menu: click <strong>File &gt; Build Settings...</strong>
+</li>
+<li>Select Android in the platform list</li>
+<li>Click <strong>Switch Platform</strong>
+</li>
+<li>Add the game scenes to the build.</li>
+<li>In the project explorer, select Assets</li>
+<li>Drag and Drop Assets/MainMenu scene to the "Scenes In Build" list within the Build Settings dialog.</li>
+<li>Then drag and drop Assets/GameScene scene into the list under MainMenu.</li>
+</ol><p><img src="../img/cardboard-unity/img-5.png.gif" style="max-width: 347px"></p><ol start="1">
+<li>Configure the Unity player settings</li>
+<li>Click Player Settings&#8230; in the Build Settings dialog</li>
+<li>Then expand &#8220;Resolution and Presentation&#8221; section by clicking on it.</li>
+<li>Set the application default orientation&#160;to Landscape Left. &#160;This is the correct orientation for the application when the phone is in Cardboard.</li>
+</ol><p><img src="../img/cardboard-unity/img-6.png" style="max-width: 343px"></p><ol start="1">
+<li>Expand the &#8220;Other Settings&#8221; section by clicking on it.</li>
+<li>Enter a unique Bundle ID, this follows .Net namespace (or Java package) naming rules. &#160;Typically this is of the form: com.&lt;yourcompany&gt;.&lt;appname&gt;</li>
+</ol><p><img src="../img/cardboard-unity/img-7.png" style="max-width: 400px"></p><ol start="7">
+<li>Save your project! &#160;Better safe than sorry&#160;:)</li>
+<li>Connect a device&#160;build and run! &#160;When prompted for a name for the APK file, enter Lollygagger.apk.</li>
+</ol><p>Congratulations! If you can play the starter project game on your Android device, you are now ready to add Cardboard! </p><h3>Troubleshooting</h3><p>Even the most simple things can have gotchas! &#160;Here are a couple and what to do about it. &#160;If you&#8217;re still having problems ask for help!</p><p><strong>Issue</strong></p><ul><li>I'm only seeing the Unity splash screen and then a blue screen with nothing happening</li></ul><p><strong>Solution</strong></p><ul><li>Make sure you have added MainMenu.unity and GameScene.unity scenes to the Build settings</li></ul><p><img src="../img/cardboard-unity/img-8.png" style="max-width: 454px"></p><p><strong>Issue:</strong>&#160;Error building Player: UnityException: Bundle Identifier has not been set up correctly</p><p><strong>Solution:</strong>&#160;Set the bundle identifier to something other than the default. &#160;This is in the player settings &gt; Other Settings section.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add cardboard to the main menu scene" 
+        duration="10:00">
+        
+          <h1></h1><p>In this lesson, you&#8217;ll import the Cardboard SDK into the Unity project. &#160;This gives you all the scripts and easy to use prefabs for quickly and easily enabling the game to be played in virtual reality mode.</p><h2>Add the Cardboard SDK to the project</h2><ol start="1">
+<li>Unzip the Cardboard SDK if you haven't yet</li>
+<li>From the menu in Unity: click <strong>Assets &gt; Import Package &gt; Custom package</strong>
+</li>
+<li>Select CardboardSDKForUnity.unitypackage</li>
+<li>Once the package is opened, Unity presents a list of the files within in the package. &#160;</li>
+<li>You can deselect the Demo Scene <em>and</em>&#160;the Legacy/Demo Scene folders, since we won&#8217;t be using it in this exercise.</li>
+<li>Click "<strong>Import</strong>"</li>
+</ol><p><img src="../img/cardboard-unity/img-9.png" style="max-width: 278px"></p><aside class="special"><p><strong>New to Cardboard?</strong></p>
+<p>If you are new to Cardboard, or want to explore it some more, your can create a new Unity project and import the Cardboard SDK <em>including</em>&#160;the demo scene and run it!</p></aside><h2>Add cardboard mode to the main menu scene</h2><p>This step adds the stereo cameras and related scripts which are used by the Cardboard SDK to render the stereoscopic view needed to use Cardboard.</p><ol start="1">
+<li>Open the main menu&#160;scene. &#160;In the project explorer, select the Assets folder, and then double click the MainMenu scene.</li>
+<li>Select the Main Camera in the Scene hierarchy. </li>
+<li>From the menu, click &#160;<strong>Component&#160;&gt; Cardboard &gt; Update Stereo Cameras</strong>. &#160;This does the following:</li>
+</ol><ol start="1">
+<li>Adds the StereoController script component (controls the rendering of the stereo effect)</li>
+<li>Adds the CardboardHead script component (the &#8220;head&#8221; containing the &#8220;eyes&#8221;)</li>
+<li>Creates Left and Right child cameras (aka the &#8220;eyes&#8221;)</li>
+<li>Also adds the SkyboxMesh script component (important since we use a skybox background).</li>
+</ol><h2>Change the UI to be in world space</h2><p>This step converts the main menu from being mapped to the Screen Space (which is based on the screen dimensions) to be mapped in the World Space (which is based on the 3d coordinates within the scene). &#160;This is done so that the menu rendering can be done by the stereo cameras used by Cardboard.</p><ol start="1"><li>Select <strong>Canvas </strong>from the <strong>Hierarchy </strong>window, then in the inspector panel:</li></ol><ul><li>Change Render Mode to World space</li></ul><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Change position to (0, 0, 750)</p><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Change Width and Height to 640 and 480</p><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;pivot = &#160;(.5, .5)</p><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Change scale to (1, 1, 1)</p><p><img src="../img/cardboard-unity/img-10.png" style="max-width: 312px"></p><ol start="2"><li>Associate the Main Camera with the Canvas. &#160;This is done so that UI events can be translated from the screen coordinates to the world coordinates. </li></ol><ul>
+<li>Click on the <strong>Canvas</strong>&#160;</li>
+<li>In the properties inspector, click on the circle control &#160;next to the Event Camera which will bring up the object selection dialog.</li>
+<li>Select the Scene tab, then Main Camera object.</li>
+</ul><p><img src="../img/cardboard-unity/img-11.png" style="max-width: 253px"></p><ol start="3"><li>Check the menu location and size. &#160;You can do this by clicking on the Game tab in the scene editor. &#160;You should see:</li></ol><p><img src="../img/cardboard-unity/img-12.png" style="max-width: 405px"></p><h2>Add the Cardboard mode button to the menu</h2><p>In this step, we add a button to the menu that will turn on and off "Cardboard Mode". In cardboard mode the stereoscopic rendering is done, in non-cardboard mode it is the normal 2D rendering. Just to make everything easy, we have made a prefab button.</p><ol start="1">
+<li>Find the cardboardButton prefab in the project explorer. &#160;This is under Assets/Prefabs.</li>
+<li>In the Hierarchy panel, expand the Canvas object and the Panel object. </li>
+<li>Drag and drop the cardboardButton prefab onto the Panel object in the hierarchy. When you are done, the hierarchy should look like:</li>
+</ol><p><img src="../img/cardboard-unity/img-13.png" style="max-width: 206px"></p><p>Next, we'll write the script that will run when the button is clicked.&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</p><h3></h3>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Write the Cardboard Mode Script" 
+        duration="5:00">
+        
+          <h1></h1><p>Now that there is a button on the menu for switching the cardboard mode, we need to make it do something when it is clicked. So finally we get to write some code!</p><ol start="1"><li>Create a new script component on the Canvas.</li></ol><ul>
+<li>Select the Canvas object in the hierarchy.</li>
+<li>In the properties panel, scroll to the bottom and click <strong>Add Component</strong>
+</li>
+<li>In the list of component types, scroll to the bottom and click <strong>New Script</strong>.</li>
+<li>Name the script <strong>CardboardModeMgr</strong>, and keep the language CSharp.</li>
+<li>Click <strong>Create and Add</strong>.</li>
+</ul><p>There are two tasks that this script must do. First, it should handle the toggling of Cardboard mode, and second, it must handle the pointer functionality. This is the equivalent of using the mouse on a computer, or your finger on a mobile device. When in Cardboard mode the direction you are looking needs to be treated in the same manner.</p><aside class="special"><p><strong>Note: </strong>The Cardboard SDK is implemented as a game object on the current scene. This means if you want to change the mode VR mode, or any of the settings, you must handle changing all the scenes in your application.</p></aside><h2></h2><h2>Handle Cardboard mode</h2><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;There are two methods we need to handle the cardboard mode.</p><ol start="1">
+<li>When we start figure out which mode we should be in.</li>
+<li>When the button to change the mode is clicked, we change the mode and remember which mode we are in.</li>
+</ol><p>Open&#160;CardboardModeMgr&#160;script by double-clicking on it, delete the entire contents and paste in the following code.</p><h3></h3><codelab-snippet>using UnityEngine;
+using System.Collections;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using UnityEngine.UI;
+
+public class CardboardModeMgr : MonoBehaviour {
+    
+    // We need a reference to camera which 
+    // is how we get to the cardboard components.
+    public GameObject mainCamera;
+
+
+    public void Start()
+    {
+        // Save a flag in the local player preferences to initialize VR mode
+        // This way when the app is restarted, it is in the mode that was last used.
+        int doVR = PlayerPrefs.GetInt("VREnabled");
+        Cardboard.SDK.VRModeEnabled = doVR == 1;
+        CardboardHead head = mainCamera.GetComponent&lt;CardboardHead&gt;();
+        head.enabled  = Cardboard.SDK.VRModeEnabled;
+    }
+
+   // The event handler to call to toggle Cardboard mode.
+    public void ChangeCardboardMode ()
+    {
+        CardboardHead head = mainCamera.GetComponent&lt;CardboardHead&gt;();
+        if (Cardboard.SDK.VRModeEnabled) {
+            // disabling.  rotate back to the original rotation.
+            head.transform.localRotation = Quaternion.identity;
+        }
+        Cardboard.SDK.VRModeEnabled = !Cardboard.SDK.VRModeEnabled;
+        head.enabled  = Cardboard.SDK.VRModeEnabled;
+        PlayerPrefs.SetInt("VREnabled", Cardboard.SDK.VRModeEnabled?1:0);
+        PlayerPrefs.Save();        
+    }
+}</codelab-snippet><aside class="special"><p><strong>P</strong><em>ro Tip</em>: when pasting code into the editor, the script editor sometimes gets out of sync with the Unity project. &#160;This is fixed by &#160;selecting Assets &gt; Sync Monodevelop Project from the Unity main menu.</p></aside><ol start="3"><li>Save the script and switch back to the Scene Editor.</li></ol><h2>Handle VR pointing and clicking</h2><p>In order to control the game play while in cardboard mode, we need to add an input module to the event system that uses the player's gaze to select or point to objects and use the cardboard trigger as an input event.</p><ol start="1">
+<li>In the scene hierarchy, select the EventSystem object.</li>
+<li>From the menu, select <strong>Component &gt; Scripts &gt; Gaze Input Module</strong>.</li>
+</ol><h2>Associate the camera with the other game objects</h2><p>In order to gain access to the user&#8217;s direction of view, or <em>gaze</em>, the main camera needs to be made available to these components.</p><ol start="1">
+<li>Select the Canvas object &#160;in the hierarchy.</li>
+<li>Notice in the properties inspector for the Cardboard Mode Mgr component, there is a place for Main Camera. &#160;</li>
+<li>Click on the circle next to the value and select the Scene tab, then Main Camera object.</li>
+</ol><p><img src="../img/cardboard-unity/img-14.png" style="max-width: 253px"></p><h2>Associate the click event with the script</h2><ol start="1">
+<li>In the scene hierarchy, select the buttonCardboard&#160;object(under Canvas/Panel) .</li>
+<li>In the properties inspector, scroll down to the <strong>On Click () </strong>&#160;section.</li>
+<li>Click the <strong>+ </strong>to add another handler.</li>
+</ol><ul>
+<li>Make sure Runtime Only is selected</li>
+<li>For the game object, click the circle, and under the scene tab, select <strong>Canvas </strong>by double clicking.</li>
+</ul><p><img src="../img/cardboard-unity/img-15.png" style="max-width: 325px"></p><ul><li>Drop down the function selection (initially showing <em>No Function</em>) and select CardboardModeMgr.ChangeCardboardMode()</li></ul><ol start="4"><li>Save the scene, and Save the project!</li></ol>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Test out the main menu!" 
+        duration="1:00">
+        
+          <h1></h1><p>The Cardboard SDK has the facility to preview the stereo rendering in the editor. &#160;Using Alt+mouse to move the head around. &#160;It is not perfect--specifically the input events can be can get a little confusing since the mouse is present, but it is a good quick way of doing a sanity check.</p><p>But enough sanity! Let&#8217;s build the project again and run the app. &#160;Click on the Cardboard Button to go into VR mode, and put your phone in the Cardboard&#160;device.</p><p><img src="../img/cardboard-unity/img-16.png" style="max-width: 527px"></p><p>Look around, see how the buttons become selected by just looking at them! &#160;</p><p>Using the trigger will click the selected button--but be careful!! The main game is <em>not</em>&#160;in VR mode (yet) so trying to play the the main game in Cardboard can be a dizzying experience&#8230;..</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add Cardboard to the Game Scene" 
+        duration="10:00">
+        
+          <h1></h1><p>This lesson updates the main game scene to be VR enabled. &#160;This involves similar steps that you just did in the previous lesson. &#160;Specifically adding the stereoscopic rendering, updating menu UIs and adding trigger support.</p><h2>Add Cardboard view to the Game Scene</h2><p>This step adds the stereo cameras and related scripts which are used by the Cardboard SDK to render the stereoscopic view needed to use Cardboard.</p><ol start="1">
+<li>Open the game scene. &#160;In the project explorer, select the Assets folder, and the double click the GameScene scene.</li>
+<li>Select the Main Camera in the Scene hierarchy. Since the game play is in first person, the main camera is a child object of the player.</li>
+<li>From the menu, click <strong>&#160;Component &gt; Cardboard &gt; Update Stereo Cameras</strong>. &#160;This does the following:</li>
+</ol><ol start="1">
+<li>Adds StereoController (controls the rendering of the stereo effect)</li>
+<li>Adds CardboardHead (the &#8220;head&#8221; containing the &#8220;eyes&#8221;)</li>
+<li>Creates Left and Right child cameras (aka the &#8220;eyes&#8221;)</li>
+<li>Also adds SkyboxMesh (important since we use a skybox background).</li>
+</ol><h2>Add the GazeInputModule script to the EventSystem</h2><p>The GazeInputModule handles input events, so it needs to be on every scene.</p><ol start="3">
+<li>In the scene hierarchy, select the EventSystem object.</li>
+<li>From the menu, select <strong>Component &gt; Scripts &gt; Gaze Input Module</strong>.</li>
+</ol><h2>Save and Run!</h2><ol start="1">
+<li><strong>File &gt; Save scene</strong></li>
+<li><strong>File &gt; Save project</strong></li>
+<li>
+<strong>File &gt; Build and ru</strong>n &#160;</li>
+</ol><p>When you start the game, if it is not in cardboard mode, click on cardboard mode and then Start.</p><p><em>Great News: </em>The scene is in 3D and you can look around the virtual world!</p><p><em>Not So Great News</em>: Shooting, and the menu are not working (yet, but that is why you&#8217;re here!)</p><h2>Change Aiming to be based on the gaze of the player</h2><p>In the 2D world, the finger touch is used to rotate the player in order to aim and shoot. &#160;In VR mode, the rotation is done by the actual user, and the Cardboard SDK handles that for you!</p><ol start="1">
+<li>Open the MouseLooking script. &#160;This is found in the project explorer, Assets/Scripts. </li>
+<li>Then at the top of the Update() method paste the following. &#160;It does not affect the application other than saving a few precious CPU cycles.</li>
+</ol><codelab-snippet>if (Cardboard.SDK.VRModeEnabled) {
+           return;    
+ }</codelab-snippet><ol start="3"><li>Save the script and return to the Unity editor.</li></ol><p>Wonderful - all those CPU cycles are yours to keep!</p><h2>Add firing using the cardboard button or trigger</h2><ol start="1">
+<li>Open the Shooting script. This is found in the project explorer, Assets/Scripts. </li>
+<li>In the Update() method, find the if statement:</li>
+</ol><codelab-snippet>// Replace this...
+if(Input.GetButtonUp("Fire1") &amp;&amp; ! GameManager.Instance.IsMenuShowing)</codelab-snippet><p>And change it to:</p><codelab-snippet>// Cardboard-enabled
+if((Cardboard.SDK.CardboardTriggered || Input.GetButtonUp("Fire1")) &amp;&amp; 
+     !GameManager.Instance.IsMenuShowing)</codelab-snippet><ol start="1">
+<li>Save the script and return to the Unity editor.</li>
+<li>Save the scene and the project.</li>
+<li>Build and run!</li>
+</ol><h2>Make the ending menu VR compatible</h2><p>This is similar to what we did in the MainMenu scene to make the menu appear in Cardboard mode. &#160;As you recall, the UI canvas needs to be mapped in the World Space (which is the 3d coordinates within the game) so that the menu rendering can be done by the stereo cameras used by Cardboard.</p><ol start="1"><li>Select <strong>Canvas </strong>from the <strong>Hierarchy </strong>window, then in the inspector panel:</li></ol><ul>
+<li>Change Render Mode to World space</li>
+<li>Change position to (25, 0, 135)</li>
+<li>Change Width and Height to 240 and 180</li>
+<li>pivot &#160; (.5, .5)</li>
+<li>Change scale to (0.04, 0.04, 0.04)</li>
+</ul><ol start="2"><li>Set the Event Camera to be the Main Camera (By now you should know how to do this!) Hint: click the circle next to the property and select the Main Camera.</li></ol><p><img src="../img/cardboard-unity/img-17.png" style="max-width: 369px"></p><ol start="3">
+<li>Save the project</li>
+<li>Build &amp; run and be amazed!</li>
+</ol><p><em>Congratulations!!!</em>&#160;You've just taken a giant step to the exciting world of Cardboard using Unity. But as you can imagine, there are so many more facets to creating awesome Cardboard games.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="References" 
+        duration="0:00">
+        
+          <h1></h1><p>Here are some references for you to explore on your own time.</p><p><strong><a href="https://developers.google.com/cardboard/overview">Overview of Cardboard</a></strong></p><p><strong><a href="https://developer.android.com/distribute/tools/launch-checklist.html">Android Launch Checklist</a></strong></p><p><strong><a href="https://docs.unity3d.com/Manual/OptimizingGraphicsPerformance.html">Performance Optimizations</a></strong></p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

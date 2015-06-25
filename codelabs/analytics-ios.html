@@ -1,0 +1,130 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="http://io2015codelabs.appspot.com/codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="http://io2015codelabs.appspot.com/css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Google Analytics for iOS Apps"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Analytics"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p><img src="../img/analytics-ios/img-1.png" style="max-width: 624px"></p><p>Google Analytics is a great tool for understanding how people are using your app. You can get data in real-time about what screens they are using, and set-up custom events to find out what they&#8217;re doing.</p><p>In this&#160;codelab, you&#8217;ll&#160;learn how to add Google Analytics to an existing iOS Application. You&#8217;ll have a working app which you can track data from at analytics.google.com.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Setup and configure a Google Analytics project</li>
+<li>Incorporate it into a sample iOS application</li>
+<li>Track screen usage in real-time</li>
+</ul><h3>What you’ll need</h3><ul>
+<li><a href="https://developer.apple.com/xcode/downloads/">Xcode</a></li>
+<li>The <a href="https://github.com/googlesamples/io2015-codelabs/tree/master/analytics-ios">sample code</a>
+</li>
+<li>
+<a href="http://guides.cocoapods.org/using/getting-started.html">CocoaPods</a>&#160;to simplify dependency management</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Configure your project" 
+        duration="1:00">
+        
+          <h1></h1><h3>Log in to your project</h3><p>Click <a href="http://developers.google.com/mobile/add">here</a>&#160;to configure your project. Log in to your project if necessary. Then select "Pick a platform".</p><h3>Configure your project</h3><p><img src="../img/analytics-ios/img-2.png" style="max-width: 509px"></p><p>and select iOS.</p><p><img src="http://io2015codelabs.appspot.com/img/analytics-ios/img-3.png" style="max-width: 513px"></p><p>Create a new project, give it a name and use this bundle ID:</p><p><code>com.google.samples.quickstart.AnalyticsExample</code></p><p><img src="http://io2015codelabs.appspot.com/img/analytics-ios/img-4.png" style="max-width: 624px"></p><p>Press Choose and configure services. Then click to accept the TOS.</p><p><img src="http://io2015codelabs.appspot.com/img/analytics-ios/img-5.png" style="max-width: 624px"></p><p>Select Analytics. Then select your Google Analytics Account, or create one if you don&#8217;t have one. And then select your <a href="https://support.google.com/analytics/answer/2649554">Analytics Property</a>. If you don&#8217;t have one, this will automatically create it for you. Finally, push Enable Analytics Service&#160;and then press Continue to Generate Configuration Files. </p><p><img src="../img/analytics-ios/img-6.png" style="max-width: 624px"></p><p>On this last page, press Download GoogleService-Info.plist to get the required plist file. </p><p>Note that the screen gives you instructions for setting up a Podfile. You do not need to create a Podfile as one already exists in the sample project you&#8217;re about to open. If you're trying this code lab at Google I/O, CocoaPods is pre-installed for you., Otherwise, if you don't have CocoaPods already, follow the <a href="https://guides.cocoapods.org/using/getting-started.html">installation instructions</a>.</p><p>The screen also gives you an Analytics tracking ID. You won&#8217;t need it for this project.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run Sample Code" 
+        duration="0:30">
+        
+          <h1></h1><h4>Code Location</h4><p>Check out the code from the <a href="https://github.com/googlesamples/io2015-codelabs/tree/master/analytics-ios">github repository</a>.</p><p>Open up a Terminal and run</p><codelab-snippet>$ cd io2015-codelabs/analytics-ios
+$ pod install
+$ open AnalyticsExample.xcworkspace</codelab-snippet><h4>CocoaPods</h4><p>This will&#160;fetch the CocoaPods dependencies, and&#160;open the app in Xcode.</p><p>In Finder, navigate to where you downloaded the <code>GoogleService-Info.plist</code>&#160;file. Drag that into the Supporting Files directory of your project on Xcode. Make sure 'Copy files if needed' is checked. Click OK. Then click Run and run it in the iOS Simulator. You&#8217;ll get this quickstart app in the simulator. At the bottom of the default view there&#8217;s four tabs, A-D. Each one changes the icon displayed. Click on one&#160;and check out the new image.</p><p><img src="../img/analytics-ios/img-7.png" style="max-width: 315px"></p><p>At the moment, switching tabs switches the screen, but does nothing else.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add in Analytics Code to your app" 
+        duration="1:00">
+        
+          <h1></h1><p>In this step you&#8217;ll add in code to three different files, <code>AppDelegate.m, ViewController.m</code>, and <code>PatternTabBarController.m</code>&#160;and start sending information to Google Analytics.</p><h2>AppDelegate.m</h2><p>In <code>AppDelegate.m</code>&#160;you&#8217;ll create a shared context by adding in the tracker information that you brought in by adding in the <code>GoogleServices-Info.plist</code>&#160;file.</p><p>First, add these imports:</p><h3></h3><codelab-snippet>#import &lt;Google/Core.h&gt;
+#import &lt;GoogleAnalytics/GAI.h&gt;</codelab-snippet><p>In <code>application:didFinishLaunchingWithOptions:</code>&#160;add in the following code:<br></p><codelab-snippet>     NSError *configureError;
+    [[GGLContext sharedInstance] configureWithError:&amp;configureError];
+    if (configureError != nil) {
+        NSLog(@"Error configuring the Google context: %@", configureError);
+    }
+    
+    // Optional: configure GAI options.
+    GAI *gai = [GAI sharedInstance];
+    gai.trackUncaughtExceptions = YES;  // report uncaught exceptions
+    gai.logger.logLevel = kGAILogLevelVerbose;  // remove before app release</codelab-snippet><h2>ViewController.m</h2><p>In&#160;<code>ViewController.m</code>&#160;take these steps to send your screen information to Analytics, every time a new tab is displayed:</p><ol start="1">
+<li>Import <code>Google/Analytics.h</code>
+</li>
+<li>In <code>viewWillAppear:animated: </code>create a string based on the tab name<br><code>&#160; NSString *name = [NSString stringWithFormat:@"Pattern~%@", self.title];</code>
+</li>
+<li>Get the default <code>GAITracker</code>, and give it the value you set in the previous step<br><code>&#160; id&lt;GAITracker&gt; tracker = [[GAI sharedInstance] defaultTracker];&#160; id&lt;GAITracker&gt; tracker = [[GAI sharedInstance] defaultTracker];<br> &#160;[tracker set:kGAIScreenName value:name];</code>
+</li>
+<li>Send that information to your Analytics account<br> &#160;<code>[tracker send:[[GAIDictionaryBuilder createScreenView] build]];</code>
+</li>
+</ol><p>This will send info to Google Analytics when the view is created, and Analytics will track the screen that is in use.</p><h2>PatternTabBarController.m</h2><p>In&#160;<code>PatternTabBarController.m</code>, take these steps to send a custom event when the Share button is pressed:</p><ol start="1">
+<li>Import <code>Google/Analytics.h</code>
+</li>
+<li>In <code>didTapShare:sender:</code>, get the default <code>GAITracker</code><br><code>&#160; id&lt;GAITracker&gt; tracker = [[GAI sharedInstance] defaultTracker];</code>
+</li>
+<li>Create a custom event, and share it with the tracker:</li>
+</ol><codelab-snippet>NSMutableDictionary *event =
+    [[GAIDictionaryBuilder createEventWithCategory:@"Action"
+                                            action:@"Share"
+                                             label:nil
+                                             value:nil] build];
+[tracker send:event];</codelab-snippet><ol start="4"><li>You can optionally implement the Share action, or just display an alert when the button is pressed, as so:</li></ol><codelab-snippet>NSString *title = [NSString stringWithFormat:@"Share: %@",
+                            self.selectedViewController.title];
+NSString *message = @"Share is not implemented in this quickstart";
+
+UIAlertController *alert = [UIAlertController
+           alertControllerWithTitle:title 
+                            message:message 
+                     preferredStyle:UIAlertControllerStyleAlert];
+[alert addAction:[UIAlertAction 
+                   actionWithTitle:@"Awww...."
+                             style:UIAlertActionStyleCancel
+                           handler:nil]];
+[self presentViewController:alert animated:YES completion:nil];</codelab-snippet><h2>Run the app</h2><p>Finally, run the app again and start pressing tabs. That information will immediately get sent to Google Analytics.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Access the data" 
+        duration="0:30">
+        
+          <h1></h1><p>Go to <a href="http://www.google.com/analytics/">analytics.google.com</a>&#160;and select Access Google Analytics&#160;in the upper-right corner. This will take you to your Google Analytics account. Drill down into your account and the property that matches the Analytics ID you added to the project.&#160;Drill down to Real-Time data and you can see data usage for your app as you click on buttons.&#160;Check out the Screens and Events tabs to see info about your app.</p><p><img src="../img/analytics-ios/img-8.png" style="max-width: 624px"></p><p>Congratulations! You&#8217;re done!</p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

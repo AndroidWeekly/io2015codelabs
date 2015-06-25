@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/core-overlay/core-overlay.html">
+<link rel="import" href="../../bower_components/core-tooltip/core-tooltip.html">
+
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
+<polymer-element name="glossary-term" attributes="heading text term" constructor="GlossaryTerm">
+<template>
+	<link rel="stylesheet" href="glossary-term.css">
+
+  <a id="term" class="glossary-term"><content></content></a>
+
+  <paper-dialog id="definition" backdrop heading="{{heading}}" transition="core-transition-center">
+    <p><strong>Definition:</strong> {{text}}</p>
+  </paper-dialog>
+
+</template>
+<script>
+  Polymer('glossary-term', {
+    heading: '',
+    text: '',
+    selected: false,
+    ready: function() {
+      if (!this.term) {
+        this.term = this.textContent.toLowerCase();
+      }
+      this.$.term.addEventListener('click', function(definition){ return function(){
+        definition.toggle();
+      }}(this.$.definition));
+    }
+  });
+</script>
+</polymer-element>

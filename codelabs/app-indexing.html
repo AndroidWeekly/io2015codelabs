@@ -1,0 +1,283 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Get Search Autocomplete from Deep Links"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Search"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p><img src="../img/app-indexing/img-1.png" style="max-width: 526px"></p><p>In this codelab, you&#8217;ll&#160;learn how to send page view data to the App Indexing API. &#160;This allows Android to show custom autocomplete results&#160;for your app's users&#160;in the Google&#160;search&#160;app. </p><p>You&#8217;ll be able to play with the sample app and see autocomplete results show up in the Google app.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Recording pageviews with the App Indexing API</li>
+<li>Displaying custom autocomplete results in the Google app</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>
+<a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>&#160;version 1.0+</li>
+<li>The sample code</li>
+<li>The <a href="https://play.google.com/store/apps/details?id=com.google.android.googlequicksearchbox">Google app</a>&#160;version 2.8+</li>
+<li>A device with Android&#160;4.1+</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="1:30">
+        
+          <h1></h1><p>You can either download all the sample code to your computer... </p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/google/search-samples/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/google/search-samples.git</pre><aside class="special"><p>The search-samples repository contains many sample projects. This codelab only uses two:</p>
+<ul>
+<li>
+<img src="../img/app-indexing/img-2.png" style="max-width: 20px"><strong>android-deep-linking</strong>&#8212;The starting code that we will build upon in this codelab.</li>
+<li>
+<img src="../img/app-indexing/img-2.png" style="max-width: 20px"><strong>app-indexing</strong>&#8212;The complete code for the finished Android app.</li>
+</ul></aside>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Run the sample app" 
+        duration="1:30">
+        
+          <h1></h1><p>First, let&#8217;s see what the finished app looks like. Open the completed sample app in <a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>:</p><ol start="1">
+<li>Select the <img src="../img/app-indexing/img-2.png" style="max-width: 20px"><code>app-indexing</code>&#160;directory from the sample code(<strong>Quickstart</strong>&#160;&gt; &#160;<strong>Import Project&#8230; </strong>&gt; <code>app-indexing</code>).</li>
+<li>Click the <img src="../img/app-indexing/img-3.png" style="max-width: 20px"><strong>Gradle sync </strong>button.</li>
+<li>
+<a href="http://developer.android.com/tools/device.html">Enable USB debugging</a>&#160;on your Android device.</li>
+<li>Plug your Android device&#160;and click the <img src="../img/app-indexing/img-4.png" style="max-width: 20px"><strong>Run</strong>&#160;button. You should see the Recipe App home screen appear after a few seconds.</li>
+<li>Open a command line terminal on your computer and enter the following Android Debug Bridge command:</li>
+</ol><pre>adb shell am start -a android.intent.action.VIEW \
+-d "http://recipe-app.com/recipe/pierogi-poutine" com.recipe_app</pre><ol start="6"><li>This command should launch the app with the given URI, which points to a recipe. Verify that the app opens with the&#160;delicious recipe on the screen.</li></ol><p>Next,&#160;you'll test that this recipe is available from the Google app as an autocomplete result.</p><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="https://developer.android.com/sdk/installing/studio.html">How do I install Android Studio?</a></li>
+<li><a href="http://developer.android.com/tools/device.html">How do I enable USB debugging?</a></li>
+<li><a href="http://stackoverflow.com/a/16598454">Why doesn't Android Studio see my device?</a></li>
+<li><a href="http://stackoverflow.com/a/4786299">Android error: Failed to install *.apk on device *: timeout?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Test Final App Autocomplete in Google Search">
+        
+          <h1></h1><p>Duration: 1:00</p><p>Before you can see autocomplete results from your app in the Google app, we need to make sure that autocomplete is enabled for the sample recipe app.</p><ol start="1">
+<li>Go to the Google app and click on <strong>Settings</strong>.</li>
+<li>From the settings page, click on <strong>Phone search</strong>.</li>
+</ol><p><img src="../img/app-indexing/img-5.png.jpeg" style="max-width: 244px"></p><ol start="3"><li>Make sure that the checkbox beside the sample app is checked. If you don&#8217;t see the sample app there, you haven&#8217;t recorded any pageviews yet.</li></ol><p><img src="../img/app-indexing/img-6.png.jpeg" style="max-width: 243px"></p><ol start="4">
+<li>Once autocomplete is enabled for the sample app, test it out to make sure that it works properly.</li>
+<li>Open the Google app, and start typing <em>"pierogi poutine</em>" in the search box.</li>
+<li>You should see an autocomplete result for the sample app.</li>
+<li>Click on the autocomplete result to get the intent chooser dialog.</li>
+<li>Select your app from the list and make sure that it opens the correct view in your app.</li>
+</ol>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run the starter app" 
+        duration="1:00">
+        
+          <h1></h1><p><img src="../img/app-indexing/img-7.png" style="max-width: 241px"></p><p>Now you&#8217;re ready to build on top of the starter project to add search autocomplete to it.</p><ol start="1">
+<li>Select the <img src="../img/app-indexing/img-2.png" style="max-width: 20px"><code>android-deep-linking</code>&#160;directory from your sample code download (<strong>File</strong>&#160;&gt; &#160;<strong>Import Project&#8230; </strong>&gt; <code>android-deep-linking</code>).</li>
+<li>Click the <img src="../img/app-indexing/img-3.png" style="max-width: 20px"><strong>Gradle sync </strong>button. &#160;If this button is grayed out, wait for Android Studio to finish &#8220;Indexing&#8221; (you can see progress in the lower right).</li>
+<li>Click the <img src="../img/app-indexing/img-4.png" style="max-width: 20px"><strong>Run</strong>&#160;button. You should see the Recipe App home screen appear after a few seconds.</li>
+</ol><p>That&#8217;s all that the app does for now. Next, we&#8217;ll add the App Indexing API so that we can record pageviews.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add App Indexing API" 
+        duration="1:45">
+        
+          <h1></h1><p>The next thing we need to do is add the App Indexing API to our project. </p><p>If your app is already using Google Play services, you need to make sure that you are using version 5 or higher and minSdkVersion 17 or less.</p><aside class="special"><p><strong>Selectively compiling APIs into your executable</strong></p>
+<p>In versions of Google Play services prior to 6.5, you had to compile all of the Google Play services APIs into your app. This made it difficult to keep the number of methods in your app under the 65,536 limit. Starting with version Google Play services 6.5, you can selectively compile Google Play service APIs into your app.</p></aside><p>Here&#8217;s what you need to do to just add the App Indexing API Jar file to your project.</p><ol start="1"><li>Add the following extras from the <img src="../img/app-indexing/img-8.png" style="max-width: 20px"><strong>SDK Manager</strong>&#160;if you don't already have them:</li></ol><ul>
+<li>Android support repository</li>
+<li>Google Play services</li>
+<li>Google repository</li>
+</ul><ol start="2"><li>Add the App Indexing library to your Gradle build file dependencies.</li></ol><h3><a href="https://github.com/google/search-samples/blob/master/app-indexing/app/build.gradle">build.gradle</a> </h3><codelab-snippet>dependencies {
+    compile 'com.android.support:support-v13:21.0.0'
+    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.google.android.gms:play-services-appindexing:7.0.0'
+    compile group:'com.squareup.picasso', name:'picasso', version:'2.3.2'
+    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+}</codelab-snippet><ol start="3"><li>Once the dependencies are declared, run <img src="../img/app-indexing/img-3.png" style="max-width: 20px"><strong>Gradle sync</strong>&#160;to update the Android Studio project.</li></ol><p>Now your project has access to the App Indexing API and you can start recording pageviews in your app.</p><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="http://stackoverflow.com/a/17243377">How do I add Google Play services to&#160;a project in Android Studio?</a></li>
+<li><a href="http://stackoverflow.com/q/14371725/81821">How do I add Google Play services to a project in Eclipse?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create an API Client" 
+        duration="0:45">
+        
+          <h1></h1><p>Before we can make calls to the App Indexing API,&#160;we need to add an instance of <code>GoogleApiClient</code>&#160;to our Activity. This can be done in the <code>onCreate()</code>&#160;method as follows:</p><h3><a href="https://github.com/google/search-samples/blob/master/app-indexing/app/src/main/java/com/recipe_app/client/RecipeActivity.java">RecipeActivity.java</a></h3><codelab-snippet>private GoogleApiClient mClient;
+...
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_recipe);
+
+    mClient = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
+
+    onNewIntent(getIntent());
+}</codelab-snippet>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Record a Page View" 
+        duration="1:30">
+        
+          <h1></h1><p>Now that we've created an API client, we're ready to start indexing the page views in our app. In this step, we'll tell Google that the user has viewed a specific page within our app. This will make that page available as an autocompletion the next time they search for this topic in the Google app.</p><p>Add the <code>TAG</code>&#160;and <code>BASE_APP_URI</code>&#160;constants to the top of <code>RecipeActivity</code>&#160;and then add the <code>onStart()</code>&#160;method to the body of the <code>RecipeActivity</code>&#160;class.</p><h3><a href="https://github.com/google/search-samples/blob/master/app-indexing/app/src/main/java/com/recipe_app/client/RecipeActivity.java">RecipeActivity.java</a></h3><codelab-snippet>private static final String TAG = RecipeActivity.class.getName();
+private static final Uri BASE_APP_URI = Uri.parse("android-app://com.recipe_app/http/recipe-app.com/recipe/");
+
+...
+
+@Override
+public void onStart(){
+    super.onStart();
+    if (recipe != null) {
+        // Connect your client
+        mClient.connect();
+
+        // Define a title for your current page, shown in autocompletion UI
+        final String TITLE = recipe.getTitle();
+        final Uri APP_URI = BASE_APP_URI.buildUpon().appendPath(recipe.getId()).build();
+
+        Action viewAction = Action.newAction(Action.TYPE_VIEW, TITLE, APP_URI);
+
+        // Call the App Indexing API view method
+        PendingResult&lt;Status&gt; result = AppIndex.AppIndexApi.start(mClient, viewAction);
+
+        result.setResultCallback(new ResultCallback&lt;Status&gt;() {
+            @Override
+            public void onResult(Status status) {
+                if (status.isSuccess()) {
+                    Log.d(TAG, "App Indexing API: Recorded recipe "
+                            + recipe.getTitle() + " view successfully.");
+                } else {
+                    Log.e(TAG, "App Indexing API: There was an error recording the recipe view."
+                            + status.toString());
+                }
+            }
+        });
+    }
+}</codelab-snippet><p>Notice that we need to pass in the title of the page. This is what will be shown to the user in the search autocomplete,&#160;and it is also the text that is used to determine what queries to show the autocomplete result for.</p><p>We also pass in the URI that corresponds to the Android app deep link for the current page. This is the deep link that is triggered when the user clicks on the autocomplete result.</p><aside class="special"><p><strong>Best Practices</strong></p>
+<ul>
+<li>Only call the <code>AppIndexApi.start()</code>&#160;method once each time the user explicitly chooses to view some content.</li>
+<li>There should be an existing <a href="http://localhost:22080/app-indexing/webmasters/app">deep link</a>&#160;in the app for each API call.</li>
+<li>Use an accurate and descriptive title in your <code>AppIndexApi.start()</code>&#160;call. The text defined in this title may be used in the Google app query autocompletions.</li>
+<li>We recommend that you inform your users that links visited in the app may be shared with Google to improve the search experience.</li>
+</ul></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Record a Page View End" 
+        duration="1:30">
+        
+          <h1></h1><p>When a user has finished viewing a page, it's important to send an update to the API to notify it that the pageview is completed.</p><p>Add the following <code>onStop()</code>method to the <code>RecipeActivity</code>&#160;class:</p><h3><a href="https://github.com/google/search-samples/blob/master/app-indexing/app/src/main/java/com/recipe_app/client/RecipeActivity.java">RecipeActivity.java</a></h3><codelab-snippet>@Override
+public void onStop(){
+    if (recipe != null) {
+        final String TITLE = recipe.getTitle();
+        final Uri APP_URI = BASE_APP_URI.buildUpon().appendPath(recipe.getId()).build();
+
+        Action viewAction = Action.newAction(Action.TYPE_VIEW, TITLE, APP_URI);
+        PendingResult&lt;Status&gt; result = AppIndex.AppIndexApi.end(mClient, viewAction);
+
+        result.setResultCallback(new ResultCallback&lt;Status&gt;() {
+            @Override
+            public void onResult(Status status) {
+                if (status.isSuccess()) {
+                    Log.d(TAG, "App Indexing API: Recorded recipe "
+                            + recipe.getTitle() + " view end successfully.");
+                } else {
+                    Log.e(TAG, "App Indexing API: There was an error recording the recipe view."
+                            + status.toString());
+                }
+            }
+        });
+
+        mClient.disconnect();
+        super.onStop();
+    }
+}</codelab-snippet><p>This method is very similar to the start() method. It also sends a title and a deep link URI. Calling this method allows the API to measure how long the the user spent&#160;on the page.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Test Autocomplete in Google Search" 
+        duration="1:30">
+        
+          <h1></h1><p><img src="../img/app-indexing/img-1.png" style="max-width: 526px"></p><p>Now let's test this in the Google app to see the autocompletions for our sample app.</p><ol start="1">
+<li>Click the <img src="../img/app-indexing/img-4.png" style="max-width: 20px"><strong>Run</strong>&#160;button. You should see the Recipe App home screen appear after a few seconds.</li>
+<li>Open some pages in the sample app using the Android Debug Bridge.</li>
+</ol><pre>adb shell am start -a android.intent.action.VIEW \
+-d "http://recipe-app.com/recipe/pierogi-poutine" com.recipe_app</pre><ol start="3">
+<li>Using the Google app, do a search for the title (<em>&#8220;pierogi poutine&#8221;</em>) of one of the pages in your app.</li>
+<li>You should see the sample app listed in the autocomplete results.</li>
+<li>Click on the autocomplete result and make sure that it deep links to the correct view in the sample app.</li>
+<li>You can verify that the page views have been indexed by checking your <a href="http://history.google.com/history/app">app history</a>.</li>
+</ol>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="1:00">
+        
+          <h1></h1><p><img src="../img/app-indexing/img-9.png" style="max-width: 624px"></p><p>Your app is now ready to show autocomplete results from the Google app powered by deep links and the App Indexing API. </p><h3>What we've covered:</h3><ul>
+<li>Recording pageviews with the App Indexing API</li>
+<li>Displaying custom autocomplete results in the Google app</li>
+</ul><h3>Next Steps:</h3><ul>
+<li>Add autocomplete to your own app</li>
+<li>Learn how to <a href="http://search-codelabs.appspot.com/codelabs/web-deep-linking">add deep links to your website</a>
+</li>
+</ul><p>If you would like to find out more about App Indexing please see the <a href="https://developers.google.com/app-indexing/">full developer documentation</a>.</p><p>You can post questions and find answers on Stack&#160;Overflow under the <a href="http://stackoverflow.com/questions/tagged/deep-linking" class="stackoverflow-tag">deep-linking</a>&#160;or <a href="http://stackoverflow.com/questions/tagged/android-app-indexing" class="stackoverflow-tag">android-app-indexing</a>&#160;tags.</p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

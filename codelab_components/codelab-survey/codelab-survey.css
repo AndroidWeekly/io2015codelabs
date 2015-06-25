@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  background-color: rgb(237, 244, 255);
+  margin: 2em 0;
+  padding: 0;
+  border-left: 4px solid #94BAF9;
+}
+
+h4 {
+  font-weight: 400;
+  font-size: 1.2em;
+  padding: 0.8em 0.6em 0 20px;
+  margin: 0;
+  
+}
+
+paper-radio-group {
+  padding: 0.4em 0 1.1em 30px;
+}
+
+paper-radio-group::shadow ::content > * {
+  padding: 4px 0;
+}
+
+paper-radio-group paper-radio-button::shadow #ink[checked] {
+  color: #4285f4;
+}
+
+paper-radio-group paper-radio-button::shadow #onRadio {
+  background-color: #4285f4;
+}
+
+paper-radio-group paper-radio-button[checked]::shadow #offRadio {
+  border-color: #4285f4;
+}
+
+paper-radio-button {
+  display: block;
+}

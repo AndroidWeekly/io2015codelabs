@@ -1,0 +1,283 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Google Compute Engine: Compute the Cosmos"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Cloud"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p><img src="../img/computing-the-cosmos/img-1.png" style="max-width: 565px"></p><p>This codelab demonstrates how Google Compute Engine can help you accomplish all sorts of tasks, big or small. In the first part of the codelab, you're going to learn the basics of using Google Compute Engine. In the second part, we'll use the skills we've learned from the first part to do something amazing: compute our Universe. You'll walk through the steps of using a Virtual Machine&#160;instance to process public astronomical data to generate a viewable image.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Basics of using Google Compute Engine.</li>
+<li>How to process astronomical data to generate a viewable image.</li>
+</ul><codelab-survey><h4>How&#160;will you use this tutorial?</h4>
+<select><option>Read it through only</option>
+<option>Read it and complete the exercises</option></select><h4>How&#160;would rate your experience with building Cloud based apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Setup: Enable the Google Cloud Project APIs" 
+        duration="1:30">
+        
+          <h3>Sign in</h3><p><strong>Ask a TA support person in the Codelab Area for credentials</strong>&#160;to sign-in to a Google Cloud Project.</p><p>Projects are used to manage all of the Google Cloud Platform resources for your application. &#160;</p><p>Login using the username and password you were provided. Accept the creation of your new account and Terms of Use. </p><h3>Enable the APIs</h3><p>For this codelab you'll be using Google Compute Engine and Google Cloud Storage.</p><p>Click the following link to <a href="https://console.developers.google.com/flows/enableapi?apiid=compute_component,storage_component,storage_api">enable theses APIs for your Project</a>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Setup: Creating a Google Cloud Project" 
+        duration="1:30">
+        
+          <h1></h1><p>You can use one Developers Console project to manage all of your work, or you can create multiple projects, depending on your development and collaboration needs. </p><h3>Creating a project</h3><p>To create a project, do the following:</p><p>Go to the <a href="https://console.developers.google.com/">Google Developers Console</a>. Click Create Project, enter a name and a project ID, or accept the defaults, and click Create.</p><h3>Enable Billing</h3><p>Some APIs in the Google Developers Console charge for usage, and you need to enable billing before you can start using these APIs.</p><p>To enable billing for your project, do the following:</p><ol start="1">
+<li>Go to the <a href="https://console.developers.google.com/project/_/settings">project settings</a>&#160;page. If prompted, select a project.</li>
+<li>In the <strong>Billing</strong>&#160;section, click <strong>Enable billing</strong>.</li>
+<li>If you do not have a billing account, create one.</li>
+<li>Select your location, fill out the form, and click <strong>Submit and enable billing</strong>.</li>
+</ol><h3>Enable the APIs</h3><p>For this codelab you'll be using Google Compute Engine and Google Cloud Storage.</p><p>Click the following link to <a href="https://console.developers.google.com/flows/enableapi?apiid=compute_component,storage_component,storage_api">enable theses APIs for your Project</a>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Setup: Install the Google Cloud SDK" 
+        duration="1:30">
+        
+          <h1></h1><p>Google Cloud SDK contains tools and libraries that enable you to easily create and manage resources on Google Cloud Platform</p><p>&#8594; In a terminal window run the following command to install the Google Cloud SDK:</p><pre>curl https://sdk.cloud.google.com | bash</pre><aside class="special"><p><strong>Important</strong>: Restart your terminal to initialize the Cloud SDK after the above command completes.</p></aside><h3>Authenticate the Google Cloud SDK</h3><p>The final step to complete the configuration of the Cloud SDK is to authenticate your account.</p><p>&#8594; Run the following command to authenticate your account with the Cloud SDK for your project:</p><pre>gcloud auth login</pre><p>A new browser tab will open. You'll be prompted to select an account and enter the account password. Once you've done that you'll be redirected to a new page requesting authorization to use some Cloud APIs. Click on the 'Accept' button at the bottom of the page.</p><p><img src="../img/computing-the-cosmos/img-2.png" style="max-width: 365px"></p><p>&#8594; You should also set a default project, to avoid the need to enter your Project ID on every request. You can do this with the following command: </p><ul><li>Substitute your Project ID from the &#160;<a href="https://console.developers.google.com/">Google Developers Console</a>&#160;for PROJECT_ID</li></ul><pre>gcloud config set project PROJECT_ID</pre><p>Your Cloud SDK client is now authorized and ready for use. You can see the newly authorized account by executing the 'gcloud auth list' command. Later in this codelab, you'll use the Cloud SDK to remotely login to your virtual machine.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Introduction to Compute Engine" 
+        duration="1:30">
+        
+          <h1></h1><p>Google Compute Engine is a service that allows you to start virtual machines (VMs) on Google&#8217;s infrastructure.</p><p><img src="../img/computing-the-cosmos/img-3.png" style="max-width: 778px"></p><h3>Compute Engine Projects - Overview</h3><p>A project requires compute, network, storage, and tools. There are three different entry points to GCE, all of which talk to our API:</p><ol start="1">
+<li>The command-line interface (CLI), using <a href="https://cloud.google.com/sdk/">Cloud SDK</a>
+</li>
+<li>The Web UI, which you can access through the <a href="https://console.developers.google.com/">Developers Console</a>
+</li>
+<li>The <a href="https://cloud.google.com/compute/docs/reference/latest/">API</a>&#160;directly, (simply HTTP/JSON with client libraries in many different languages) which you can call from your code</li>
+</ol><p><img src="../img/computing-the-cosmos/img-4.png" style="max-width: 773px"></p><p>Your VMs are accessible through an assigned External IP&#160;Address, and they easily talk to each other via a local private network. Talking between VMs this way is FAST. We'll set up a default firewall for you, or you can configure your own. You can even create multiple network configurations with various firewall rules to suit your needs and security.</p><p>Your VMs can access storage on mountable Persistent Disks and in Google Cloud Storage.&#160;We'll cover this in more depth later.</p><h3>Summary</h3><p>In this step, you learned:</p><ul>
+<li>What's provided by the Google Compute Engine service</li>
+<li>The three ways to access Google Compute Engine:&#160;the CLI, the API and the Web UI.</li>
+</ul><h3>Next up</h3><p>Now that you know what Compute Engine is, let's create a Compute Engine VM instance.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Creating a VM Instance with a custom VM Image" 
+        duration="4:00">
+        
+          <h1></h1><h3>Adding a custom VM Image to the project</h3><p>You are now going to create a Virtual Machine (VM) on Google Compute Engine using a custom VM Image that includes the&#160;LSST Software Stack&#160;you'll be using to process astronomy images in this code lab.</p><p>The first thing you need to do is to import the custom LSST VM Image into your Google Cloud Platform Project. You can do that with one command using the Cloud SDK's CLI.</p><p>&#8594; Open a terminal window. Then run the following command to add a custom VM Image to your project named "codelab-image":</p><pre>gcloud compute images create \
+--source-uri \
+http://storage.googleapis.com/codelab-2015-vm-image/1ad8c7f0540790f98eaf87801804feac985676e1.image.tar.gz \
+codelab-image</pre><aside class="special"><p><strong>Note</strong>: This step can take 3-5 minutes or more. While you&#8217;re waiting, you can smile about the fact that once you&#8217;ve added this custom VM Image to your project you&#8217;ll be able to create a VM Instance that includes Astronomy image processing software&#160;- <a href="https://confluence.lsstcorp.org/display/LSWUG/Getting+Started+with+the+LSST+Software+Stack">LSST Software Stack</a></p></aside><h3>Verify that the image was added</h3><p>Now that you've added a custom VM Image to your project you can list the VM images to confirm that you now see the "codelab-image" VM Image you just added.</p><p>&#8594; Run the following command to list the VM Images in your project:</p><pre>gcloud compute images list</pre><ul><li>You should see a result something like this:</li></ul><p><img src="../img/computing-the-cosmos/img-5.png" style="max-width: 797px"></p><h3>Summary</h3><p>In this step you added a custom VM Image to a Google Cloud Platform Project.</p><h3>Next Up</h3><p>Create a VM Instance along with an attached Persistent Disk.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Creating a VM with an attached Persistent Disk" 
+        duration="2:30">
+        
+          <h1></h1><p>First you're going to create a Persistent Disk,&#160;then you'll create a VM instance to attach it to.</p><h3>Create Persistent Disk</h3><p>For this codelab we&#8217;re dealing with large image files,&#160;so we first start with creating a Persistent Disk to provide some space to work in. When creating resources like Persistent Disks in Google Cloud Platform, you must specify a '<a href="https://cloud.google.com/compute/docs/zones">zone</a>' which is indicates where the resources live, giving you control over where your data is stored and used. To attach a disk to an instance, both resources must reside in the same zone. </p><p>&#8594; In a terminal window on the command-line, run the following command to create a <a href="https://cloud.google.com/compute/docs/disks/">disk</a>&#160;named "disk1" in zone "us-central1-f":</p><pre>gcloud compute disks create disk1 --size 800GB --zone us-central1-f</pre><h3>Create VM Instance</h3><p>Now you're going to create a VM instance using the "compute instances create" command. You'll specify the VM Image "codelab-image" that we just created in the previous step. You'll also enable the Compute Engine instance to have permission to read/write to the Cloud Storage and Cloud Storage APIs using the "--scopes" flag. Finally you'll attach "disk1" (the disk you just created) to the VM Instance using the "--disk" flag.</p><p>&#8594; On a terminal command-line run the following command to create a VM instance named "codelab-node":</p><pre>  gcloud compute instances create \
+      codelab-node \
+      --zone us-central1-f \
+      --image codelab-image \
+      --machine-type n1-standard-4 \
+      --scopes compute-rw,storage-full \
+      --boot-disk-device-name codelab-node \
+      --disk name=disk1,device-name=disk1,mode=rw</pre><h3>Summary</h3><p>In this step you created a VM Instance with a custom VM Image along with an attached Persistent Disk. And you enabled the Compute Engine service account so that you can run code on the VM Instance that accesses the Compute Engine and Cloud Storage APIs.</p><h3>Next Up</h3><p>Let's take our new VM Instance for a spin and use it to run some Python code to call the Compute Engine API.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Overview: using Compute Engine programmatically" 
+        duration="0:30">
+        
+          <h1></h1><p><strong>Review the steps for accessing Google Compute Engine with Python</strong></p><p>We&#8217;ll create a Python app that queries the Compute Engine API. It will:</p><ul>
+<li>Import the Python client library for Google APIs</li>
+<li>Authenticate and build the Compute Engine service</li>
+<li>Make an API request to the Compute Engine API</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Importing the Python API client library" 
+        duration="4:30">
+        
+          <h1></h1><h3>Using the Google API Python client library to access Compute Engine</h3><p>Now you're going to create a file and add code to import some libraries to help make HTTP requests, authenticate to the GCE API, and format the HTTP response. Google Compute Engine offers client libraries in many languages. You can find a list of available client libraries here: <a href="https://developers.google.com/discovery/libraries">https://developers.google.com/discovery/libraries</a></p><p>Your VM Instance already has the Google API Python client library installed because it's included in the LSST VM Image you created your VM with, so let&#8217;s test it out now.</p><h3>SSH into your VM instance</h3><p>&#8594; ssh in to your VM instance by running the following command:</p><pre>gcloud compute ssh codelab-node --zone us-central1-f</pre><aside class="special"><p><strong>Note</strong>: For security reasons, you can't ssh in as root. Since you're the VM Instance creator,&#160;you will automatically have administrator access to run <em>sudo</em>&#160;without password.</p>
+<p>What is <em>sudo</em>? The <em>sudo</em>&#160;command lets you run&#160;commands&#160;as root without providing the root password. You can perform tasks that require root access, such as &#160;installing an application&#160;or editing system configuration files.</p></aside><h3>Create a new Python file named helloworld.py</h3><p>&#8594; On the VM command&#160;line,&#160;type the following command to create a file named 'helloworld.py' using <em>nano</em>, a simple command-line file editor:</p><pre>nano -m helloworld.py</pre><p>&#8594; Copy and paste the following import statements into your new file :</p><pre>from googleapiclient.discovery import build
+from oauth2client.client import GoogleCredentials
+import json</pre><aside class="special"><p><strong>Note</strong>: Don't close the file yet, we're going to add more code in the next two Steps.</p></aside><h3>Summary</h3><p>In this step you:</p><ul>
+<li>used the Python client library for Google APIs</li>
+<li>created a file on your VM instance</li>
+<li>added code to that file to import libraries that enable: Making HTTP requests, Authenticating with the GCE API, and JSON Formatting of HTTP responses</li>
+</ul><h3>Next up</h3><p>Add code to handle authentication with the Compute Engine API.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Authenticating with the API and building the Compute Engine API service" 
+        duration="3:00">
+        
+          <h1></h1><p>You are now going to add code to your program to use a service account to authenticate with Compute Engine via OAuth 2.0. The Google Compute Engine API uses OAuth 2.0 for authentication, but hides its complexity with service accounts. They:</p><ul>
+<li>Act on behalf of the application without need for user credentials</li>
+<li>Perform the OAuth 2.0 flow for you, and save the refresh token</li>
+<li>Allow you to use the refresh token to request an access token</li>
+<li>Let you authenticate to a variety of Google APIs, like Google Cloud Storage</li>
+</ul><p>And it&#8217;s already set&#160;up!&#160;The good news is that since you specified the --scopes of "compute-rw storage-full" when you ran the "compute instances create" command to create your VM Instance, it already has a service account setup with the &#8220;<a href="https://cloud.google.com/compute/docs/api/how-tos/authorization">scopes of access</a>&#8221; you&#8217;ll need to access the Compute Engine and Cloud Storage services.</p><h3>Add code to authenticate and build the service</h3><p>&#8594; In your helloworld.py file, add the following lines of code:</p><pre>credentials = GoogleCredentials.get_application_default()
+service = build('compute', 'v1', credentials=credentials)</pre><aside class="special"><p><strong>Note</strong>: Don't close the file yet, we're going to add more code in the next Step.</p></aside><h3>Summary</h3><p>That&#8217;s it for authentication!</p><h3>Next up</h3><p>Add the code to make an API request.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Making requests to the Compute Engine API" 
+        duration="4:00">
+        
+          <h1></h1><p>You are now going to add code to your Python program to make a 'list instances' request to the Compute Engine API.</p><h3>Add code to list VM instances</h3><p>&#8594; 1. In your helloworld.py file, add the following lines of code. </p><pre>response = service.instances().list(project='PROJECT_ID', zone='us-central1-f').execute()
+print json.dumps(response, sort_keys=True, indent=4)</pre><aside class="special"><p><strong>Note</strong>: You must specify the correct zone. We've been using 'us-central1-f'. &#160;</p>
+<p>You must also replace&#160;PROJECT_ID with your project's&#160;id from&#160;the&#160;<a href="https://console.developers.google.com/">Google Developers Console</a>.</p></aside><p>&#8594; 2. Close the file in the nano editor with the following key combinations:</p><ul>
+<li>Press the &#8220;Ctrl&#8221; and &#8220;x&#8221; keys - to start the &#8220;Exit and save&#8221; process</li>
+<li>Press the &#8220;y&#8221; key - to indicate &#8220;yes - save the file&#8221;</li>
+<li>Press the [enter] key - to save it to the same filename &#8220;helloworld.py&#8221;</li>
+</ul><p>&#8594; 3. Run it from the command line:</p><pre>python helloworld.py</pre><p>&#8594; 4. Confirm the output looks good: You should see a list of Compute Engine instances.</p><p><img src="../img/computing-the-cosmos/img-6.png" style="max-width: 624px"></p><h3>Summary</h3><p>In this step you added code to your Python program to list all VM instances in a specific GCE Zone.</p><h3>Next Up</h3><p>Use your new knowledge and experience with Compute Engine to process astronomy images and compute the cosmos!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Computing the Universe" 
+        duration="3:00">
+        
+          <h1></h1><p>Examine the Universe by adding up everything we know about one part of the sky.</p><p><img src="../img/computing-the-cosmos/img-7.png" style="max-width: 624px"></p><p>One image of sky is interesting but if you combine many images that were taken over the time span of years, new previously unseen details are revealed.</p><p><img src="../img/computing-the-cosmos/img-8.png" style="max-width: 624px"></p><p>Here's an example of single input image next to an example of the type of final image that results from stacking many images taken over time.</p><p><img src="../img/computing-the-cosmos/img-9.png" style="max-width: 624px"></p><h3>Your assignment</h3><p>Now you will be assigned a piece of the sky to process with Compute Engine.</p><p>You might be assigned a piece of the sky that's been previously determined as one of the more interesting places in the Universe or you could be assigned an area that's yet to be explored - it's up to you to find the most interesting object in the sky!</p><h3>Summary</h3><p>You saw examples of how new details are visible when images of the sky taken over time are combined. You'll be assigned a part of the sky to perform this process yourself with Compute Engine.</p><h3>Next Up</h3><p>Review the architecture of how you'll get all the images for a piece of the sky and how you'll combine them into one final image.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Overview: the Universe processing architecture" 
+        duration="3:00">
+        
+          <h1></h1><p>Review the components and steps required to process astronomy images.</p><h3>What you’ll be doing</h3><ol start="1">
+<li>Format, and mount a Persistent disk to your VM Instance</li>
+<li>Request a piece of the Universe from our Tile Server</li>
+<li>Initialize the Image Processing Software</li>
+<li>Process your tile data into an image and view it</li>
+</ol><p><img src="../img/computing-the-cosmos/img-10.png" style="max-width: 795px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Formatting and mounting disk space" 
+        duration="4:00">
+        
+          <h1></h1><p>From here on out, we&#8217;re dealing with real image files that require lots of space. Let&#8217;s mount &#8220;disk1&#8221;, the blank Persistent Disk we created in Step 4 when we created our &#8220;codelab-node&#8221; VM instance.</p><p>&#8594; 1. Create a folder to mount the disk to. Run the command:</p><pre>sudo mkdir /mnt/disk1</pre><p>&#8594; 2. Determine the Disk ID in order to format and mount it. Run the command:</p><pre>ls -l /dev/disk/by-id/*</pre><ul><li>The Disk ID should be something like /scsi-0Google_PersistentDisk_nameOfDisk</li></ul><p>&#8594; 3. Format and mount the drive to the newly created folder. Run the command:</p><pre>sudo /usr/share/google/safe_format_and_mount -m "mkfs.ext4 -F" \
+/dev/disk/by-id/scsi-0Google_PersistentDisk_disk1 /mnt/disk1</pre><p>&#8594; 4. Open up access to the folder. Run the command:</p><pre>sudo chmod 777 /mnt/disk1</pre><p>&#8594; 5. Confirm that the additional disk space is now available. Run the command:</p><pre>sudo df -h --total</pre><ul><li>This should report that the VM has ~800 GB Total available space</li></ul><p>&#8594; 6. Change directory to use the new disk space. Run the command:</p><pre>cd /mnt/disk1</pre><h3>Summary</h3><p>You formatted and mounted the additional Persistent Disk on to your VM instance. You also confirmed that you now have the space available to start processing images.</p><h3>Next Up</h3><p>Get assigned a part of the Universe to process.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Assigning yourself part of the Universe" 
+        duration="4:00">
+        
+          <h1></h1><p>You are now going to request a "tile" which is a piece of the sky that you can process with the LSST Software Stack on your VM Instance.</p><h3>Understanding tiles</h3><p>A tile consist of all the available images for a given coordinate in space covering a range of times from a catalog of astronomical photography called the <a href="http://classic.sdss.org/legacy/stripe82.html">Stripe 82 database</a>&#160;collected by the <a href="http://www.sdss.org/">Sloan Digital Sky Survey</a>&#160;- starting in 1998 when the first image was taken and continuing up until 2007 when the last image was taken. Think of a tile as a stack of images (sometimes 100s) that you're going to stack, align and then combine into one final composite image. A copy of all of the Stripe 82 images (10 TB in total) is stored in Google Cloud Storage which provides fast access to the images needed to process a tile.</p><h3>Request a tile from the Tile Server and save the JSON response</h3><p>For this code lab, we've made it easy and created a Tile Server App running on App Engine that does the following for you:</p><ul>
+<li>accepts HTTP requests for a tile assignment</li>
+<li>assigns a tile to the request</li>
+<li>returns a JSON response that includes information about the images that correspond to the coordinates of the tile that's been assigned</li>
+</ul><p>&#8594; Run the following command to get a tile assignment:</p><pre>curl http://compute-codelab.appspot.com/get-tile &gt; tile-assignment.json</pre><h3>Confirm that your tile assignment is valid</h3><p>&#8594; Run the following command to confirm that you've got a valid tile assignment:</p><pre>cat tile-assignment.json</pre><ul><li>The file should contain a JSON object with a series of URL paths to <a href="http://en.wikipedia.org/wiki/FITS">.fits</a>&#160;files</li></ul><p>&#8594;&#160;To see the same information using JSON Pretty Print try running this command:</p><pre>cat tile-assignment.json | python -mjson.tool</pre><aside class="special"><p><strong>Troubleshooting</strong>: If you did not get a valid JSON response when you requested a tile assignment, try to request another assignment.</p></aside><h3>Summary</h3><p>You requested a tile assignment from the Tile Server and you confirmed that you were assigned a valid tile.</p><h3>Next Up</h3><p>Initialize the LSST Software Stack in order to process your tile assignment.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Setting up for tile processing" 
+        duration="3:00">
+        
+          <h1></h1><p>Initialize the LSST Software Stack for astronomical image processing and download the Python processing script and other input files.</p><p>&#8594; 1. Change your present directory to the location of LSST Software Stack. Run the following command:</p><pre>cd /opt/lsst/</pre><p>&#8594; 2. Initialize LSST software for usage. Run the following command:</p><pre>source loadLSST.bash</pre><p>&#8594; 3. Setup the LSST afw Python library. Run the following command:</p><pre>setup afw</pre><p>&#8594; 4. Download makeCoaddCloud.py&#160;provided by <a href="http://ssg.astro.washington.edu/">University of Washington</a>&#160;and other input files from Google Cloud Storage to the mounted Persistent Disk. Run the following command:</p><pre>gsutil cp gs://codelab-files/* /mnt/disk1/</pre><p>&#8594; 5. Change directory back to mounted Persistent Disk</p><pre>cd /mnt/disk1</pre><h3>Summary</h3><p>You initialized the LSST Software Stack on your VM Instance and downloaded the Python file - makeCoaddCloud.py - that you'll be using next to interact with the LSST Software Stack to process your assigned tile.</p><h3>Next Up</h3><p>Process the tile and generate a final composite image.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Processing a tile" 
+        duration="7:00">
+        
+          <h1></h1><p>Start the image processing. Then save the final resulting image to Google Cloud Storage in order to view it in a browser.</p><p>&#8594; 1. Execute the makeCoaddCloud.py&#160;script to process the JSON in our tile assignment and generate an image. Run the following command:</p><pre>python makeCoaddCloud.py tile-assignment.json --maxImages=20</pre><aside class="special"><p><strong>Note</strong>: Start with --maxImages=20, increasing by 5 until it successfully completes, if it still fails abandon this tile and go back and perform Step 13 to get assigned a new tile. If you want to include all images associated with your tile assignment you can run the command without the --maxImages flag but be aware that this will require more time for processing.</p></aside><p>&#8594; 2. Find out the image filename for your newly created image by listing the contents of your current directory. Run the following command:</p><pre>ls -l</pre><ul><li>You should see an image listed. It will be named something like "48433.png".</li></ul><p><img src="../img/computing-the-cosmos/img-11.png" style="max-width: 624px"></p><p>&#8594; 3. Create a Google Cloud Storage bucket in your project to host your image for viewing in a web browser. You'll use the Cloud Storage command-line utility called 'gsutil' to accomplish this task, which is included in the Cloud SDK.</p><p>&#160;Run the following command to create a Cloud Storage bucket:</p><ul><li>Replace PROJECT_ID in the command with your Project ID from the <a href="https://console.developers.google.com/">Developers Console</a>&#160;so that "viewing-images-PROJECT_ID" looks like "viewing-images-your-project-id" :</li></ul><pre>gsutil mb gs://viewing-images-PROJECT_ID</pre><p>&#8594; 4. Copy the composite image file you just created to a Google Cloud Storage bucket in your project. Run the following command:</p><ul>
+<li>Replace '&lt;image-filename&gt;' with the image filename for the image created when you ran the makeCoaddCloud.py command above</li>
+<li>Replace PROJECT_ID in the command with your Project ID from the <a href="https://console.developers.google.com/">Developers Console</a>&#160;so that "gs://viewing-images-PROJECT_ID" looks like "gs://viewing-images-your-project-id" </li>
+</ul><pre>gsutil cp &lt;image-filename&gt; gs://viewing-images-PROJECT_ID</pre><p>&#8594; 5. Make the image public. Run the following command:</p><ul>
+<li>Update "gs://viewing-images-PROJECT_ID" to include your project's actual Project ID from the <a href="https://console.developers.google.com/">Developers Console</a>&#160;so that it looks like "gs://viewing-images-your-project-id"</li>
+<li>Replace '&lt;image-filename&gt;' with the image filename for the image created when you ran the makeCoaddCloud.py command above</li>
+</ul><pre>gsutil acl set public-read gs://viewing-images-PROJECT_ID/&lt;image-filename&gt;</pre><p>&#8594; 6. View the image in a web browser. Open a browser and go to the following URL:</p><ul>
+<li>Update "viewing-images-PROJECT_ID" to include your project's actual Project ID from the <a href="https://console.developers.google.com/">Developers Console</a>&#160;so that looks like "viewing-images-your-project-id"</li>
+<li>Replace '&lt;image-filename&gt;' with the image filename for the image created when you ran the makeCoaddCloud.py command above</li>
+</ul><pre>http://storage.googleapis.com/viewing-images-PROJECT_ID/&lt;image-filename&gt;</pre><h3>Summary</h3><p>You used the makeCoaddCloud.py Python script to interact with the LSST Software Stack in order to process a tile assignment into a final composite image. Then you copied the composite image to Cloud Storage. Finally you viewed the image you created in a browser.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:00">
+        
+          <h1></h1><p>Hooray! You used Compute Engine to generate a composite image from a large stack of (<a href="http://www.sdss.org/">SDSS</a>) images stored in Cloud Storage, and computed the cosmos. Nice Work!</p><h3>Additional resources</h3><p>We hope this introduction to Compute Engine has demonstrated its flexibility, power, and usefulness. To learn more, take a look at our resources below:</p><ul>
+<li><a href="https://cloud.google.com/compute/">Google Compute Engine</a></li>
+<li><a href="https://cloud.google.com/storage/">Google Cloud Storage</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

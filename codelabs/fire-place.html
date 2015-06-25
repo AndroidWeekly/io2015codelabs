@@ -1,0 +1,355 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Going Places with Android"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Geo, Cloud, Android"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p><img src="../img/fire-place/img-1.png" style="max-width: 366px"></p><p>Check-In apps are so last year. In this code lab, we&#8217;ll build a simple Check-Out app to find the hottest places people are leaving. We&#8217;ll use the <a href="https://developers.google.com/places/android/">Google Places API for Android</a>&#160;to manage nearby locations and we&#8217;ll use <a href="https://www.firebase.com/">Firebase</a>&#160;to store and synchronise data across devices in <em>real time</em>.</p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>How to build a simple Android app focused on a Google Map</li>
+<li>How to use the Google Places API for Android to help your users tell you where they <strong>really </strong>are</li>
+<li>How to use Firebase to store and stream data down to your apps in real time</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>
+<a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>&#160;version 1.0+</li>
+<li>At least one Android phone or tablet device</li>
+</ul><codelab-survey><h4>How&#160;will you use this tutorial?</h4>
+<select><option>Skim read</option>
+<option>Read it and complete the exercises</option>
+<option>Check out the final code and run the app</option></select><h4>How&#160;would rate your experience with building Android apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>Have you ever used the Google Places or Firebase APIs before?</h4>
+<select><option>Neither</option>
+<option>Yep, just the Google Places API</option>
+<option>Yep, just Firebase</option>
+<option>Yep, both</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Start a new project" 
+        duration="1:00">
+        
+          <h1></h1><p>Let&#8217;s create our new app from scratch.</p><p>1. Open <img src="../img/fire-place/img-2.png" style="max-width: 26px"><strong>Android Studio</strong>&#160;and choose <strong>New Project</strong>, either from the Quick Start dialog or from the File menu.</p><p>2. Name your application <strong>Check Out</strong>&#160;and enter <strong>google.io</strong>&#160;as your company domain. Leave the Project Location un-touched. Click <strong>Next</strong>.</p><p><img src="../img/fire-place/img-3.png" style="max-width: 624px"></p><p>3. We&#8217;ll leave the default settings for device targets, that is just <strong>Phone and Tablet</strong>&#160;with a Minimum SDK of <strong>API 19 (KitKat)</strong>. Click <strong>Next</strong>.</p><p><img src="../img/fire-place/img-4.png" style="max-width: 624px"></p><p>4. Our app will be driven by a map, so on the activity selection screen, choose <strong>Google Maps Activity</strong>&#160;and click <strong>Next</strong>.</p><p><img src="../img/fire-place/img-5.png" style="max-width: 624px"></p><p>5. Set the title to <strong>Check Outs!</strong>&#160;and leave the rest of the settings as they are. Click <strong>Finish</strong>.</p><p><img src="../img/fire-place/img-6.png" style="max-width: 624px"></p><p>6. Wait for the initial build to complete. This is where Android Studio downloads the dependencies and performs an initial compilation so that you can get started straight away.</p><p><img src="../img/fire-place/img-7.png" style="max-width: 560px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Enable the Places API" 
+        duration="5:00">
+        
+          <h1></h1><p>Before we can start using the <strong>Places API</strong>, we need to get an API key and set the key up in our app.</p><p>When Android Studio finished setting up your project, it should have opened a file with some instructions. We&#8217;re going to follow those instructions.</p><p>1. If it&#8217;s not already open in front of you, open <strong>google_maps_api.xml</strong>. It will be in the project under <img src="../img/fire-place/img-8.png" style="max-width: 20px"><strong>app/res/values</strong>.</p><aside class="special"><p><strong>Pro Tip</strong>: In Android Studio, you can double-press the <strong>Shift</strong>&#160;key to find files anywhere in your project. Try it now - <strong>tap shift</strong>, then <strong>tap shift</strong>&#160;again, then start typing <strong>google_maps_api.xml</strong>&#160;and you&#8217;ll see the file we&#8217;ve just opened.</p></aside><p>2. The contents will look something like this.</p><h3>google_maps_api.xml</h3><codelab-snippet>&lt;resources&gt;
+   &lt;!--
+   TODO: Before you run your application, you need a Google Maps API key.
+
+   To get one, follow this link, follow the directions and press "Create" at the end:
+
+https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&amp;keyType=CLIENT_SIDE_ANDROID&amp;r=27:8F:79:CC:AF:73:B8:C6:2F:7E:04:7E:F8:E8:4A:A3:07:85:37:14%3Bio.google.checkout
+
+   You can also add your credentials to an existing key, using this line:
+   27:8F:79:CC:AF:73:B8:C6:2F:7E:04:7E:F8:E8:4A:A3:07:85:37:14;io.google.checkout
+
+   Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+   string in this file.
+   --&gt;
+   &lt;string name="google_maps_key" translatable="false" templateMergeStrategy="preserve"&gt;
+       YOUR_KEY_HERE
+   &lt;/string&gt;
+&lt;/resources&gt;</codelab-snippet><p>3. In the comment, there is a link you need to <strong>copy and paste into your browser</strong>. Log in if you are prompted.</p><aside class="warning"><p><strong>Important</strong>: Make sure your copy the link from <strong>your file</strong>&#160;not from the code above. The link contains a reference to the key being used inside your application and it&#8217;s important that you set up <strong>your key</strong>, which will be different from the key above.</p></aside><p>4. Follow the prompts on the page to create a new project or re-use one you&#8217;ve already set up.</p><p><img src="../img/fire-place/img-9.png" style="max-width: 542px"></p><p>5. When prompted to &#8220;Create an Android key and configure allowed Android applications&#8221; you should see that the box is already pre-filled with the information listed in google_maps_api.xml. Just click <strong>Create</strong>.</p><p><img src="../img/fire-place/img-10.png" style="max-width: 624px"></p><p>6. Now select <strong>APIs</strong>&#160;from the left-hand navigation (underneath <strong>APIs &amp; auth</strong>).</p><p>7. On the APIs page, click on the <strong>Google Places API for Android</strong>&#160;link. It will be under&#160;the <img src="../img/fire-place/img-11.png" style="max-width: 31px"><strong>Google Maps APIs.</strong></p><p>8. Now click <strong>Enable API</strong>. You&#8217;re now ready to use the API!</p><p>9. To get the API key we need, click on the <strong>Credentials</strong>&#160;link on the left-hand navigation.</p><p><img src="../img/fire-place/img-12.png" style="max-width: 624px"></p><p>10. Copy the text next to <strong>API key</strong>&#160;(it will be a long string starting with <strong>AIza</strong>&#8230;), head back into Android Studio and replace the text <strong>YOUR_KEY_HERE </strong>with the key you just copied.</p><p>11. One last step! Open up <strong>AndroidManifest.xml</strong>&#160;in Android Studio (it will be under <img src="../img/fire-place/img-8.png" style="max-width: 20px">&#160;<strong>app/manifests</strong>) and find this code:</p><h3>AndroidManifest.xml</h3><codelab-snippet>&lt;meta-data
+   android:name="com.google.android.maps.v2.API_KEY"
+   android:value="@string/google_maps_key" /&gt;</codelab-snippet><p>And replace it with this code:</p><h3>AndroidManifest.xml</h3><codelab-snippet>&lt;meta-data
+   android:name="com.google.android.geo.API_KEY"
+   android:value="@string/google_maps_key" /&gt;</codelab-snippet><p>This uses the new name for the key, so that the Places API can find it.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Enable Firebase" 
+        duration="0:30">
+        
+          <h1></h1><p><a href="https://www.firebase.com/">Firebase</a>&#160;is an &#8220;Instant Data API&#8221; that we&#8217;ll be using to get real-time data updates in our app.</p><p>1. Load up <a href="https://www.firebase.com/signup/">https://www.firebase.com/signup/</a>&#160;in your web browser</p><p>2. Enter your email, create a super-secret password and click <strong>Create My Account</strong>.</p><p><img src="../img/fire-place/img-13.png" style="max-width: 599px"></p><p>3. On the<strong>&#160;</strong>welcome page, find the <strong>My First App</strong>&#160;dialog. You will want to take note of your <img src="../img/fire-place/img-14.png" style="max-width: 19px"><strong>Firebase URL</strong>, it&#8217;s the text that ends in <strong>.firebaseIO.com</strong>.</p><p><img src="../img/fire-place/img-15.png" style="max-width: 317px"></p><aside class="special"><p><strong>Note</strong>: You can click on the Firebase URL to open a data explorer. It can be useful to keep this open while you&#8217;re working so you can see your data as it&#8217;s added and modified.</p></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run the app" 
+        duration="1:00">
+        
+          <h1></h1><p>Before we make any changes, let&#8217;s run the app as it is.</p><p>1. Ensure your device is plugged into your machine&#8217;s USB port.</p><p>a. If you&#8217;re here at Google I/O, then your machine and device should be set up and ready to go, if not then you can follow the instructions on <a href="http://developer.android.com/tools/device.html#setting-up">setting up your device for debugging</a>.</p><p>2. In Android Studio, press the <img src="../img/fire-place/img-16.png" style="max-width: 20px"><strong>Run</strong>&#160;button and wait for the project to build.</p><p>3. Select your device from the list and click <strong>OK.</strong></p><p><img src="../img/fire-place/img-17.png" style="max-width: 594px"></p><p>4. Check out the map on your device!</p><p><img src="../img/fire-place/img-18.png" style="max-width: 437px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add a button" 
+        duration="1:00">
+        
+          <h1></h1><p>Let&#8217;s add the Check Out button to our app, even though it won&#8217;t do much yet.</p><aside class="special"><p><strong>Feeling lazy?</strong>&#160;If you want to jump straight to the finished code, you can grab the completed file from <strong><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/fire-place/app/src/main/java/com/example/android/checkout/MapsActivity.java">GitHub</a></strong>&#160;and copy it into <strong>MapsActivity</strong>&#160;in your app.</p></aside><p>1. We&#8217;ll add the button first. Open up the layout file for the app, <strong>activity_maps.xml</strong>, found under <img src="../img/fire-place/img-8.png" style="max-width: 20px"><strong>app/res/layout</strong>.</p><p>2. To make the button appear on top of the map, we&#8217;ll wrap everything in a <strong>FrameLayout</strong>&#160;and insert a <strong>&lt;Button&gt;</strong>&#160;above the <strong>&lt;fragment&gt;</strong>&#160;holding the map. Replace the contents of the whole file with this code. <strong>Note</strong>&#160;that the button has an <strong>onClick</strong>&#160;attribute - we&#8217;ll define that function in a few steps.</p><h3>activity_maps.xml</h3><codelab-snippet>&lt;FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_height="match_parent"
+             android:layout_width="match_parent"&gt;
+
+   &lt;Button android:id="@+id/checkout_button"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:text="@string/check_out"
+           android:onClick="checkOut"/&gt;
+
+   &lt;fragment xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:id="@+id/map"
+             tools:context=".MapsActivity"
+             android:name="com.google.android.gms.maps.SupportMapFragment"/&gt;
+
+&lt;/FrameLayout&gt;</codelab-snippet><p>3. Android Studio will complain that the button text @string/check_out is not defined. Fix the error by clicking on the error and pausing for a second, a red bulb should appear in the left gutter <img src="../img/fire-place/img-19.png" style="max-width: 35px">, click it and choose <strong>Create string value resource &#8216;check_out&#8217;</strong>.</p><aside class="special"><p><strong>Pro-tip:</strong>&#160;You can use the keyboard to trigger the error suggestion prompt by pressing <strong>Alt-Enter</strong>.</p></aside><p>4. Set the resource value to <strong>Check Out!</strong>&#160;(this will be the text on our button) and click <strong>OK.</strong></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add some visual features to the map" 
+        duration="5:00">
+        
+          <h1></h1><p>We&#8217;ll add a few subtle but nice visual effects to our map: some padding so that the button can &#8220;float&#8221; over the map, a blue dot indicating the user&#8217;s location and we&#8217;ll zoom the map to the user&#8217;s location.</p><p>1. Open the <strong>MapsActivity</strong>&#160;class (found in <img src="../img/fire-place/img-8.png" style="max-width: 20px">&#160;<strong>app/java/io/google/checkout</strong>)</p><p>2. We&#8217;re going to use the new <strong><a href="http://developer.android.com/reference/com/google/android/gms/maps/MapFragment.html#getMapAsync(com.google.android.gms.maps.OnMapReadyCallback)">getMapAsync(..)</a></strong>&#160;method in the Android Maps API, so let&#8217;s replace <strong>MapsActivity</strong>&#160;completely. Paste this code into the file, overwriting the entire contents.</p><h3>MapsActivity.java</h3><codelab-snippet>package io.google.checkout;
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+   private GoogleMap mMap;
+
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_maps);
+
+       // Set up Google Maps
+       SupportMapFragment mapFragment = (SupportMapFragment)
+               getSupportFragmentManager().findFragmentById(R.id.map);
+       mapFragment.getMapAsync(this);
+   }
+
+   /**
+    * Map setup. This is called when the GoogleMap is available to manipulate.
+    */
+   @Override
+   public void onMapReady(GoogleMap googleMap) {
+       mMap = googleMap;
+   }
+}</codelab-snippet><p>3. To set the padding on the top of the map to make room for the button, add the following code to the <strong>onMapReady</strong>&#160;method. This will ensure that we set the padding correctly once the button has been drawn on-screen, as the map may be ready before the button is drawn.</p><h3>MapsActivity.java</h3><codelab-snippet>// Pad the map controls to make room for the button - note that the button may not have
+// been laid out yet.
+final Button button = (Button) findViewById(R.id.checkout_button);
+button.getViewTreeObserver().addOnGlobalLayoutListener(
+        new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mMap.setPadding(0, button.getHeight(), 0, 0);
+            }
+        }
+);</codelab-snippet><aside class="warning"><p><strong>Important</strong>: When pasting code into Android Studio, you will get errors saying that it <strong>Cannot resolve symbol</strong>. These are caused by missing import statements. In each case, simply put the cursor on the red error text, press <strong>Alt-Enter</strong>&#160;and choose <strong>Import Class</strong>.</p></aside><p>4. To make sure everything we&#8217;ve drawn on the map is visible, we&#8217;ll use a <a href="http://developer.android.com/reference/com/google/android/gms/maps/model/LatLngBounds.Builder.html">LatLngBounds Builder</a>&#160;and a helper method to update it and animate the camera when we get new points. </p><p>a. Add this line at the top, under the <strong>private GoogleMap mMap</strong>&#160;line.</p><h3>MapsActivity.java</h3><codelab-snippet>private LatLngBounds.Builder mBounds = new LatLngBounds.Builder();</codelab-snippet><p>b. Now add this helper method in the class:</p><h3>MapsActivity.java</h3><codelab-snippet>private void addPointToViewPort(LatLng newPoint) {
+    mBounds.include(newPoint);
+    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mBounds.build(),
+            findViewById(R.id.checkout_button).getHeight()));
+}</codelab-snippet><p>c. Now we can add this code to <strong>onMapReady</strong>&#160;to enable the user&#8217;s location and update the viewport when we have a GPS lock.</p><h3>MapsActivity.java</h3><codelab-snippet>mMap.setMyLocationEnabled(true);
+mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+    @Override
+    public void onMyLocationChange(Location location) {
+        LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+        addPointToViewPort(ll);
+        // we only want to grab the location once, to allow the user to pan and zoom freely.
+        mMap.setOnMyLocationChangeListener(null);
+    }
+});</codelab-snippet><p>5. Now is a good time to hit the <img src="../img/fire-place/img-16.png" style="max-width: 20px"><strong>Run</strong>&#160;button and see how the app looks on your phone.</p><p><img src="../img/fire-place/img-20.png" style="max-width: 415px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add the Place Picker" 
+        duration="5:00">
+        
+          <h1></h1><p>Now let&#8217;s wire up the button to the <a href="https://developers.google.com/places/android/placepicker">Place Picker</a>!</p><p>1. The Places API uses the <strong><a href="https://developer.android.com/reference/com/google/android/gms/common/api/GoogleApiClient.html">GoogleApiClient</a></strong>&#160;in Google Play Services to manage API connections, so we&#8217;ll need to set that up. </p><p>a. Add this field at the top of the file, below <strong>private GoogleMap mMap</strong>.</p><h3>MapsActivity.java</h3><codelab-snippet>private GoogleApiClient mGoogleApiClient;</codelab-snippet><p>b. And add this code in your <strong>onCreate()</strong>&#160;method.</p><h3>MapsActivity.java</h3><codelab-snippet>// Set up the API client for Places API
+mGoogleApiClient = new GoogleApiClient.Builder(this)
+   .addApi(Places.GEO_DATA_API)
+   .build();
+mGoogleApiClient.connect();</codelab-snippet><p>2. Recall that in our layout, we set the button&#8217;s on-click handler to be a method called <strong>checkOut</strong>. Let&#8217;s write that now.</p><p>a. We want to fire an intent and receive a result, so we&#8217;ll need a result code. Insert this constant declaration with the other fields at the top of the file (e.g. above <strong>private GoogleMap mMap</strong>)</p><h3>MapsActivity.java</h3><codelab-snippet>private static final int REQUEST_PLACE_PICKER = 1;</codelab-snippet><p>b. Here&#8217;s the code for <strong>checkOut()</strong>. It creates an intent using <strong><a href="https://developer.android.com/reference/com/google/android/gms/location/places/ui/PlacePicker.IntentBuilder.html">PlacePicker.IntentBuilder</a></strong>, starts it and handles two important exceptions that users may encounter. Note that the <strong><a href="https://developer.android.com/reference/com/google/android/gms/common/GooglePlayServicesRepairableException.html">GooglePlayServicesRepairableException</a></strong>&#160;is recoverable, so we attempt to do so.</p><h3>MapsActivity.java</h3><codelab-snippet>/**
+* Prompt the user to check out of their location. Called when the "Check Out!" button
+* is clicked.
+*/
+public void checkOut(View view) {
+   try {
+       PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+       Intent intent = intentBuilder.build(this);
+       startActivityForResult(intent, REQUEST_PLACE_PICKER);
+   } catch (GooglePlayServicesRepairableException e) {
+       GoogleApiAvailability.getInstance().getErrorDialog(this, e.getConnectionStatusCode(),
+               REQUEST_PLACE_PICKER);
+   } catch (GooglePlayServicesNotAvailableException e) {
+       Toast.makeText(this, "Please install Google Play Services!", Toast.LENGTH_LONG).show();
+   }
+}</codelab-snippet><aside class="special"><p><strong>Note:</strong>&#160;To find out more about starting activities and passing data, read the developer docs on <a href="http://developer.android.com/reference/android/app/Activity.html#StartingActivities">Starting Activities</a>.</p></aside><p>3. Once the user has chosen a place, <strong>onActivityResult</strong>&#160;will be called, so we need to implement that now. This code checks that the intent was successful and uses <strong><a href="https://developer.android.com/reference/com/google/android/gms/location/places/ui/PlacePicker.html#getPlace(android.content.Intent,%20android.content.Context)">PlacePicker.getPlace()</a></strong>&#160;to obtain the chosen <strong><a href="https://developer.android.com/reference/com/google/android/gms/location/places/Place.html">Place</a></strong>.</p><h3>MapsActivity.java</h3><codelab-snippet>@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+   if (requestCode == REQUEST_PLACE_PICKER) {
+       if (resultCode == Activity.RESULT_OK) {
+           Place place = PlacePicker.getPlace(data, this);
+       } else if (resultCode == PlacePicker.RESULT_ERROR) {
+           Toast.makeText(this, "Places API failure! Check that the API is enabled for your key",
+                   Toast.LENGTH_LONG).show();
+       }
+   } else {
+       super.onActivityResult(requestCode, resultCode, data);
+   }
+}</codelab-snippet><p>4. Now press the <img src="../img/fire-place/img-16.png" style="max-width: 20px"><strong>Run</strong>&#160;button and when the app loads, tap the <strong>Check Out</strong>&#160;button to use the Place Picker. It won&#8217;t do anything with the result yet, but we&#8217;ll fix that next.</p><p><img src="../img/fire-place/img-1.png" style="max-width: 375px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Set it on Fire(base)" 
+        duration="10:00">
+        
+          <h1></h1><p>While the Place Picker <em>is</em>&#160;beautiful, this app doesn&#8217;t do much. We need to add storage!</p><p>1. First add the dependency on Firebase to the app&#8217;s <img src="../img/fire-place/img-21.png" style="max-width: 20px">&#160;<strong>build.gradle</strong>&#160;file.</p><p>a. Add the final <strong>compile</strong>&#160;line from the snippet below to your <strong>app</strong>&#160;module&#8217;s <strong>build.gradle</strong>&#160;file (not the CheckOut project&#8217;s build.gradle).</p><h3>build.gradle</h3><codelab-snippet>dependencies {
+   compile fileTree(dir: 'libs', include: ['*.jar'])
+   compile 'com.android.support:appcompat-v7:22.1.1'
+   compile 'com.google.android.gms:play-services:7.3.0'
+
+   compile 'com.firebase:firebase-client-android:2.2.4'
+}</codelab-snippet><p>b. Add this block to the same file, within the <strong>android { .. }</strong>&#160;block.</p><h3>build.gradle</h3><codelab-snippet>packagingOptions {
+   exclude 'META-INF/LICENSE'
+   exclude 'META-INF/NOTICE'
+}</codelab-snippet><p>c. Click the <img src="../img/fire-place/img-22.png" style="max-width: 20px"><strong>Gradle sync </strong>button to download the Firebase library to your local project.</p><p>2. Make sure you have your Firebase URL that we set up in the <strong>Enable Firebase</strong>&#160;step. We need to add it as a constant (e.g. below <strong>private static final int REQUEST_PLACE_PICKER = 1</strong>).</p><p>a. Paste in the snippet below and replace the value of <strong>FIREBASE_URL</strong>&#160;with your Firebase URL. i.e. the code below would be correct if your URL was <strong>https://ferg-burger-420.firebaseio.com/</strong></p><p>b. In order to keep our check-out properly separated from any other data we might store later, we will store everything under a single node, that we&#8217;re arbitrarily calling <strong>checkouts</strong>.</p><h3>MapsActivity.java</h3><codelab-snippet>private static final String FIREBASE_URL = "https://ferg-burger-420.firebaseio.com/";
+private static final String FIREBASE_ROOT_NODE = "checkouts";</codelab-snippet><p>c. Add a class member to hold the reference to our Firebase connection, like so. Once again, put this with the other members (e.g. <strong>private GoogleMap mMap</strong>).</p><h3>MapsActivity.java</h3><codelab-snippet>private Firebase mFirebase;</codelab-snippet><p>3. When our Activity is created, we need to open our connection to Firebase. Add the connection code in the <strong>onCreate</strong>&#160;method. Here we are also setting up a <strong><a href="https://www.firebase.com/docs/java-api/javadoc/com/firebase/client/ChildEventListener.html">ChildEventListener</a></strong>&#160;to capture incoming data events.</p><h3>MapsActivity.java</h3><codelab-snippet>// Set up Firebase
+Firebase.setAndroidContext(this);
+mFirebase = new Firebase(FIREBASE_URL);
+mFirebase.child(FIREBASE_ROOT_NODE).addChildEventListener(this);</codelab-snippet><p>4. To write the selected places to Firebase, we need to modify <strong>onActivityResult</strong>&#160;to create the database entry when it retrieves the <strong>Place</strong>. &#160;The complete method should look like this.</p><p>a. This creates or updates a record in Firebase with a key matching the Place ID and with a value of <strong>{ time: 14024376459 }</strong>, where the timestamp is set to the server&#8217;s current time.</p><h3>MapsActivity.java</h3><codelab-snippet>@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+   if (requestCode == REQUEST_PLACE_PICKER) {
+       if (resultCode == Activity.RESULT_OK) {
+           Place place = PlacePicker.getPlace(data, this);
+
+           Map&lt;String, Object&gt; checkoutData = new HashMap&lt;&gt;();
+           checkoutData.put("time", ServerValue.TIMESTAMP);
+
+           mFirebase.child(FIREBASE_ROOT_NODE).child(place.getId()).setValue(checkoutData);
+
+       } else if (resultCode == PlacePicker.RESULT_ERROR) {
+           Toast.makeText(this, "Places API failure! Check the API is enabled for your key",
+                   Toast.LENGTH_LONG).show();
+       }
+   } else {
+       super.onActivityResult(requestCode, resultCode, data);
+   }
+}</codelab-snippet><p>5. To handle data changes, we need to implement the missing <strong>ChildEventListener</strong>&#160;methods.</p><p>a. Add <strong>ChildEventListener</strong>&#160;to the list of interfaces that the MapsActivity class implements.</p><h3>MapsActivity.java</h3><codelab-snippet>public class MapsActivity extends FragmentActivity 
+        implements OnMapReadyCallback, ChildEventListener {</codelab-snippet><p>b. Android Studio will indicate that there&#8217;s an error here, press <strong>Alt-Enter,</strong>&#160;choose <strong>Implement methods</strong>&#160;and click <strong>OK</strong>.</p><p>c. For now we are only interested in data being added to our map (that is, when a new CheckOut occurs). In the <strong>onChildAdded</strong>&#160;method, we want to <a href="https://developers.google.com/places/android/place-details#get-place">look up the Place ID</a>&#160;and <a href="https://developers.google.com/maps/documentation/android/marker">add a marker to the map</a>.</p><aside class="special"><p><strong>Note:</strong>&#160;As you paste in this code and fix the import errors, you may be asked to choose from multiple options for <strong>ResultCallback</strong>&#160;- you want <strong>com.google.android.gms.common.api.ResultCallback</strong>.</p></aside><h3>MapsActivity.java</h3><codelab-snippet>@Override
+public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+   String placeId = dataSnapshot.getKey();
+   if (placeId != null) {
+       Places.GeoDataApi
+               .getPlaceById(mGoogleApiClient, placeId)
+               .setResultCallback(new ResultCallback&lt;PlaceBuffer&gt;() {
+                          @Override
+                          public void onResult(PlaceBuffer places) {
+                              LatLng location = places.get(0).getLatLng();
+                              addPointToViewPort(location);
+                              mMap.addMarker(new MarkerOptions().position(location));
+                              places.release();
+                          }
+                      }
+               );
+   }
+}</codelab-snippet><p>6. Now press the <img src="../img/fire-place/img-16.png" style="max-width: 20px"><strong>Run</strong>&#160;button and once the app has loaded:</p><p>a. Tap the <strong>Check Out</strong>&#160;button to use the Place Picker.</p><p>b. Choose a place nearby.</p><p>c. Watch in awe as the place is added to your map!</p><aside class="warning"><p><strong>Important</strong>: We have not set up any security on our Firebase data. This is fine if we&#8217;re just hacking, but if you&#8217;re building a real production-quality app, make sure you read the Firebase guide to <a href="https://www.firebase.com/docs/security/guide/index.html">securing your data</a>.</p></aside><p><img src="../img/fire-place/img-23.png" style="max-width: 449px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Bonus step: Real-time updates across devices [no code!]" 
+        duration="1:00">
+        
+          <h1></h1><p>For this step you will need a second device. Plug it into your machine and press the <img src="../img/fire-place/img-16.png" style="max-width: 20px"><strong>Run</strong>&#160;button, installing the app to the new device.</p><p>Make sure you can see both devices - this is <strong>important</strong>!</p><p>1. On one device, make sure the map is visible.</p><p>2. On the other device, tap <strong>Check Out</strong>&#160;and choose a place.</p><p>3. Watch the devices to see how both screens update simultaneously with the new data!</p><aside class="special"><p><strong>Tip:</strong>&#160;Ask the people around you if they are also doing this code lab - if so, share your Firebase URL so you&#8217;re using the same data and watch it appear as you both update in real time!</p></aside><p><img src="../img/fire-place/img-24.png" style="max-width: 346px"></p><p><img src="../img/fire-place/img-25.png" style="max-width: 546px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:00">
+        
+          <h1></h1><p>You now have a technical skeleton for a hot new <strong>Check Out</strong>&#160;app. Now add some more user-focused features and hunt down some VC funding!</p><h3 class="checklist">What we've covered</h3><ul class="checklist">
+<li>Using the Android Place Picker to add real place data</li>
+<li>Looking up Place IDs using getPlaceById</li>
+<li>Writing data to Firebase</li>
+<li>Streaming data-creation events from Firebase to your apps</li>
+</ul><h3>Next Steps</h3><ul>
+<li>Try <a href="https://www.youtube.com/watch?v=WKfZsCKSXVQ">animating</a>&#160;the markers when they appear.</li>
+<li>Wouldn&#8217;t it be more interesting to find out why people are leaving? Add more data to your check-outs, like a rating and comment. Display it in an <a href="https://developer.android.com/reference/com/google/android/gms/maps/model/Marker.html#showInfoWindow()">InfoWindow</a>.</li>
+<li>Right now we&#8217;re monitoring all data coming from Firebase, try restricting the data to just check-outs in the last hour. Hint: Make sure you&#8217;re removing markers from the map when they expire, with <a href="https://www.firebase.com/docs/java-api/javadoc/com/firebase/client/ChildEventListener.html#onChildRemoved(com.firebase.client.DataSnapshot)">onChildRemoved</a>.</li>
+<li>Try limiting the data being displayed to just the currently viewed map. Hint: you might like to use <a href="https://github.com/firebase/geofire-java">GeoFire</a>.</li>
+<li>Get VC funding!</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul>
+<li>Read the Android Maps API <a href="https://developers.google.com/maps/documentation/android/">developer documentation</a>
+</li>
+<li>
+<a href="https://developers.google.com/maps/documentation/android/">Read</a>&#160;the <a href="https://www.firebase.com/docs/android/">Firebase Android API</a>
+</li>
+<li>Watch these videos:<br> &#160; &#160;<a href="https://www.youtube.com/watch?v=xPo3gfTXXOQ">Going Places on Android</a><br> &#160; &#160;<a href="https://www.youtube.com/watch?v=F0Kh_RnSM0w">Google Play Services 7.0</a>
+</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

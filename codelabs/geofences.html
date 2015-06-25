@@ -1,0 +1,338 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Building GeoFences into your Android App"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Geo, Android"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview">
+        
+          <h1></h1><p>You&#8217;ve probably learned how to use the GPS on your device to get the location of the device. Maybe you&#8217;ve played with the <code>FusedLocationProvider</code>&#160;which smartly uses the GPS along with other sensors to get your current location. How about we take it to the next level? How about an app that tells you when you enter or leave a specific location? You could use this for social check ins, or maybe as a parent you can use this to tell when your kids get home? I&#8217;ve seen games that use this too -- where they virtually hide loot, and when you go to the real world location, your device knows, and can react.</p><p>A great and easy way to implement this is using a <em>geofence. </em>Simply, a geofence is a location in latitude and longitude, a radius around that location, and a time for which it is active. So, for example, you could put the latitude and longitude of your loot stash, a radius of say 10 meters, and data that it&#8217;s only active on weekends. The Location APIs will take this, and when you exit or enter that space, can be used to generate a notification. It&#8217;s up to you as a developer how you handle this!</p><p>Sound exciting? I think so -- so let&#8217;s dive in and learn how it works.</p>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Prerequisites">
+        
+          <h1></h1><p>Before beginning, check that you have all the necessary pre-requisites. These include:</p><ul>
+<li>Android Studio</li>
+<li>An Android device that runs Android 4.2.2 or later &#160; &#160;-or- &#160; A configured Android emulator (this is available in Android Studio). However in order to test entering and leaving a GeoFence, you&#8217;ll need a real device that you can move around!</li>
+<li>The latest version of the Android SDK including the SDK tools component. You can get this from the Android SDK Manager in Android Studio.</li>
+<li>The Google Play Services SDK. You can get this from the Android SDK Manager in Android Studio.</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Getting Started">
+        
+          <h1></h1><p>In this step you&#8217;ll create the boilerplate&#160;app that you&#8217;ll finish later by adding the sign-in code. </p><h2>Create the new App</h2><p>Start Android Studio by clicking on its icon in the launcher bar at the bottom of the screen.</p><p>When you launch Android Studio, you&#8217;ll see an option to &#8216;Start a new Android Studio project&#8217;. Select this. You&#8217;ll see the &#8216;New Project&#8217; dialog. Enter the details for your app.</p><p><img src="../img/geofences/img-1.png" style="max-width: 768px"></p><p>Press Next, and you&#8217;ll get a screen asking to &#8216;Target Android Devices&#8217;. Be sure to choose a minimum of API 19: Android 4.4 (KitKat) for Phone and Tablet.</p><p>You&#8217;ll see &#8216;Add an activity to Mobile&#8217; dialog. <strong>Ensure that you select &#8216;Blank Activity&#8217; here.</strong></p><p><img src="../img/geofences/img-2.png" style="max-width: 768px"></p><p>Click &#8216;Next&#8217; and you&#8217;ll be asked to customize the Activity. Just accept the defaults, and press &#8216;Finish&#8217;.</p><h2>Configure build.gradle and AndroidManifest.xml</h2><p>In this step you&#8217;ll ensure that your app can use Google Play services, in which the APIs for signin reside. To do this, you&#8217;ll first update your build.gradle file. In Android Studio, open the Gradle Scripts folder [see screenshot below], and select build.gradle (Module App) as shown:</p><p><img src="../img/geofences/img-3.png" style="max-width: 341px"></p><p>This will open your <code>build.gradle</code>&#160;file, at the bottom of which will be code like this:</p><codelab-snippet>dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
+}</codelab-snippet><p>We need to add Google Play Services, so add an additional dependency, as below:</p><codelab-snippet>dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.google.android.gms:play-services:7.3.0'
+}</codelab-snippet><aside class="special"><p><strong>As of writing, the latest version of Google Play services is 7.3.0. You might want to use a later version. To get that, follow these steps:</strong></p>
+<ol start="1"><li><strong>Get the install location for Google Play services. You can see this in the SDK manager. </strong></li></ol>
+<p><img src="../img/geofences/img-4.png" style="max-width: 768px"></p>
+<p><strong>2. Using Terminal / Command Prompt, change to the directory above&#160;this one. I.E. in the above example, you would change to /Users/lmoroney/Library/Android/sdk/extras/google.</strong></p>
+<p><strong>Then:</strong></p>
+<p><strong>cd m2repository</strong></p>
+<p><strong>cd com/google/android/gms/play-services</strong></p>
+<p><strong>Then when you list the contents of that directory, you&#8217;ll see every version of Play Services that&#8217;s installed. In this case, you can see that my latest is 7.3.0, so that&#8217;s why I used it in my gradle file.</strong></p>
+<p><img src="../img/geofences/img-5.png" style="max-width: 768px"></p></aside><p>If you are asked to perform a gradle sync, do so. Otherwise, find the Gradle Sync button on the toolbar and press it to trigger a sync.</p><p>It looks like this:</p><p><img src="../img/geofences/img-6.png" style="max-width: 352px"></p><p>Now find your AndroidManifest.xml, and add the following code just above the closing <code>&lt;/activity&gt;</code>&#160;tag.</p><codelab-snippet>&lt;meta-data
+    android:name="com.google.android.gms.version"
+    android:value="@integer/google_play_services_version" /&gt;</codelab-snippet><p>Android Studio will change the contents of the value to something else. That&#8217;s perfectly natural, and a sign that things are working well. If the <code>google_play_services_version</code>&#160;goes red, make sure you've hit Gradle Sync.</p><p>Finally, add the following lines at the bottom, just before the closing <code>&lt;/manifest&gt;</code>:</p><codelab-snippet>    &lt;uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/&gt;</codelab-snippet><h2>Editing your Layout File</h2><p>In this case you&#8217;ll have a very simple layout that has a single button that adds a list of geofences for you to monitor. The app will then send you a notification whenever you enter, or leave, one of these geofences.</p><p>Go to <code>res/layouts/activity_main.xml</code>. </p><p>Make sure that in Android Studio you have it opened in Text view, where you can inspect the XML markup that defines the layout.</p><p><img src="../img/geofences/img-7.png" style="max-width: 669px"></p><p>You&#8217;ll see that it&#8217;s a basic &#8216;hello world&#8217; UI, with a <code>TextView</code>&#160;containing &#8216;Hello World&#8217; that looks like this:</p><codelab-snippet>    &lt;TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" /&gt;</codelab-snippet><p>Delete this and replace it with a <code>Button</code>:</p><codelab-snippet>&lt;Button
+        android:id="@+id/add_geofences_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:onClick="addGeofencesButtonHandler"
+        android:text="Add GeoFences" /&gt;</codelab-snippet><p><strong>Note </strong>that it&#8217;s best practice <em>not</em>&#160;to hardcode the text &#8216;Add GeoFences&#8217; into this XML, but instead to externalize it in a strings.xml file. I&#8217;ve just hardcoded it here for brevity.</p><p>Save and close your layout file. In the next step you&#8217;ll write the code behind this layout!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Coding your App">
+        
+          <h1></h1><p>Now that you&#8217;ve created the project in Android studio, and configured the gradle, manifest and layout files, you&#8217;re ready to begin coding. We&#8217;ll go through it step by step so you understand everything that&#8217;s going on.</p><h2>Clean up your Main Activity</h2><p>The single activity template that you used created an app with an <code>ActionBar</code>&#160;at the top, which requires <code>onCreateOptionsMenu</code>&#160;and <code>onOptionsItemSelected</code>&#160;methods to be overridden. If you look at your Main activity, you&#8217;ll see this code. We don&#8217;t need this in this app, so let&#8217;s clean it up.</p><ul>
+<li>Delete the <code>onCreateOptionsMenu</code>&#160;method</li>
+<li>Delete the <code>onOptionsItemSelected</code>&#160;method</li>
+<li>Change the class declaration to remove <code>extends ActionBarActivit</code>y and add <code>extends Activity</code>
+</li>
+<li>Import <code>android.app.Activity</code>&#160;</li>
+<li>Remove unused imports.</li>
+</ul><p>When you&#8217;re done, your activity should look like this (except for the package name):</p><codelab-snippet>package com.lmoroney.geofencecodelab;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+public class MainActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+}</codelab-snippet><h2>Extend your Class for Google Play services</h2><p>Your <code>MainActivity</code>&#160;class extends Activity, making it an activity, but it will also need to implement a number of interfaces in order to take advantage of Google Play services asynchronicity. <br><br>Update your <code>MainActivity</code>&#160;class declaration to:</p><codelab-snippet>public class MainActivity         extends Activity
+implements
+GoogleApiClient.ConnectionCallbacks, 
+GoogleApiClient.OnConnectionFailedListener, 
+ResultCallback&lt;Status&gt;{</codelab-snippet><p>If using Android Studio, this will also prompt you for the appropriate imports. For reference they&#8217;re here:</p><codelab-snippet>import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;</codelab-snippet><h2>Add Class Variables</h2><p>There are a few variables that need to be accessed by the entire class. They are the list of geofences we want to monitor, the GoogleAPIClient&#160;that is used to communicate&#160;with Google Play Services&#160;and the representation of the button you created in the layout. </p><p>Add the following to your class, just below its&#160;declaration, and before the onCreate:</p><codelab-snippet>    protected ArrayList&lt;Geofence&gt; mGeofenceList;
+    protected GoogleApiClient mGoogleApiClient;
+    private Button mAddGeofencesButton;</codelab-snippet><h2>Initializing in onCreate.</h2><p>In your <code>onCreate</code>&#160;function you&#8217;ll initialize the variables you created above. The geofence list will be initialized and populated, the GoogleApiClient&#160;will be set up, and the button wired up to its declaration in the layout.</p><p>Update your <code>onCreate</code>&#160;so that it looks like this:</p><codelab-snippet>
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mAddGeofencesButton = (Button) findViewById(R.id.add_geofences_button);
+        // Empty list for storing geofences.
+        mGeofenceList = new ArrayList&lt;Geofence&gt;();
+
+        // Get the geofences used. Geofence data is hard coded in this sample.
+        populateGeofenceList();
+
+        // Kick off the request to build GoogleApiClient.
+        buildGoogleApiClient();
+    }</codelab-snippet><p>You&#8217;ll notice that it uses a helper function (<code>populateGeofenceList</code>) to set up the Geofences, and another (<code>buildGoogleApiClient</code>) to set up your GoogleApiClient. You&#8217;ll build them in the next couple of steps.</p><h2>Populating the list of Geofences</h2><p>Create a new java class in your project,&#160;by right clicking on the package name, selecting &#8216;New&#8217; and then selecting &#8216;Java Class&#8217; as shown:</p><p><img src="../img/geofences/img-8.png" style="max-width: 768px"></p><p>Call the new class Constants.java. Update its content to match the following, changing only the package name to suit your project. This defines a HashMap of locations, each with a key that is a string with the friendly name of the location, and a LatLng (Latitude&#160;and Longitude) for the location.</p><p>A Geofence can be thought of as a location, with a radius around it, and a time of expiration. When the geofence is active, anything detected within the radius distance of the location, either entering or exiting the area, can trigger a notification. This can be in perpetuity, or for a limited time. In this example, we&#8217;re specifying a 20 meter radius, with a 12 hour expiration time.</p><p>In this example, I&#8217;ve hardcoded several locations for a Geofence -- you don&#8217;t need to do this, of course, and can have a more dynamic layout by serving up the list of geofences from a service call, for example:</p><codelab-snippet>package com.lmoroney.geofencecodelab;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.HashMap;
+
+
+public class Constants {
+
+    public static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS = 12 * 60 * 60 * 1000;
+    public static final float GEOFENCE_RADIUS_IN_METERS = 20;
+    
+    public static final HashMap&lt;String, LatLng&gt; LANDMARKS = new HashMap&lt;String, LatLng&gt;();
+    static {
+        // San Francisco International Airport.
+        LANDMARKS.put("Moscone South", new LatLng(37.783888,-122.4009012));
+
+        // Googleplex.
+        LANDMARKS.put("Japantown", new LatLng(37.785281,-122.4296384));
+
+        // Test
+        LANDMARKS.put("SFO", new LatLng(37.621313,-122.378955));
+    }
+}</codelab-snippet><p>Now that the list of GeoFences is defined, along with an expiration time and a radius, write the function in MainActivity.java that loads them.</p><p>Here&#8217;s the code:</p><codelab-snippet>public void populateGeofenceList() {
+for (Map.Entry&lt;String, LatLng&gt; entry : Constants.LANDMARKS.entrySet()) {
+mGeofenceList.add(new Geofence.Builder()
+.setRequestId(entry.getKey())
+.setCircularRegion(
+entry.getValue().latitude,
+entry.getValue().longitude,
+Constants.GEOFENCE_RADIUS_IN_METERS
+)
+.setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+Geofence.GEOFENCE_TRANSITION_EXIT)
+.build());
+}
+}</codelab-snippet><p>This iterates through the HashMap that was set up in Constants.java, and for each entry, creates a new Geofence using a Geofence.Builder. The parameters passed to this are the ID -- which is the key on the HashMap (e.g. &#8220;JapanTown&#8221;), a circular region that defines the Geofence, containing a latitude and logitude of the center of the region, and a radius that defines a circle around that center. It then defines the expiration duration (which can be 0 for never, check the docs), and a transition type that triggers an alert. This can be entering the fence, exiting the fence or both. In this case you can see that it&#8217;s both.</p><h2>Building the Api Client</h2><p>When you set up the <code>onCreate</code>, you called a method <code>buildApiClient() </code>that hadn&#8217;t been written yet. You&#8217;ll do that in this step.</p><p>As mentioned earlier, the Google Api Client is the main entry point to Google Play services. To create one, you need to specify a number of things:</p><ul>
+<li>Location of Connection Callbacks. The Google Api Client is highly asynchronous in nature, and needs functions implemented <em>somewhere</em>&#160;that it calls when it&#8217;s connected (<code>onConnected</code>) and when the connection is suspended (<code>onConnectionSuspended</code>). In this lab you&#8217;ll code these in this activity, so you set the location for the connection callbacks to this.</li>
+<li>Location of Connection Failed callback. It also needs you to specify the location of the <code>onConnectionFailed</code>&#160;function which runs if there&#8217;s a failure in the connection</li>
+<li>The APIs that you want to use. Google Play services supports lots of APIs, so you specify which ones you want to connect to here. For Geofencing you use the Location APIs.</li>
+</ul><p>Here&#8217;s the code:</p><codelab-snippet>    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }</codelab-snippet><p>This uses a GoogleApiClient builder, setting the callback container to &#8216;this&#8217;, and specifying that you want Location services. The result is assigned to <code>mGoogleApiClient</code>, which you defined earlier as a class variable.</p><p>If you&#8217;ve gotten this far, great, keep going! Not to far to go now. As a quick checkpoint, make sure you have all the correct import statements at the top of your MainActivity.java file.&#160;For reference, here&#8217;s what you should have:</p><codelab-snippet>import android.app.Activity;
+import android.os.Bundle;
+import android.widget.Button;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
+import java.util.Map;</codelab-snippet><h2>Implementing Overrides</h2><p>When using the GoogleApiClient, there are a number of overrides that the various interface you specified that you&#8217;d implement, that need to be defined. </p><p>The first of these are <code>onStart</code>&#160;and <code>onStop</code>. These are called when the Activity is started and stopped by Android respectively. You should use them to connect and disconnect your GoogleApiClient&#160;respectively.</p><p>Here&#8217;s the code:</p><codelab-snippet>    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!mGoogleApiClient.isConnecting() || !mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnecting() || mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }</codelab-snippet><p><code>onConnected</code>&#160;fires when you make a connection to the API. For this app, you don&#8217;t need to do anything with it, but you still need to provide the override. The same applies to <code>onConectionFailed</code>. In a real app you&#8217;d probably want to log the error, or do something user-friendly, but for the purposes of this tutorial, I&#8217;ll just leave it blank.</p><codelab-snippet>
+    @Override
+    public void onConnected(Bundle connectionHint) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        // Do something with result.getErrorCode());
+    }</codelab-snippet><p>Finally there&#8217;s <code>onConnectionSuspended</code>, which fires if something happens to disrupt the connection, but it hasn&#8217;t completely dropped. Typically you&#8217;d just try to reconnect at this point:</p><codelab-snippet>    @Override
+    public void onConnectionSuspended(int cause) {
+        mGoogleApiClient.connect();
+    }</codelab-snippet><h2>Implementing the Button Handler</h2><p>In the layout file, when you added the button you specified that it&#8217;s <code>onClick</code>&#160;would be <code>addGeofencesButtonHandler</code>. This specifies the name of the method to call when the button is pressed. Let&#8217;s implement that next.</p><p>Pressing the button should, if the GoogleApiClient is connected, add the list of geofences, and configure what should happen when a geofence transition occurs.</p><p>To do this you call <code>addGeofences</code>&#160;on the Geofencing API, passing it the GoogleApiClient that you are working with, a geofencingrequest object that contains the list of geofences, and a pending intent which is used to generate an intent when the geofence transition occurs. This is documented <a href="https://developer.android.com/reference/com/google/android/gms/location/GeofencingApi.html">here</a>. </p><p>Here&#8217;s the code for the Button Handler.</p><codelab-snippet>public void addGeofencesButtonHandler(View view) {
+        if (!mGoogleApiClient.isConnected()) {
+            Toast.makeText(this, "Google API Client not connected!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    getGeofencingRequest(),
+                    getGeofencePendingIntent()
+            ).setResultCallback(this); // Result processed in onResult().
+        } catch (SecurityException securityException) {
+            // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
+        }
+    }</codelab-snippet><p>This uses the return from <code>getGeofencingRequest()</code>&#160;to set up the request, and <code>getGerofencePendingIntent()</code>&#160;to set up the pending intent. Let&#8217;s build these next.</p><p>A <code>geoFencingRequest</code>&#160;is set up using a builder, to which you configure the initial trigger conditions if any, and add the list of geofences to. It&#8217;s documented <a href="https://developer.android.com/reference/com/google/android/gms/location/GeofencingRequest.Builder.html">here</a>.</p><p>We&#8217;re going to create a geoFencing request with our list of geofences, triggered by initial entry, like this:</p><codelab-snippet>    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(mGeofenceList);
+        return builder.build();
+    }</codelab-snippet><p>The <code>getGeofencePendingIntent</code>() function returns a <code>PendingIntent</code>, which we create from an existing intent. In the next step you&#8217;ll create this, but for now, just set it up as follows:</p><codelab-snippet>private PendingIntent getGeofencePendingIntent() {
+        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling addgeoFences()
+        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }</codelab-snippet><p>This requires you to build the <code>GeofenceTransitionsIntentService</code>&#160;class. You&#8217;ll see that in the next step.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Wrapping Up">
+        
+          <h1></h1><h2>Building the Intent Service</h2><p>A pending intent generates an intent when the transition event occurs. In the last step you created a pending intent from an intent defined by a class called <code>GeofencesTransitionsIntentService</code>, and you&#8217;ll add that in this step.</p><p>Add a new class to your app called GeofenceTransitionsIntentService. (Right click on the package, select &#8216;New&#8217;, select &#8216;Java Class&#8217;)</p><p>First, we should make sure it <code>extends IntentService</code>&#160;and handles the incoming Intent correctly. Replace the boilerplate code with this:</p><codelab-snippet>public class GeofenceTransitionsIntentService extends IntentService {
+  protected static final String TAG = "GeofenceTransitionsIS";
+
+  public GeofenceTransitionsIntentService() {
+    super(TAG);  // use TAG to name the IntentService worker thread
+  }
+
+  @Override
+  protected void onHandleIntent(Intent intent) {
+    GeofencingEvent event = GeofencingEvent.fromIntent(intent);
+    if (event.hasError()) {
+      Log.e(TAG, "GeofencingEvent Error: " + event.getErrorCode());
+      return;
+    }
+  }
+}</codelab-snippet><p>This will correctly handle any incoming Intent, but it doesn't do anything else. At the end of <code>onHandleIntent</code>, let's call some hypothetical new methods that get details, and send a notification:</p><codelab-snippet>    String description = getGeofenceTransitionDetails(event);
+    sendNotification(description);</codelab-snippet><p>Let's now add these methods on this class. This is long, but fairly straightforward, code to format the <code>GeofenceEvent</code>, and send it as a Notification to your users:</p><codelab-snippet>  private static String getGeofenceTransitionDetails(GeofencingEvent event) {
+    String transitionString =
+        GeofenceStatusCodes.getStatusCodeString(event.getGeofenceTransition());
+    List triggeringIDs = new ArrayList();
+    for (Geofence geofence : event.getTriggeringGeofences()) {
+      triggeringIDs.add(geofence.getRequestId());
+    }
+    return String.format("%s: %s", transitionString, TextUtils.join(", ", triggeringIDs));
+  }
+
+  private void sendNotification(String notificationDetails) {
+    // Create an explicit content Intent that starts MainActivity.
+    Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+
+    // Get a PendingIntent containing the entire back stack.
+    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+    stackBuilder.addParentStack(MainActivity.class).addNextIntent(notificationIntent);
+    PendingIntent notificationPendingIntent =
+        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    // Get a notification builder that's compatible with platform versions &gt;= 4
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+    // Define the notification settings.
+    builder.setColor(Color.RED)
+        .setContentTitle(notificationDetails)
+        .setContentText("Click notification to return to App")
+        .setContentIntent(notificationPendingIntent)
+        .setAutoCancel(true);
+
+    // Fire and notify the built Notification.
+    NotificationManager notificationManager =
+        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    notificationManager.notify(0, builder.build());
+  }</codelab-snippet><h2>Handling Intents and Errors</h2><p>When it receives an intent, the <strong>onHandleIntent</strong>&#160;method will run. This pulls the <code>GeofencingEvent</code>&#160;from the intent, and get metadata from the event with information such as the list of geofences that triggered the event to happen. (Remember as geofences are circles around a <code>LatLng</code>, they can overlap). It gets the list and uses these to send a notification back to the app.</p><p>Now that the service is ready to go, don&#8217;t forget that you also need to register it with your app -- and this is done in <code>AndroidManifest.xml</code>. Go to this file, and just before the closing &lt;/application&gt; tag, add the following.</p><p><code>&lt;service android:name=".GeofenceTransitionsIntentService" /&gt;</code></p><p>You&#8217;re almost done -- a little but more housekeeping is needed on your <code>MainActivity</code>&#160;before you can try it out.</p><h2>Catching the onResult callback</h2><p>You want to ensure that the Geofences have been properly added, and the infrastructure will call you back with a <code>ResultCallback&lt;Status&gt;</code>&#160;when this happens. You&#8217;ve already implemented this interface, but you need to implement the <code>onResult</code>&#160;method in the activity in order to get it to work. This will just set a Toast to let the user know that the Geofences have been added, or allow you to catch an error if they haven&#8217;t.</p><p>Here&#8217;s the code:</p><codelab-snippet>    public void onResult(Status status) {
+        if (status.isSuccess()) {
+            Toast.makeText(
+                    this,
+                    "Geofences Added",
+                    Toast.LENGTH_SHORT
+            ).show();
+        } else {
+            // Get the status code for the error and log it using a user-friendly message.
+            String errorMessage = GeofenceErrorMessages.getErrorString(this,
+                    status.getStatusCode());
+        }
+    }</codelab-snippet><p>You&#8217;re now ready to test your application. Set a geofence near you, and enter that into the <code>Constants</code>&#160;class. Run the app, and walk around the area, seeing if you can trigger an alert on your phone as you enter or leave it. It&#8217;s pretty cool, right? </p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Conclusion">
+        
+          <h1></h1><p>In this lab you saw how to use a <code>GoogleApiClient</code>&#160;to use Location services to generate geofences, and to raise notifications on the phone when it crosses into, or out of, these geo fences! This can be the basis of lots of great applications or games, and hopefully this lab was enough to get you started in building with this fascinating technology.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul>
+<li>Read the <a href="https://developer.android.com/training/location/geofencing.html">developer documentation</a>.</li>
+<li>Learn more about geofencing in the <a href="https://www.udacity.com/course/google-play-services--ud876">Google Play services</a>&#160;online course.</li>
+<li>Install the <a href="http://developer.android.com/samples/Geofencing/index.html">geofencing sample code</a>.<br>
+</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

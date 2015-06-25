@@ -1,0 +1,66 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/core-icons/av-icons.html">
+
+<link rel="import" href="../../bower_components/highlightjs-element/highlightjs-element.html">
+
+<link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+
+<polymer-element name="codelab-survey" attributes="heading opened">
+<template>
+  <link rel="stylesheet" href="codelab-survey.css">
+  <polymer-cookie name="codelabs" id="cookie" value="{{cookie}}"></polymer-cookie>
+  <div id="survey"></div>
+</template>
+<script>
+  Polymer('codelab-survey', {
+    heading: '',
+    lang: 'html',
+    code: '',
+    opened: false,
+    selected: false,
+    ready: function() {
+      var childNodes = this.querySelectorAll('h4,select');
+      var question = '';
+      var saved_answer = null;
+      for (var i=0; i<childNodes.length; i++) {
+        var node = childNodes[i];
+        if (node.tagName == 'SELECT') {
+          var radio_group = document.createElement('paper-radio-group');
+          var items = node.querySelectorAll('option');
+          for (var j=0; j<items.length; j++) {
+            var radio_button = document.createElement('paper-radio-button');
+            var answer = items[j].textContent;
+            radio_button.setAttribute('label', answer);
+            if (answer == saved_answer) {
+              radio_button.setAttribute('checked', true);
+            }
+            radio_group.appendChild(radio_button);
+            radio_button.addEventListener('click',function(el, question, answer){ return function(){
+              this.fire("survey-question-answered", { "question": question, "answer": answer });
+              el.setSurveyAnswer(question, answer);
+            }}(this, question, answer), false);
+          }
+          this.$.survey.appendChild(radio_group);
+        } else if (node.tagName == 'H4') {
+          question = node.innerText;
+          var cookie = JSON.parse(this.cookie);
+          if (cookie['survey_answers'] != null) {
+            saved_answer = cookie['survey_answers'][question];
+          }
+          this.$.survey.appendChild(node);
+        }
+      }
+    },
+    setSurveyAnswer: function(question, answer) {
+      var cookie = JSON.parse(this.cookie);
+      if (cookie['survey_answers'] == null) {
+        cookie['survey_answers'] = {};
+      }
+      cookie['survey_answers'][question] = answer;
+      this.cookie = JSON.stringify(cookie);
+    }
+  });
+</script>
+</polymer-element>

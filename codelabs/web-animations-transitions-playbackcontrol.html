@@ -1,0 +1,255 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Web Animations Transitions and Playback Control"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Web, Chrome"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="1:00">
+        
+          <h1></h1><p>In this&#160;codelab, you&#8217;ll&#160;learn how to use the Web Animations API to enhance a single-page HTML website. You'll add transitions between content, and use animations to support an effect&#160;based on the scroll position of the page.</p><p>The final site will run amazingly on both desktop and mobile, in all modern browsers. Check out this preview:</p><p><img src="../img/web-animations-transitions-playbackcontrol/img-1.png.gif" style="max-width: 480px"></p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Use animations to create striking transitions between content</li>
+<li>How to use playback control to manipulate animations</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>The <a href="https://github.com/web-animations/web-animations-js">web-animations-next</a>&#160;polyfill</li>
+<li>A modern browser that supports Web Animations and&#160;the polyfill, such as Chrome, Firefox or IE11+</li>
+</ul><codelab-survey><h4>How&#160;will you use this tutorial?</h4>
+<select><option>Read it through only</option>
+<option>Read it and complete the exercises</option>
+<option>Check out the final code to demo the final effect</option></select><h4>How&#160;would rate your experience with web development?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>How&#160;would rate your experience with animations on the web?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get the sample code" 
+        duration="1:00">
+        
+          <h1></h1><p>You can either download all the sample code to your computer...&#160;</p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/io2015-codelabs/archive/master.zip">Download Zip</a></paper-button></p><p>...or clone the GitHub repository from the command line.</p><pre>$ git clone https://github.com/googlesamples/io2015-codelabs.git</pre><aside class="special"><p>The <code>io2015-codelabs</code>&#160;repository contains many sample projects. This codelab only uses one:</p>
+<ul><li>
+<img src="../img/web-animations-transitions-playbackcontrol/img-2.png" style="max-width: 20px"><strong>web-animations</strong>&#8212;This Web Animations codelab.</li></ul></aside>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Open the sample site">
+        
+          <h1></h1><p>Let's first take a look at the&#160;sample site that we're going to animate. This is a simple&#160;site with a few different tabs.</p><p><img src="../img/web-animations-transitions-playbackcontrol/img-3.png" style="max-width: 258px"></p><ol start="1">
+<li>Open the <code>web-animations/start</code>&#160;folder.</li>
+<li>Open the <code>index.html</code>&#160;file in your browser.</li>
+<li>Click on the headings in the top-right of the site - different&#160;content will show&#160;for each tab. You can also press back or forwards in your browser.</li>
+</ol><p>That's it! Our base site is very simple, but has some boilerplate CSS, and JavaScript to manage showing and hiding the different sections. If you're curious about this boilerplate code, it lives in the <code>web-animations/shared</code>&#160;folder. In this codelab, we won't modify it&#160;at all.</p><p>If you'd like to open the final version of the site to see what you'll be building, you can find the code in the&#160;<code>web-animations/step4</code>&#160;folder. It contains the entire codelab including the optional step.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Include Web Animations" 
+        duration="1:00">
+        
+          <h1></h1><p>The Web Animations API is a suite of primitives and features, some of which may not yet be available natively in your favourite browser. Let's get started by including the <a href="https://github.com/web-animations/web-animations-js#web-animations-nextminjs">web-animations-next polyfill</a>. This is a JavaScript implementation of the Web Animations API that's supported on all modern browsers, and it's good practice to include it unless you're very confident about the browsers of your users.</p><aside class="special"><p><strong>Note</strong>: The polyfill&#160;will use any native support when available, so you'll always get the best combination of support and performance.</p></aside><p>In this codelab, we'll work within the <code>web-animations/start</code>&#160;folder.</p><p>Open the <code>web-animations/start/index.html</code>&#160;file&#160;in a text editor, and include <code>web-animations-next.min.js</code>&#160;from GitHub as shown below.</p><h3>index.html</h3><codelab-snippet>&lt;head&gt;
+  &lt;link href="..." rel="stylesheet" type="text/css" /&gt;
+  &lt;link href="../shared/codelab.css" rel="stylesheet" type="text/css" &gt;
+  &lt;link href="site.css" rel="stylesheet" type="text/css" &gt;
+  &lt;!-- Add the line below --&gt;
+  &lt;script src="https://cdn.rawgit.com/web-animations/web-animations-js/2.0.0/web-animations-next.min.js"&gt;&lt;/script&gt;
+  &lt;script src="../shared/codelab.js"&gt;&lt;/script&gt;
+  &lt;script src="work.js"&gt;&lt;/script&gt;
+&lt;/head&gt;</codelab-snippet><h4>Alternatives</h4><ol start="1">
+<li>If internet access isn't available, include a local version of the <code>web-animations-next.min.js</code>&#160;script from a checked out <a href="https://github.com/web-animations/web-animations-js#web-animations-nextminjs">polyfill repo</a><br>
+</li>
+<li>You can use <a href="http://bower.io">Bower</a>&#160;to depend on <code>web-animations-js</code>, version 2.0.0 or later.</li>
+</ol>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Material loading effect" 
+        duration="5:00">
+        
+          <h1></h1><p>The <a href="https://events.google.com/io2015">Google I/O 2015 site</a>&#160;has a striking visual effect when you load different pages. It creates a colored circle from the link that expands to fill the whole header. It's subtle, but effective. Let's replicate that effect for our demo site.</p><p>Open the <code>site.js</code>&#160;file. The shared <code>codelab.js</code>&#160;file (which you won't modify in this codelab) will call a function named <code>animateToSection</code>&#160;when a user loads a new section, and we've provided this as boilerplate here for you. However, it doesn't do anything just yet.</p><p>Inside this function, we're going to first create a new DOM element, and position it over the clicked&#160;link. To do that, insert the following code into <code>animateToSection</code>:</p><h3>site.js</h3><codelab-snippet>  var effectNode = document.createElement('div');
+  effectNode.className = 'circleEffect';
+
+  var bounds = link.getBoundingClientRect();
+  effectNode.style.left = bounds.left + bounds.width / 2 + 'px';
+  effectNode.style.top = bounds.top + bounds.height / 2 + 'px';
+
+  var header = document.querySelector('header');
+  header.appendChild(effectNode);</codelab-snippet><p>We also need to define the <code>circleEffect</code>&#160;class. Open up <code>site.css</code>&#8212;this is intentionally blank to start with&#8212;and let's make something resoundingly round. We use the 'vw' (viewport width) units to make sure the circle is always larger than the width of the screen, and use a <code>margin</code>&#160;to position it perfectly centered.</p><h3>site.css</h3><codelab-snippet>div.circleEffect {
+  width: 240vw;
+  height: 240vw;
+  margin-left: -120vw;
+  margin-top: -120vw;
+  border-radius: 100%;
+  position: absolute;
+  will-change: transform;
+}</codelab-snippet><p>Now, it's time to get colorful, choosing a new color to go to, not to mention animated - we'll create an <code>Animation</code>&#160;player that scales the circle from zero to hero by changing the CSS <code>transform</code>&#160;property.&#160;Append this code at the end of the <code>animateToSection</code>&#160;method:</p><h3>site.js</h3><codelab-snippet>  var newColor = 'hsl(' + Math.round(Math.random() * 255) + ', 46%, 42%)';
+  effectNode.style.background = newColor;
+
+  var scaleSteps = [{transform: 'scale(0)'}, {transform: 'scale(1)'}];
+  var timing = {duration: 2500, easing: 'ease-in-out'};
+
+  var anim = effectNode.animate(scaleSteps, timing);
+
+  anim.addEventListener('finish', function() {
+    header.style.backgroundColor = newColor;
+    header.removeChild(effectNode);
+  });</codelab-snippet><p>And that's it! Try it out now by loading different parts of the demo site.</p><p>This code randomly chooses a new color, applies it to the <code>effectNode</code>, and then animates it through the defined steps in <code>scaleSteps</code>. When that <code>Animation</code>&#160;is finished, it removes the node (good to clean up, otherwise you'll end up with lots of DOM) and sets the header to always have that new color.</p><aside class="special"><p><strong>Note</strong>: Instead of <code>random</code>, you could choose a specific new color based on a HTML property, or (my favourite) a hash of the href.</p></aside><p>The completed code for this step is available in <code>web-animations/step1</code>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Fade in" 
+        duration="5:00">
+        
+          <h1></h1><p>Another great effect from the <a href="https://events.google.com/io2015">I/O site</a>&#160;shows page content fade in as different parts of the site are loaded. Let's replicate that effect. We'll again be modifying only the <code>animateToSection</code>&#160;method inside <code>site.js</code>.</p><p>In the previous step, we created an <code>Animation</code>&#160;player by calling the <code>animate</code>&#160;method on our <code>effectNode</code>. This is a great shorthand, but is limited to controlling a single effect. In Web Animations, we can group together multiple effects and control them with a single player. Replace the <code>effectNode.animate</code>&#160;line with this code:</p><h3>site.js</h3><codelab-snippet>  var scaleEffect = new KeyframeEffect(effectNode, scaleSteps, timing);
+
+  var allEffects = [scaleEffect];
+
+  // Play all animations within this group.
+  var groupEffect = new GroupEffect(allEffects);
+  var anim = document.timeline.play(groupEffect);</codelab-snippet><p>This creates a <code>KeyframeEffect</code>&#160;that encapsulates our change to <code>effectNode</code>, without implicitly playing the animation before we're ready. It then creates a <code>GroupEffect</code>&#160;which will play all effects&#8212;just one for now&#8212;inside <code>allEffects</code>&#160;in parallel.</p><p>Let's add another effect that fades in the new content. First, add a new method at the end of this file that creates a 'fade-in' effect on a generic target:</p><h3>site.js</h3><codelab-snippet>function buildFadeIn(target) {
+  var steps = [
+    {opacity: 0, transform: 'translate(0, 20em)'},
+    {opacity: 1, transform: 'translate(0)'}
+  ];
+  return new KeyframeEffect(target, steps, {
+    duration: 500,
+    easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+  });
+}</codelab-snippet><p>And then, compose this effect inside the <code>allEffects</code>&#160;array:</p><h3>site.js</h3><codelab-snippet>  var allEffects = [scaleEffect, buildFadeIn(current)];</codelab-snippet><p>If you load the page now, you'll see the content quickly slide in (and bounce, thanks to the <code>cubic-bezier</code>&#160;<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/timing-function">easing function</a>) timed along with the ripple effect.</p><p>The completed code for this step is available in <code>web-animations/step2</code>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Fade out" 
+        duration="5:00">
+        
+          <h1></h1><p>Let's combine this with a fade out effect for the previous content, but with a literal twist. It's going to randomly dismiss the previous section in a certain direction and angle.&#160;We're going to build this animation in the same way as before - first, add a new method&#160;to <code>site.js</code>&#160;to build a custom and random dismiss effect:</p><h3>site.js</h3><codelab-snippet>function buildFadeOut(target) {
+  var angle = Math.pow((Math.random() * 16) - 6, 3);
+  var offset = (Math.random() * 20) - 10;
+  var transform =
+      'translate(' + offset + 'em, 20em) ' +
+      'rotate(' + angle + 'deg) ' + 
+      'scale(0)';
+  var steps = [
+    {visibility: 'visible', opacity: 1, transform: 'none'},
+    {visibility: 'visible', opacity: 0, transform: transform}
+  ];
+  return new KeyframeEffect(target, steps, {
+    duration: 1500,
+    easing: 'ease-in'
+  });
+}</codelab-snippet><p>Then, as before, we're going to compose this effect. However, instead of running the effects in parallel, let's perform one after the other using <code>SequenceEffect</code>:</p><h3>site.js</h3><codelab-snippet>  var fadeEffect = new SequenceEffect([buildFadeOut(previous), buildFadeIn(current)]);
+  var allEffects = [scaleEffect, fadeEffect];</codelab-snippet><p>We're almost there, but if you were to run the effect now, you&#160;would&#160;see the new page content in its final state (i.e., visible and static) <em>before</em>&#160;the animation created in <code>buildFadeIn</code>&#160;plays. In the Web Animations API, this is by design - the API doesn't know what should happen to your properties before or after an animation plays. Let's update the timing passed to the <code>KeyframeEffect</code>&#160;constructor inside <code>buildFadeIn</code>:</p><h3>site.js</h3><codelab-snippet>  return new KeyframeEffect(target, steps, {
+    duration: 500,
+    delay: -1000,
+    fill: 'backwards',
+    easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+  });</codelab-snippet><p>The most important change here is the addition of <code>fill: 'backwards'</code>. This tells the API that you want the effect to apply&#160;(in this case, making the now-selected tab have a zero opacity) as soon as the animation is added to the page, even if it hasn't started playing yet, which is perfect for our delayed animation.</p><p>We've also hinted to this animation that it should start one second in the past - this means it will start somewhere in the middle of the fade out animation we've just added&#160;- creating an even more immersive effect.</p><p><img src="../img/web-animations-transitions-playbackcontrol/img-4.png" style="max-width: 371px"></p><aside class="special"><p><strong>Note</strong>: You can also use <code>fill: 'forwards'</code>&#160;or <code>fill: 'both'</code>&#160;in your animations, but be careful! Animations that fill forwards will stick around until you explicitly cancel them, even if you no longer care about the effect that they're applying. You can find out more under <a href="http://w3c.github.io/web-animations/#fill-behavior">Fill Behavior</a>.</p></aside><p>The completed code for this step is available in <code>web-animations/step3</code>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Optional: Playback Control" 
+        duration="5:00">
+        
+          <h1></h1><p>An <code>Animation</code>&#160;normally plays forward, transitioning from state A to state B. However, the Web Animations API is very versatile - instead of playing forward, we could use the <code>currentTime</code>&#160;property to&#160;<a href="http://en.wikipedia.org/wiki/Scrubbing_(audio)">'scrub'</a>&#160;an animation based on some external input.</p><p>For this optional extension, let's animate the small heart icon&#8212;hiding in the bottom left of the page. At the end of <code>site.js</code>, add an event listener to run when the page is ready, which will contain our new behavior:</p><h3>site.js</h3><codelab-snippet>window.addEventListener('load', function() {
+  var icon = document.querySelector('.icon');
+
+  var steps = [
+    {color: 'hsl(206, 46%, 89%)', transform: 'scale(0.5)'},
+    {color: 'hsl(13, 79%, 96%)', transform: 'scale(2)'},
+    {color: 'red', transform: 'scale(1)'}
+  ];
+  var timing = {duration: 1, fill: 'both'};
+  var anim = icon.animate(steps, timing);
+});</codelab-snippet><p>This creates an animation effect, as we built before. However, it only runs for 1ms&#8212;hardly enough time to see the color and scale change!</p><p>However, let's not actually have the animation play forward.&#160;First, we're going to find the ratio of the user's viewport position on the page, which will be a number in the range <code>[0,1]</code>. Since our animation only goes for 1ms, we can use this number to control the <code>currentTime</code>&#160;property.</p><p>Append the following code at the end of the function:</p><h3>site.js</h3><codelab-snippet>  anim.pause();  // never play this animation forward
+
+  function updatePlayer() {
+    var top = window.scrollY;
+    var height = document.body.scrollHeight - window.innerHeight;
+    anim.currentTime = top / height;
+  }
+  updatePlayer();
+  window.addEventListener('scroll', updatePlayer);</codelab-snippet><p>Great! The <code>currentTime</code>&#160;will change from zero to one, depending on the user's scroll position. When you're testing this out, make sure you drag your browser's scroll bar to experience a perfectly smooth effect.</p><p>The completed code for this step is available in <code>web-animations/step4</code>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:30">
+        
+          <h1></h1><p>You've used the Web Animations&#160;API to create perfectly composed visual transitions between pages in a site, and learned about the versatility of the <code>Animation</code>&#160;player object.</p><h3>What we've covered:</h3><ul>
+<li>Simple animations with <code>Element.animate</code>
+</li>
+<li>The <code>KeyframeEffect</code>&#160;constructor</li>
+<li>Composing animations with <code>GroupEffect</code>&#160;and <code>SequenceEffect</code>
+</li>
+<li>Using an <code>Animation</code>&#160;to provide a timeline</li>
+</ul><p>Web Animations is not perfect for every animation - sometimes, you should use declarative CSS animations or procedural animations via <code>requestAnimationFrame</code>. However, it's a perfect addition to your toolbox and it's available for use in all modern browsers right now.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn more">
+        
+          <h1></h1><ul>
+<li>Read <a href="http://www.html5rocks.com/en/search?q=web+animation">the animations articles</a>&#160;on HTML5Rocks</li>
+<li>Use the <a href="http://w3c.github.io/web-animations/">W3C specification</a>&#160;for reference</li>
+<li>Check out the <a href="http://web-animations.github.io/web-animations-demos">Web Animations Demos</a>&#160;for inspiration, or try <a href="https://github.com/web-animations/web-animations-codelabs">more codelabs</a>
+</li>
+<li>Dive into <a href="https://github.com/google/santa-tracker-web">Santa Tracker</a>, which uses the Web Animations API in about &#8531; of its scenes</li>
+<li>Watch these videos:<br> &#160; &#160;<a href="https://www.youtube.com/watch?v=ep0_0W0qWsc">Silky smooth Web Animations</a><br> &#160; &#160;<a href="https://www.youtube.com/watch?v=tNgBQC9qMP4">HTTP 203: Christmas Special</a>
+</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

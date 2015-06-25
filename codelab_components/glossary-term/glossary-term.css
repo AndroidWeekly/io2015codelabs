@@ -1,0 +1,6 @@
+.glossary-term {
+	color: #444;
+	border-bottom: 1px dotted #444;
+	text-decoration: none;
+	cursor: pointer;
+}

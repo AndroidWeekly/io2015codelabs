@@ -1,0 +1,302 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Building Apps that Sign In with Google"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Android"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview">
+        
+          <h1></h1><p>Many apps need to establish the user&#8217;s Identity in order to customize the app to the user&#8217;s desires, save their data, allow them to identify themselves in social circles and countless other scenarios. There are many ways that you can allow your users to identify themselves, such as implementing a sign in functionality of your own, where you manage your users and their credentials, or, as is becoming increasingly more common, you can allow them to sign in using their credentials from commonly used platforms such as Facebook, Twitter&#160;or Google. </p><p>To support this, we&#8217;ve built the Google Identity Platform and the services it provides, including Google Sign-In for Android, iOS and the Web, the Google Identity Toolkit, that allows you to integrate multiple identity providers, plain OAuth 2.0 for typical sign in scenarios, and the Chrome Identity API which allows users to sign into your Chrome Apps.</p><p>In this lab, you&#8217;ll learn how to provide sign-in functionality to your Android App, built using Android Studio, using Google Sign-In.</p><p>Google Sign-In is a technology that allows you to get users into your apps quickly and securely with little development work required. It allows you to create a seamless experience across screens for your users -- they sign in once, and are authenticated on all of your&#160;devices. It allows you to integrate Google&#8217;s services into your websites and mobile apps, and also enables over-the-air installation of Android apps when users sign into your web sites. In this lesson you&#8217;ll learn how to add Google Sign-In to your android app -- and how to manage the workflow of your users signing into your app. </p>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Prerequisites">
+        
+          <h1></h1><p>Before beginning, check that you have all the necessary pre-requisites. These include:</p><ul>
+<li>Android Studio</li>
+<li>An Android Device that runs Android 4.2.2 or later &#160; &#160;-or- &#160; A configured Android Emulator (this is available in Android Studio)</li>
+<li>The latest version of the Android SDK including the SDK tools component. You can get this from the Android SDK Manager in Android Studio.</li>
+<li>The Google Play Services SDK. You can get this from the Android SDK Manager in Android Studio.</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Enabling Sign-In for your App">
+        
+          <h1></h1><p>Before you start coding any of the Android functionality, you need to turn on the Sign-In APIs for your App in the Google Developer&#8217;s console. You&#8217;ll see how to do that in this section.</p><h2>Create a Project</h2><p>To create a project, visit the developer&#8217;s console at: <a href="https://console.developers.google.com/project">https://console.developers.google.com/project</a>.</p><p>Press the &#8216;Create Project&#8217; button, and you&#8217;ll see a popup like this:</p><p><img src="../img/sign-in/img-1.png" style="max-width: 768px"></p><p>Enter a meaningful name for your project in the &#8216;Project name&#8217; box. For the project ID, you&#8217;ll need to enter something that is unique across all of Google&#8217;s infrastructure. So, sorry codelab-signin-1 is taken :)</p><p>When you&#8217;re done, agree to the terms and press &#8216;Create&#8217;, and the console will create a project for you. After a few minutes you&#8217;ll be directed to the project&#8217;s home page, which will look like this:</p><p><img src="../img/sign-in/img-2.png" style="max-width: 768px"></p><h2>Enable the Google+ API</h2><p>Select &#8216;<strong>APIs &amp; auth</strong>&#8217; on the left hand side of the screen. It will open, revealing a sub menu containing the items APIs, Credentials, Consent screen and Push. Select &#8216;<strong>APIs</strong>&#8217; and you&#8217;ll see a screen containing all available APIs.</p><p><img src="../img/sign-in/img-3.png" style="max-width: 768px"></p><p>Find the <strong>Google+ API</strong>. You can either scroll down to find it (as you can see in the above image), or you can search for it in the search box. Select it, and you&#8217;ll be taken to a screen that allows you to enable it.</p><p><img src="../img/sign-in/img-4.png" style="max-width: 768px"></p><p>Click &#8216;<strong>Enable API</strong>&#8217; to turn on the API. Once it&#8217;s enabled, the button changes to &#8216;Disable API&#8217;, and you get a popup informing you that it&#8217;s enabled:</p><p><img src="../img/sign-in/img-5.png" style="max-width: 768px"></p><p>Be sure to leave the console page open. You&#8217;ll be using it in the next step.</p><h2>Configure Credentials</h2><p>In this step you&#8217;ll configure the credentials for your application. Google uses this to ensure that your application isn&#8217;t a fake application attempting to use our infrastructure. For the purpose of development you&#8217;ll use a debug certificate. When you deploy your app to the Play Store, it will need a &#8216;real&#8217; certificate, and steps for getting one are available here: <a href="https://developer.android.com/tools/publishing/app-signing.html">https://developer.android.com/tools/publishing/app-signing.html</a>. Once you have the certificate, you identify it by it&#8217;s SHA-1 fingerprint. <br><br>Get your SHA-1 </p><p>You can access your SHA-1 in the debug keystore. </p><ul>
+<li>On a Mac or Linux, this is in the <strong>~/.android</strong>&#160;directory. </li>
+<li>On Windows it is at <strong>C:\Users\&lt;your user name&gt;\.android. C:\Users\&lt;your user name&gt;\.android. <br></strong>
+</li>
+</ul><p>Note that the .android folder is hidden so you will not be able to see it in Finder or Windows Explorer.</p><p>Open a terminal (Command Prompt on Windows) and issue the following command (changing ~/.android.debug.keystore to the appropriate path for your OS):</p><codelab-snippet>keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android</codelab-snippet><p>You&#8217;ll should see output like this:</p><p><img src="../img/sign-in/img-6.png" style="max-width: 768px"></p><p>If you look closely, you&#8217;ll see a line that reads &#8216;<strong>Certificate fingerprints</strong>&#8217;, followed by a number of different ones. Take note of the <strong>SHA1</strong>. In this screenshot, you can see that my SHA1 is:</p><codelab-snippet>04:55:2F:18:EC:27:44:D5:83:EC:AF:3D:02:D7:5B:1C:5E:77:88:42</codelab-snippet><p>Take note of yours, you&#8217;ll will need it in the next step.</p><h3>Configure your Consent Screen</h3><p>In the <a href="https://console.developers.google.com/project">developer's console</a>, select the &#8216;<strong>Consent screen</strong>&#8217; link in the APIs &amp; auth section.</p><p><img src="../img/sign-in/img-7.png" style="max-width: 432px"></p><p>You'll see a screen where you specify details about your product to form a consent screen. You must provide your email address and Product name. Everything else is optional. An example of a consent screen is shown on the right hand side. You&#8217;re probably familiar with seeing these if you&#8217;ve run any Android apps on your phone that require user permissions, and signin is no exception.</p><p><img src="../img/sign-in/img-8.png" style="max-width: 768px"></p><p>When you&#8217;re done, press the &#8216;<strong>Save&#8217;</strong>&#160;button at the bottom of the screen.</p><h3>Configure your Credentials.</h3><p>Now that you have the SHA1 key, and the consent screen is configured, it&#8217;s time to create your credentials. </p><p>Select the &#8216;Credentials&#8217; link on the left. </p><p>You&#8217;ll see a screen asking you to pick either OAuth or Public API Access. </p><p><img src="../img/sign-in/img-9.png" style="max-width: 768px"></p><p>Under <strong>OAuth</strong>, select &#8216;<strong>Create new Client ID</strong>&#8217;. </p><p>A screen will pop up, asking if you want a Web application, Service account or Installed application.</p><p>Choose &#8216;<strong>Installed Application</strong>&#8217;, and choose &#8216;Android&#8217;. Enter the Package name&#160;you will be using in your app. You'll be creating a new project so it can be whatever you like, such as <code>com.yourname.codelab1</code>. (You'll need to remember it when you create your project later.)</p><p>Add the SHA1 you got earlier. You can leave Deep Linking Disabled.</p><p><strong>Important: Remember the package name you entered. You&#8217;ll need it later, because it has to match the package name of your app.</strong></p><p>Here&#8217;s an example:</p><p><img src="../img/sign-in/img-10.png" style="max-width: 496px"></p><p>Click <strong>Create Client ID</strong>, and after a few moments you&#8217;ll be taken back to the credential screen, and the Client ID will be ready.</p><p><img src="../img/sign-in/img-11.png" style="max-width: 768px"></p><p>You&#8217;re now ready to begin coding your app!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Creating an App that supports Sign-In.">
+        
+          <h1></h1><p>In this step you&#8217;ll create the basic skeleton of an app that you&#8217;ll fill in later by adding the sign in code. </p><h2>Create the new App</h2><p>Open <strong>Android Studio</strong>. &#160;When you launch Android Studio, you&#8217;ll see an option to &#8216;Start a new Android Studio project&#8217;. Select this. You&#8217;ll see the &#8216;New Project&#8217; dialog. Enter the details for your app.</p><aside class="warning"><p><strong>Important:</strong>&#160;Make sure that the package name matches that which you entered into the developers console when you created your Client ID above. Here is an example of how to determine the app name and company domain from the package name you chose:</p>
+<p>&#160; &#160;<strong>&#160;package name</strong>: com.lmoroney.codelab1</p>
+<p>&#160; &#160;<strong>&#160;app name</strong>: Codelab1</p>
+<p>&#160; &#160; <strong>company</strong>&#160;<strong>domain</strong>: lmoroney.com</p>
+<p>It&#8217;s a little confusing, I know, so use the package name hint in the dialog to ensure you match them up. If you have a different package name from what you configured in the console, your sign in won&#8217;t work, but if you make a mistake it&#8217;s easy to change it later in the developer console.</p></aside><p><img src="../img/sign-in/img-12.png" style="max-width: 768px"></p><p>Press Next, and you&#8217;ll get a screen asking to &#8216;Target Android Devices&#8217;. Accept the default here, and press Next to the next screen. </p><p>You&#8217;ll see &#8216;Add an activity to Mobile&#8217; dialog. <strong>Ensure that you select &#8216;Blank Activity&#8217; here.</strong></p><p><img src="../img/sign-in/img-13.png" style="max-width: 768px"></p><p>Click &#8216;Next&#8217; and you&#8217;ll be asked to customize the Activity. Just accept the defaults, and press &#8216;Finish&#8217;.</p><h2>Configure Build.gradle</h2><p>In this step you&#8217;ll ensure that your app can use Google Play services, in which the APIs for signin reside. To do this, you&#8217;ll first update your build.gradle file. </p><p>In Android Studio, open the Gradle Scripts node, and select build.gradle (Module App) as shown:</p><p><img src="../img/sign-in/img-14.png" style="max-width: 341px"></p><p>This will open your build.gradle file, at the bottom of which will be code like this:</p><codelab-snippet>dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
+}</codelab-snippet><p>Add a dependency for play services like this:</p><codelab-snippet>dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.google.android.gms:play-services:7.3.0'
+}</codelab-snippet><p>If you are asked to perform a gradle sync, do so. Otherwise, find the Gradle Sync button on the toolbar and press it to trigger a sync. &#160;It looks like this:</p><p><img src="../img/sign-in/img-15.png" style="max-width: 352px"></p><p>Now your project has all of the dependencies you need to integrate with Google Sign-In.</p><h2>Update Google Play Services</h2><p>Google Play services is frequently updated and this codelab assumes you have a recent version. &#160;To get the latest version, in Android Studio click <strong>Tools &gt; Android &gt; SDK Manager</strong>:</p><p><img src="../img/sign-in/img-16.png" style="max-width: 595px"></p><p>Then find the entry for <strong>Google Play Services</strong>&#160;and make sure you have version 23 or higher:</p><p><img src="../img/sign-in/img-17.png" style="max-width: 768px"></p><h2>Configure AndroidManifest.xml</h2><p>The AndroidManifest file is the source of all the information your Android device knows about your application. &#160;You will need to make some small changes in order to configure your app to use Google Sign-In.</p><p>In your Android studio project, you&#8217;ll see a number of folders, one of which is the &#8216;manifests&#8217; folder:</p><p><img src="../img/sign-in/img-18.png" style="max-width: 525px"></p><p>In the manifests folder, find and open your AndroidManifest.xml. Add the following code just above the closing <code>&lt;/application&gt;</code>&#160;tag:</p><codelab-snippet>&lt;meta-data
+    android:name="com.google.android.gms.version"
+    android:value="@integer/google_play_services_version" /&gt;</codelab-snippet><p>The value field references a resource that is contained within the Google Play Services client library you added as a dependency earlier. &#160;This tells the manifest which version of Google Play Services you expect so that you app will run properly on as many devices as possible.</p><p>Finally, add the following lines <strong>above</strong>&#160;the <code>&lt;application&gt;</code>&#160;tag and inside <code>&lt;manifest&gt;</code>:</p><codelab-snippet>   &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+   &lt;uses-permission android:name="android.permission.GET_ACCOUNTS" /&gt;
+   &lt;uses-permission android:name="android.permission.USE_CREDENTIALS" /&gt;</codelab-snippet><h2>Build a Basic UI</h2><p>Now that your app is fully configured, it&#8217;s time to build a UI that lets the user sign in and sign out. &#160;You will build a basic UI with a Sign In button that looks like this:</p><p><img src="../img/sign-in/img-19.png" style="max-width: 437px"></p><p>In Android Studio, select the &#8216;<strong>res</strong>&#8217; folder, and open it&#8217;s &#8216;<strong>layout</strong>&#8217; subfolder. In here you&#8217;ll see &#8216;<code>activity_main.xml</code>&#8217;.</p><p>Double click to open it in the editor, and be sure to select the &#8216;<strong>Text&#8217;</strong>&#160;tab at the bottom of the editor to get the XML text view of your Layout. Android Studio Should look something like this:</p><p><img src="../img/sign-in/img-20.png" style="max-width: 768px"></p><p>You can see that your layout contains a single <code>&lt;TextView&gt;</code>&#160;node. Delete this and replace with:</p><codelab-snippet>    &lt;LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="2dip"&gt;
+        &lt;com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false" /&gt;
+
+        &lt;Button
+            android:id="@+id/sign_out_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Out"
+            android:enabled="true" /&gt;
+
+        &lt;Button
+            android:id="@+id/revoke_access_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Revoke Access"
+            android:enabled="true" /&gt;
+
+        &lt;TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/statuslabel"
+            android:text="Status"/&gt;
+    &lt;/LinearLayout&gt;</codelab-snippet><p><strong>Note</strong>: Don't worry if you get an error in Design View in Android Studio, just work in Text View if this happens.</p><p>This layout gives you a Sign-In button, and a couple of buttons for signing out and revoking &#160;access. It also provides a TextView where the status of the sign in procedure will be displayed. You are now ready to begin coding the application.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Coding your Application">
+        
+          <h1></h1><p>Now that you&#8217;ve set up a ClientID on Google&#8217;s infrastructure for your Application, configured the application to use Google Play services with the correct permissions, and have created a basic UI, it&#8217;s time to start writing the code for your application&#8217;s sign-in flow.</p><h2>Extend your Main Activity</h2><p>Let&#8217;s start by extending the Main Activity of your application to use the Asynchronous callback functionality of Google Play services. &#160;Open the file <code>MainActivity.java</code>:</p><p>First add a couple of imports to the top of the Main Activity declaration:</p><codelab-snippet>import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;</codelab-snippet><p>Right now your MainActivity declaration looks like this:</p><codelab-snippet>        public class MainActivity extends ActionBarActivity {</codelab-snippet><p>Change it to:</p><codelab-snippet>        public class MainActivity extends FragmentActivity implements
+                ConnectionCallbacks, OnConnectionFailedListener,
+                View.OnClickListener {</codelab-snippet><p>If you are using Android Studio, this will lead to a number of new imports being added at the top of your code file. Go ahead and accept them, you&#8217;ll need them. If this doesn&#8217;t happen, check your work against the code so far to ensure you have the correct imports. </p><p>Right now the code will be red-underlined, indicating errors. Don&#8217;t worry about this -- it&#8217;s telling you that the interfaces you are implementing expect some functions to be overridden, and you haven&#8217;t done that yet. You&#8217;ll do it shortly.</p><h2>Implement Constants and Class Variables</h2><p>As you write the code there are a number of variables and constants that are shared across various functions. Put all of these below the MainActivity declaration, but before the first function (which is likely the OnCreate one).</p><p>First are the constants. Just declare these for now. You&#8217;ll see what each does when you use them.</p><codelab-snippet>    private static final int SIGNED_IN = 0;
+    private static final int STATE_SIGNING_IN = 1;
+    private static final int STATE_IN_PROGRESS = 2;
+    private static final int RC_SIGN_IN = 0;</codelab-snippet><p>Next are some variables that will represent various objects or data that you&#8217;ll need. Again, you&#8217;ll see what each of these does when you&#8217;re using them.<code>&#160;</code></p><codelab-snippet>    private GoogleApiClient mGoogleApiClient;
+    private int mSignInProgress;
+    private PendingIntent mSignInIntent;</codelab-snippet><p>Finally add the declarations for the controls on the User Interface. </p><codelab-snippet>    private SignInButton mSignInButton;
+    private Button mSignOutButton;
+    private Button mRevokeButton;
+    private TextView mStatus;</codelab-snippet><h2>Implement OnCreate()</h2><p>When Android starts your app, and activates your activity, the OnCreate() method fires as the operating system &#8216;creates&#8217; the activity. Code within your OnCreate() function will then execute.</p><p>At the moment, your onCreate code looks like this:</p><codelab-snippet>    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }</codelab-snippet><p>Replace it with the following code. &#160;This code will link your MainActivity java code to the UI you created earlier and also initiate the GoogleApiClient which you will use to control sign-in.</p><codelab-snippet>    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Get references to all of the UI views
+        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        mSignOutButton = (Button) findViewById(R.id.sign_out_button);
+        mRevokeButton = (Button) findViewById(R.id.revoke_access_button);
+        mStatus = (TextView) findViewById(R.id.statuslabel);
+
+        // Add click listeners for the buttons
+   mSignInButton.setOnClickListener(this);
+   mSignOutButton.setOnClickListener(this);
+   mRevokeButton.setOnClickListener(this);
+
+   // Build a GoogleApiClient
+   mGoogleApiClient = buildGoogleApiClient();
+    }</codelab-snippet><p>You may notice that <code>buildGoogleApiClient</code>&#160;is showing as an error -- that&#8217;s because we haven&#8217;t created it ye!. You&#8217;ll do that in the next step. &#160;The GoogleApiClient class his is the main entry point for Google Play services applications, you can find detailed documentation on it <a href="https://developer.android.com/reference/com/google/android/gms/common/api/GoogleApiClient.html">here</a>. You will be implementing <code>buildGoogleApiClient()</code>&#160;in the next step.</p><h2>Build the Api Client</h2><p>In the previous section, as well as setting up the UI controls, you also assigned your GoogleApiClient to the results of a function called buildGoogleApiClient(). You hadn&#8217;t created this function yet, so you&#8217;ll do that in this step.</p><p>The Google Api Client is the main entry point to Google Play services. To create one, you need to specify a number of things:</p><ul>
+<li>Location of Connection Callbacks. The Google Api Client is highly asynchronous in nature, and needs functions implemented <em>somewhere</em>&#160;that it calls when it&#8217;s connected (onConnected) and when the connection is suspended (onConnectionSuspended). In this lab you&#8217;ll code these in this activity, so you set the location for the connection callbacks to this.</li>
+<li>Location of Connection Failed callback. It also needs you to specify the location of the onConnectedFailed function which runs if there&#8217;s a failure in the connection</li>
+<li>The APIs that you want to use. Google Play services supports lots of APIs, so you specify which ones you want to connect to here.</li>
+<li>In the case of logging in, you also specify the Login Scope. This defines the amount of information about the user that your app will access. Details on scopes can be found <a href="https://developers.google.com/+/api/oauth">here</a>. You&#8217;ll be using email scope in this lab -- which only gives access to the user&#8217;s email address for identification rather than their full Google+ profile.</li>
+</ul><p>Add the buildGoogleApiClient() method to MainActivity. The full definition is:</p><codelab-snippet>private GoogleApiClient buildGoogleApiClient() {
+        return new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Plus.API, Plus.PlusOptions.builder().build())
+                .addScope(new Scope("email"))
+                .build();
+    }</codelab-snippet><h2>Implement onStart() and onStop()</h2><p>When your activity starts is the ideal time to connect the Google API Client to Google Play services. Similarly, when it stops is the ideal time to disconnect it. </p><p>Override the onStart() and onStop() methods to do exactly that with the followint cod:</p><codelab-snippet>@Override
+protected void onStart() {
+    super.onStart();
+    mGoogleApiClient.connect();
+}
+
+@Override
+protected void onStop() {
+    super.onStop();
+    mGoogleApiClient.disconnect();
+}</codelab-snippet><h2>Handle Suspended scenarios </h2><p>Occasionally the connection to Google Play services can drop out. It doesn&#8217;t disconnect, but gets lost for some reason. If this happens, the best thing to do is to try to reconnect. </p><p>Add the onConnectionSuspended() method:</p><codelab-snippet>@Override
+public void onConnectionSuspended(int cause) {
+    mGoogleApiClient.connect();
+}</codelab-snippet><h2>Handle Connection to Google Play services.</h2><p>When using Google Play services with signin -- the moment the app connects to the services is the moment the user is signed in. When the onConnected() callback executes, you know the user is connected. For this lab, you&#8217;ll enable the buttons, and get some details about the user. Remember you are using email scope which only gives access to their email address, so we&#8217;ll get that. If you try to get other information about the user (for example, their circle of Google+ friends), you&#8217;ll get an exception. </p><p>Add the onConnected() method to MainActivity:</p><codelab-snippet>@Override
+public void onConnected(Bundle connectionHint) {
+    mSignInButton.setEnabled(false);
+    mSignOutButton.setEnabled(true);
+    mRevokeButton.setEnabled(true);
+
+    // Indicate that the sign in process is complete.
+    mSignInProgress = SIGNED_IN;
+
+    try {
+        String emailAddress = Plus.AccountApi.getAccountName(mGoogleApiClient);
+        mStatus.setText(String.format("Signed In to My App as %s", emailAddress));
+    }
+    catch(Exception ex){
+        String exception = ex.getLocalizedMessage();
+        String exceptionString = ex.toString();
+        // Note that you should log these errors in a &#8216;real&#8217; app to aid in debugging
+    }
+}</codelab-snippet><p>Note that we set the <code>mSignInProgress</code>&#160;to <code>STATE_SIGNED_IN</code>. This is used by the app to track the status of signing in. You&#8217;ll see how that is used in the next step.</p><h2>Handle Connection Failures</h2><p>Signing in with Google is a little unique when it comes to connection failures. Typically a connection failure to Google Play services happens because you don&#8217;t have connectivity, but when using signin, it will more frequently happen because the user is in a transitional state, where they aren&#8217;t fully signed in yet. There may be two intermediate steps, and when the user hasn&#8217;t completed them, Google Play services returns a connection failure.</p><p>The first of these two steps happens when the user has more than one Google account registered on the device. Android will show them a dialog asking which account it should use. At this point, your connection has failed.</p><p>The second of these steps happens when the app shows a dialog to the user asking if they will give permissions to the app to access information based on the specified scope.</p><p>As a developer, you handle this as connection failures in onConnectionFailed, and you repeatedly try to reconnect. This is where the <code>mSignInProgress</code>&#160;and the various constants you defined earlier <code>STATE_DEFAULT</code>, <code>STATE_SIGNED_IN</code>&#160;and <code>STATE_IN_PROGRESS</code>&#160;are used.</p><p>Add the onConnectionFailed() and resolveSignInError() methods to MainActivity. Here&#8217;s the code:</p><codelab-snippet>    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        if (mSignInProgress != STATE_IN_PROGRESS) {
+            mSignInIntent = result.getResolution();
+            if (mSignInProgress == STATE_SIGNING_IN) {
+                resolveSignInError();
+            }
+        }
+        // Will implement shortly
+        onSignedOut();
+    }
+
+    private void resolveSignInError() {
+        if (mSignInIntent != null) {
+            try {
+                mSignInProgress = STATE_IN_PROGRESS;
+                startIntentSenderForResult(mSignInIntent.getIntentSender(),
+                        RC_SIGN_IN, null, 0, 0, 0);
+            } catch (IntentSender.SendIntentException e) {
+                mSignInProgress = STATE_SIGNING_IN;
+                mGoogleApiClient.connect();
+            }
+        } else {
+            // You have a play services error -- inform the user
+        }
+    }</codelab-snippet><p>The onConnectionFailed() method checks to see if the sign in process is still in progress, and if it is, it gets the intent that was returned by the callback. This intent will represent the dialog asking the user to sign in, or that asking the user for their permissions. If this is the case, the resolveSignInError() method is called. This checks the intent, and flags that the sign in is still in progress. The user&#8217;s response with the intents can be handled in onActivityResult(). </p><p>Add the onActivityResult() method to MainActivity. Here&#8217;s the code:</p><codelab-snippet>@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+switch (requestCode) {
+case RC_SIGN_IN:
+                if (resultCode == RESULT_OK) {
+                    mSignInProgress = STATE_SIGNING_IN;
+                } else {
+                    mSignInProgress = SIGNED_IN;
+                }
+
+                if (!mGoogleApiClient.isConnecting()) {
+                    mGoogleApiClient.connect();
+                }
+                break;
+}
+}</codelab-snippet><p>As the user resolves the intents by answering the dialogs presented, the flow will eventually lead to a connection to the API (if their credentials are correct) or a &#8216;real&#8217; failure (if they aren&#8217;t). Should we reach the latter -- the onSignedOut() function (in onConnectionFailed) will be called. You&#8217;ll implement that next. </p><h2>Implement onSignedOut()</h2><p>When the user signs out, or if their sign in fails for some reason, your app needs to to update the UI, disabling the sign out and revoke access buttons, and enabling the log in utton so that they can the user can again. </p><p>Add the onSignedOut() method to MainActivity. Here&#8217;s the code:</p><codelab-snippet>    private void onSignedOut() {
+        // Update the UI to reflect that the user is signed out.
+        mSignInButton.setEnabled(true);
+        mSignOutButton.setEnabled(false);
+        mRevokeButton.setEnabled(false);
+
+        mStatus.setText("Signed out");
+    }</codelab-snippet><h2>Implement the onClick handlers</h2><p>The final step is to implement the click handlers for the three buttons. Earlier (in onCreate()) you specified that this activity would contain them, so you can achieve this by implementing an onClick override in this activity, and checking which UI element (a View in this case) triggered the callback.</p><p>Add the code to MainActivity to define the onClick behavior for the buttons. Here&#8217;s the code:</p><codelab-snippet> @Override
+    public void onClick(View v) {
+        if (!mGoogleApiClient.isConnecting()) {
+            switch (v.getId()) {
+                case R.id.sign_in_button:
+                    mStatus.setText("Signing In");
+                    resolveSignInError();
+                    break;
+                case R.id.sign_out_button:
+                    Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                    mGoogleApiClient.disconnect();
+                    mGoogleApiClient.connect();
+                    break;
+                case R.id.revoke_access_button:
+                    Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                    Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient);
+                    mGoogleApiClient = buildGoogleApiClient();
+                    mGoogleApiClient.connect();
+                    break;
+            }
+        }
+    }</codelab-snippet><p>This code will ignore any button clicks if the GoogleApiClient is in the process of connecting. Otherwise, for the sign in Button, it will change the status text to Signing In, and enter the resolution of Sign In errors. Remember that if Android shows the &#8216;pick which email address&#8217; or the permissions dialog, these will be treated as &#8216;errors&#8217;. </p><p>For the sign out button, the default account will be cleared, so that on next sign in the user will be given a choice&#160;of which ID to use when signing in. Also, the client will disconnect and reconnect. </p><p>Finally, for revoking access, the user will be signed out, and access that they gave to the profile will be revoked. In other words, if the user signs in, and gives permission to the email profile, and then signs out, then on further sign in, they shouldn&#8217;t need to give the same permissions. However, if they revoke access, then on future sign-ins, they&#8217;d have to give access again in order to be able to sign into the application.</p><p>That&#8217;s it. You&#8217;re now ready to run and try out your app!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Running the App">
+        
+          <h1></h1><p>This section assumes you are using an emulator in Android Studio. For details on setting up an emulator, see the <a href="http://developer.android.com/tools/devices/emulator.html">Android Studio documentation</a>. The following screenshots are based on a Nexus 5 profile in the emulator. Of course, it also works great with a physical device attached to your computer! :)</p><h2>First Run</h2><p>When the app first loads, the user will see something like this. The status reads that they are signed out, and they will get a button for &#8216;Sign In&#8217;, &#8216;Sign Out&#8217; and &#8216;Revoke Access&#8217;. Note that in this screen shot the Sign In button is red and uses the G+ branding. This may appear differently for you -- and if so, don&#8217;t worry, you&#8217;re just using a later version than mine.</p><p><img src="../img/sign-in/img-21.png" style="max-width: 278px"></p><h2>User Touches Sign-In Button</h2><p>In this case, I&#8217;ve never been signed in, so Android checks to see if I want to use my on-device Google account or specify something else. This is the first of the &#8216;errors&#8217; in connecting that the app will handle.</p><p><img src="../img/sign-in/img-22.png" style="max-width: 289px"></p><h2>User Consent</h2><p>Earlier, you specified a consent screen. This is what is displayed here. As the scope used was email, then the scope listing is just &#8216;Know who you are on Google&#8217;. For other scopes the list would appear longer. In order to sign in, the user has to give their consent to that information access. Again, for the purposes of this app, this delay in connecting/signing in is treated as an &#8216;error&#8217;. That&#8217;s why the &#8216;resolveSignInError()&#8217; function exists.</p><p><img src="../img/sign-in/img-23.png" style="max-width: 297px"></p><h2>Successful Connection - User is Signed In</h2><p>Once the user accepts the Consent, all errors should be handled, and there&#8217;s nothing further preventing them from signing in, other than incorrect credentials. If they successfully sign in, the UI gets updated to disable the sign in button, and enable the Sign Out and Revoke Access buttons. It will also update the status with the meta data that it was able to get from the User&#8217;s identity -- namely their email address. Remember that this is based on the scope that we defined. If you want access to more information -- such as profile pictures, friends circles etc, you need to change the scope, and the user has to grant you that access via the consent screen.</p><p><img src="../img/sign-in/img-24.png" style="max-width: 306px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Conclusion">
+        
+          <h1></h1><p>In this lab you went end-to-end in creating a simple application that provides sign in to Google using your Google Account. You saw how to use the developer console to give the app permissions to use Google&#8217;s infrastructure via getting a Client ID, and also how to define the consent screen that is presented to the user. You then created a simple Android App, added Google Play services to it, configured and coded it! You now have all the tools you need to build Google Sign-in functionality into your own apps!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul>
+<li>Watch this great devbyte video:<br> <a href="https://www.youtube.com/watch?v=_cI9NcArhYs">Coffee with a Googler: Chat with Ryan Troll about sign in and security</a>
+</li>
+<li>Take the <a href="https://www.udacity.com/course/google-play-services--ud876">Google Play Services Online Course</a>.</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

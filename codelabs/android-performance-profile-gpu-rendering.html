@@ -1,0 +1,143 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Profiling GPU Rendering Codelab"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Android"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="The 16 Millisecond Per Frame Speed Limit" 
+        duration="1:00">
+        
+          <h1></h1><p><img src="../img/android-performance-profile-gpu-rendering/img-1.png" style="max-width: 282px"></p><p>If your app is slow, it is because some or all frames take more than 16 milliseconds to execute. A direct and easy way to visualize the rendering speed of each frame is by turning on <strong>Profile GPU Rendering</strong>&#160;on your mobile device.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="1:00">
+        
+          <h1></h1><p>This walkthrough shows how to use <strong>Profile GPU Rendering</strong>&#160;on your mobile device.</p><p>Profiling GPU Rendering gives you a quick visual representation of how much time it takes to render the frames of a UI window relative to the 16-ms-per-frame benchmark. </p><p><img src="../img/android-performance-profile-gpu-rendering/img-2.png" style="max-width: 413px"></p><p>Profiling GPU Rendering is useful for: </p><ul>
+<li>Quickly seeing how a UI window performs against the 16-ms-per-frame target. </li>
+<li>Identifying whether any part of the rendering pipeline stands out in using up processing time. </li>
+<li>Looking for spikes in frame rendering time associated with user or program actions. </li>
+</ul><h2>What You Need</h2><p>A mobile device running at least Android 4.1 with <a href="http://developer.android.com/tools/device.html#developer-device-options">Developer Options</a>&#160;enabled. </p><p>Open Developer options in the system Settings. On Android 4.2 and higher, the Developer options screen is hidden by default. To make it visible, go to <strong>Settings &gt; About phone</strong>&#160;and tap <strong>Build number</strong>&#160;seven times. Return to the previous screen to find Developer options at the bottom.</p><h2 class="checklist">What You’ll Learn</h2><ul class="checklist">
+<li>How to enable <strong>Profile GPU Rendering</strong>&#160;on your mobile device.</li>
+<li>How to interpret the graphs drawn by <strong>Profile GPU Rendering</strong>. </li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Turn on Profile GPU Rendering" 
+        duration="1:00">
+        
+          <h1></h1><ol start="1">
+<li>On your mobile device, go to <strong>Settings &gt; Developer Options</strong>.</li>
+<li>Scroll far down and tap <strong>Profile GPU Rendering</strong>&#160;to turn it <strong>On</strong>.</li>
+<li>In the <strong>Profile GPU Rendering</strong>&#160;popup, choose <strong>On screen as bars</strong>, to overlay the graphs on the screen of your mobile device.</li>
+<li>Go to the app that you want to profile. (This will work for any app on your device.)</li>
+</ol><p><img src="../img/android-performance-profile-gpu-rendering/img-3.png" style="max-width: 514px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="What You’ll See" 
+        duration="2:00">
+        
+          <h1></h1><ol start="1"><li>Open an app on your device and interact with it. <br>
+</li></ol><p>For each visible Activity, the tool displays a graph.<br></p><ul>
+<li>The horizontal axis shows time elapsing.</li>
+<li>The vertical axis shows time per frame in milliseconds.</li>
+<li>As you interact with your application, vertical bars show up on your screen, appearing from left to right, showing frame performance over time.</li>
+<li>Each vertical bar represents one frame of rendering. The taller the bar, the longer it took to render.</li>
+<li>The green line marks the 16 ms per frame target. Every time a bar crosses the green line, your app is dripping a frame, and your users may see this as stuttering motion.</li>
+</ul><p><img src="../img/android-performance-profile-gpu-rendering/img-4.png" style="max-width: 677px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="What It Means" 
+        duration="2:00">
+        
+          <h1></h1><h3>The Profile GPU Rendering Graph</h3><p><img src="../img/android-performance-profile-gpu-rendering/img-5.png" style="max-width: 634px"></p><p>In this enlarged image of the Profile GPU Rendering graph you can see the colored sections of the graph, and what phase of the rendering pipeline each color represents.</p><ul>
+<li>The <strong>green line</strong>&#160;represents 16 ms. To achieve 60 fps, the vertical bar for each frame needs to stay below this 16 ms mark. Any time a bar pushes above this line, there may be pauses in the animations.<br>
+</li>
+<li>Each bar has a <strong>blue</strong>, <strong>purple</strong>&#160;(only for Lollipop and newer Android versions), <strong>red</strong>, and <strong>orange</strong>&#160;component.<br>
+</li>
+<li>The <strong>blue</strong>&#160;section of the bar represents the time used to create and update the View's display lists. If this part of the bar is large, there may be a lot of custom view drawing or a lot of work in onDraw methods.<br>
+</li>
+<li>(Lollipop and newer Android OS) The <strong>purple</strong>&#160;section of the bar represents the time spent transferring resources to the render thread.<br>
+</li>
+<li>The <strong>red</strong>&#160;section of the bar represents the time spent by Android's 2D renderer issuing commands to OpenGL to draw and redraw display lists. The height of this bar is directly proportional to the time it takes to execute all display lists.<br>
+</li>
+<li>The <strong>orange</strong>&#160;section of the bar represents the time the CPU is waiting for the GPU to finish its work. If this bar gets large, it means the app is doing too much work on the GPU. </li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="What You Can Do" 
+        duration="1:00">
+        
+          <h1></h1><p>Once you identify where your app is missing the 16 ms-per-frame mark, you can use other Android Performance Profiling Tools to figure out, where exactly in your code the problem is, and fix it. </p><p>In fact, we have created a whole <a href="https://www.udacity.com/course/android-performance--ud825">Udacity course</a>&#160;to help you learn about <a href="https://www.udacity.com/course/android-performance--ud825">Android Performance</a>, the profiling tools, and how to fix common issues. </p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="And Always Remember">
+        
+          <h1></h1><p>Keep calm, profile, and stay under 16 mspf.</p><p><img src="../img/android-performance-profile-gpu-rendering/img-1.png" style="max-width: 282px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul>
+<li>Sign up for the <a href="https://www.udacity.com/course/android-performance--ud825">Android Performance Online Course</a>.</li>
+<li>Check out the <a href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE">Android Performance Patterns</a>&#160;video series.</li>
+<li>Join the <a href="https://plus.google.com/communities/116342551728637785407">Android Performance Patterns Google+ Community</a>.</li>
+<li>Find more tools in the <a href="http://developer.android.com/tools/performance/index.html">Android Performance Tools</a>&#160;documentation.</li>
+</ul><codelab-survey><h4>Do you have any experience with performance profiling?</h4>
+<select><option>No experience at all</option>
+<option>Some experience</option>
+<option>Lots of experience</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

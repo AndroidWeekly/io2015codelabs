@@ -1,0 +1,391 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Building data-rich web apps with Lovefield"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Web, Chrome"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Codelab overview" 
+        duration="4:00">
+        
+          <h1></h1><p><a href="https://github.com/google/lovefield">Lovefield</a>&#160;is an SQL-like, relational query engine for the Web implemented in JavaScript.&#160;In this codelab, you will build an offline-capable web application for analyzing stock market data.&#160;You will use Lovefield as the data access layer&#160;and learn about its powerful querying capabilities and intuitive SQL-like API.</p><h2>What you’ll learn</h2><ol start="1">
+<li>Setup steps for including Lovefield code in your application.</li>
+<li>Defining the database schema.</li>
+<li>Executing <code>INSERT</code>&#160;queries.</li>
+<li>Executing simple <code>SELECT</code>&#160;queries (column projection, value predicates, sorting).</li>
+<li>Executing complex <code>SELECT</code>&#160;queries (joins, aggregators, group by).</li>
+<li>Debugging and examining a query.</li>
+<li>Using parameterized queries.</li>
+<li>Using database observers to trigger UI updates.</li>
+</ol><p>In short, you will learn why and how to use Lovefield in your next real-world data-rich application, and you will gain a clear understanding of the functionality Lovefield provides.</p><h2>What you’ll need</h2><ul>
+<li>Chrome (recommended) or Firefox browser.</li>
+<li>The <code>StockAnalyzer</code>&#160;skeleton code&#160;(instructions on downloading available at &#8220;Step 0&#8221;).</li>
+<li>A text editor.</li>
+</ul><h2>Prerequisites</h2><p><em>Basic</em>&#160;familiarity with the concepts of <a href="http://en.wikipedia.org/wiki/Relational_database">relational databases</a>&#160;and the <a href="http://en.wikipedia.org/wiki/Relational_model">relational data model</a>&#160;is required to follow the exercises of this codelab. Familiarity with <a href="http://en.wikipedia.org/wiki/SQL">SQL (Structured Query Language)</a>&#160;is not required, but is beneficial, especially when it comes to advanced topics like <em>indexing</em>&#160;and <em>query optimization</em>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Stock Analyzer application overview">
+        
+          <h1></h1><h2>Stock Analyzer UI overview</h2><p><img src="../img/lovefield/img-1.png" style="max-width: 624px"></p><p>The application user interface has four components:</p><ol start="1">
+<li>A drop-down list populated with the available search modes, "Stocks" and "Sectors".</li>
+<li>A drop-down list populated with either stocks or industry sectors, depending on which search mode is selected.</li>
+<li>A drop-down list populated with various time windows. Options are <em>5 days</em>, <em>1 month</em>, <em>3 months</em>, <em>6 months</em>, <em>YTD (year-to-date),</em>&#160;and <em>1 year.</em>
+</li>
+<li>A pane that displays query results as a 2D graph.</li>
+</ol><p>App users can search for &#8220;Stocks&#8221; or &#8220;Sectors&#8221; and specify a time window. The result graph updates as users&#160;examine different stocks/sectors/time-windows. Hovering over or touching the graph exposes additional information about a specific date.</p><h2>Source code overview</h2><p><strong>All Lovefield-related code resides in lovefield_service.js</strong>, within a class called <code>LovefieldService</code>. Everything else is already implemented and is not the focus of this codelab.</p><table>
+<thead><tr>
+<td colspan="1" rowspan="1"><p>File name</p></td>
+<td colspan="1" rowspan="1"><p>File contents</p></td>
+</tr></thead>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1"><p><code>index.html</code></p></td>
+<td colspan="1" rowspan="1"><p>All HTML code.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>stock_analyzer.css</code></p></td>
+<td colspan="1" rowspan="1"><p>All&#160;CSS code.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>graph_plotter.js</code></p></td>
+<td colspan="1" rowspan="1"><p>Logic for drawing graphs.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>fetcher_service.js</code></p></td>
+<td colspan="1" rowspan="1"><p>Logic related to fetching real-world stock market data from the network, using the Google Finance API.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>query_builder_controller.js</code></p></td>
+<td colspan="1" rowspan="1"><p>AngularJS controller for interacting with all UI components related to building database queries.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>lovefield_service.js</code></p></td>
+<td colspan="1" rowspan="1">
+<p>Class used by the rest of the application to make calls to Lovefield's API. </p>
+<p><strong>This class is partially implemented. You will implement the remaining parts in this codelab.</strong></p>
+</td>
+</tr>
+</tbody>
+<tbody></tbody>
+</table><h2><code>LovefieldService</code> class </h2><p>The application calls the <code>LovefieldService</code>&#160;to fulfill its data-related needs. The following methods are unimplemented or only partially implemented. Each of them demonstrates a different part of Lovefield&#8217;s API, and you will implement them in this codelab.</p><table>
+<thead><tr>
+<td colspan="1" rowspan="1"><p>Method name</p></td>
+<td colspan="1" rowspan="1"><p>Method description</p></td>
+</tr></thead>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1"><p><code>buildSchema</code></p></td>
+<td colspan="1" rowspan="1"><p>Builds the database schema.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>insertData</code></p></td>
+<td colspan="1" rowspan="1"><p>Inserts data fetched from the network to the database.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>getStockList</code></p></td>
+<td colspan="1" rowspan="1"><p>Retrieves the list of stocks for the &#8220;Stocks&#8221; search mode.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>getSectorList</code></p></td>
+<td colspan="1" rowspan="1"><p>Retrieves the list of sectors for the &#8220;Sectors&#8221; search mode.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>getStockClosingPrices</code></p></td>
+<td colspan="1" rowspan="1"><p>Retrieves a given company&#8217;s performance, within a given time window.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>getSectorClosingPrices</code></p></td>
+<td colspan="1" rowspan="1"><p>Retrieves a given industry sector&#8217;s performance, within a given time window.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>observeStockClosingPrices</code></p></td>
+<td colspan="1" rowspan="1"><p>Registers an observer for the &#8220;stock closing prices&#8221; query.</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><code>observeSectorClosingPrices</code></p></td>
+<td colspan="1" rowspan="1"><p>Registers an observer for the &#8220;sector closing prices&#8221; query.</p></td>
+</tr>
+</tbody>
+<tbody></tbody>
+</table><p>One of Lovefield&#8217;s nicest features is its SQL-like API. Developers who are already familiar with SQL will find learning Lovefield APIs straightforward. To make it even easier, we're including the equivalent SQL queries for all steps in this codelab.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Step 0: Download and run the skeleton code" 
+        duration="1:00">
+        
+          <h1></h1><p>Download the zip file from <a href="https://github.com/googlesamples/io2015-codelabs/raw/master/lovefield/stock_analyzer.zip">Github</a>.</p><h2>Deploying and running the application</h2><ol start="1">
+<li>Unzip the file you downloaded.</li>
+<li>Open a terminal inside the new folder.</li>
+<li>Start a local web server:&#160;<code>python -m SimpleHTTPServer</code>.</li>
+<li>Navigate to <a href="http://localhost:8000/src/step1/index.html">http://localhost:8000/src/step1/index.html</a>
+</li>
+</ol><p>Start the codelab from step1 below by adding your code inside <code>src/step1/lovefield_service.js</code>.&#160;You can find the starting code for each step in the respective sub-folder, <code>src/step1</code>, <code>src/step2</code>&#160;&#8230; etc.</p>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Step 1: Defining the database schema" 
+        duration="4:00">
+        
+          <h1></h1><p>In this step you are going to define the database schema used for holding the data for the Stock Analyzer application. The database schema describes the structure of the relational database. More specifically it describes the following:</p><ul>
+<li>The tables in the database.</li>
+<li>The column names and data types for each table.</li>
+<li>Any constraints the database engine should enforce (primary-key, non-nullable, unique).</li>
+<li>Any indices the database engine should create in order to speed-up execution of certain queries.</li>
+</ul><p>The API entry point for defining the &#8220;schema&#8221; is&#160;<code><a href="https://github.com/google/lovefield/blob/master/docs/spec/01_schema.md#lovefield-specification">lf.schema.create()</a></code>, which in our case contains the two tables shown below.</p><h2>Table1: <code>HistoricalData</code></h2><p>This table stores historical data about stocks. Each record refers to a given stock on a given day. For example: </p><codelab-snippet>{
+  Date: Thu Apr 10 2014 00:00:00 GMT-0700 (PDT), // Date
+  Open: 565,                                     // number
+  High: 565,                                     // number
+  Low: 539.9,                                    // number
+  Close: 540.95,                                 // number  
+  Volume: 4027743,                               // integer
+  Stock: "GOOG"                                  // string
+}</codelab-snippet><p>No primary key exists on the <code>HistoricalData</code>&#160;table.</p><h2>Table2: <code>StockInfo</code></h2><p>This table stores information about each company. For example: </p><codelab-snippet>{
+  CompanyName: 'Google Inc.',  // string
+  Sector: 'Technology',        // string
+  Stock: 'GOOG'                // string, primary key
+}</codelab-snippet><p>Note that the &#8220;<code>Stock</code>&#8221; field is the primary key of the <code>StockInfo</code>&#160;table, which means that it is also unique.</p><p>Take a look at how Javascript types map to Lovefield types in the <a href="https://github.com/google/lovefield/blob/master/docs/spec/01_schema.md#131-columns">schema spec&#160;</a>&#160;and then go ahead now and implement the <code>buildSchema()</code>&#160;method on <code>LovefieldService</code>&#160;(search for <code>LovefieldService.prototype.buildSchema_</code>) &#160;inside the <code>lovefield_service.js</code>&#160;file.&#160;If you get stuck, you can take a look at <a href="https://github.com/google/lovefield/blob/master/docs/quick_start.md">Lovefield&#8217;s &#8220;Quick Start&#8221;</a>&#160;doc&#160;for some help.</p><p><em>Hints</em>:</p><ol start="1">
+<li>Get a schema builder instance by calling <code>lf.schema.create()</code>&#160;(need to pass two parameters to this call).</li>
+<li>Call <code>createTable(&#8216;TableName&#8217;)</code>, once for each table, to get a table builder instance and start calling methods on this instance to add columns to your table.</li>
+<li>Return the schema builder instance from the <code>buildSchema_</code>&#160;method.</li>
+</ol><p>If you are encountering problems finishing this step, take a look at the complete answer <a href="https://github.com/googlesamples/io2015-codelabs/blob/master/lovefield/src/step2/lovefield_service.js#L77">here</a>.</p><p>Once you've built the schema, reload the app and verify that the database has been created using&#160;the developer tools in your browser. </p><p>For Chrome, navigate to <strong>Resources &gt; IndexedDB</strong>. You should see a database called &#8220;stocks&#8221; with two empty tables, as shown in the following screenshot. </p><p>For Firefox,&#160;you first need to enable the storage inspector by checking the "Storage" checkbox in developer tools settings, see more instructions <a href="https://developer.mozilla.org/en-US/docs/Tools/Tools_Toolbox#Settings">here</a>.</p><p><img src="../img/lovefield/img-2.png" style="max-width: 624px"></p><h2>ConnectOptions</h2><p>Let&#8217;s take a look at the following code snippet which resides in <code>LovefieldService#getDbConnection()</code>&#160;method.</p><codelab-snippet>var connectOptions = {storeType: lf.schema.DataStoreType.INDEXED_DB};
+return this.buildSchema_().connect(connectOptions).then(
+    function(db) { /* do something with db */ });</codelab-snippet><p>The optional <code>connectOptions</code>&#160;parameter specifies what kind of backing storage to use for persisting the data. In this codelab we will use IndexedDB (which is also the default value if <code>connectOptions</code>&#160;is omitted), so&#160;that the data is persisted locally and it becomes inspectable by Chrome/Firefox&#8217;s developer tools.</p><aside class="special"><p>An alternative (that will not be covered in this codelab) is to use <code>lf.schema.DataStoreType.MEMORY</code>&#160;which would only store data in-memory (no persisting). <strong>This is a very powerful option since allows for leveraging Lovefield&#8217;s querying API even if persisting data is not desired</strong>.</p></aside><h2>SQL equivalent</h2><codelab-snippet>CREATE TABLE HistoricalData(
+  Close FLOAT NOT NULL,
+  Date DATE NOT NULL,
+  High FLOAT NOT NULL,
+  Low FLOAT NOT NULL,
+  Open FLOAT NOT NULL,
+  Stock VARCHAR(6) NOT NULL,
+  Volume INTEGER NOT NULL);</codelab-snippet><codelab-snippet>CREATE TABLE StockInfo(
+  CompanyName VARCHAR(30) NOT NULL,
+  Sector VARCHAR(30) NOT NULL,
+  Stock VARCHAR(6) NOT NULL,
+  PRIMARY KEY (Stock));</codelab-snippet>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Step 2: Executing INSERT queries" 
+        duration="5:00">
+        
+          <h1></h1><p>In this step you will implement the <code>LovefieldService#insertData()</code>&#160;method.&#160;This method is being called by the <code>FetcherService</code>&#160;class (already implemented) which grabs the data by making network requests to the Google Finance API. The method receives two Array parameters holding the raw data for each table. The fields for both sets of raw data match the schema we've defined. Take a look at the Lovefield API for inserting rows&#160;on <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#42-insert-query-builder">the query builder docs </a>, and populate both tables.&#160;You'll need to call <code>insert()</code>, not <code>insertOrReplace()</code>, as the latter requires a table to have a primary key, which is not the case&#160;for the <code>HistoricalData</code>&#160;table.</p><aside class="special"><p><em>Hints</em>:</p>
+<ol start="1">
+<li>You need to convert the raw data to Lovefield rows first, by calling the <code>createRow()</code>&#160;method, specifically <code>this.hd_.createRow(...)</code>&#160; (for <code>HistoricalData</code>) and <code>this.si_.createRow(...)</code>&#160;(for <code>StockInfo</code>).</li>
+<li>Then you need to call <code>this.db_.insert()</code>&#160;and start forming the <code>INSERT</code>&#160;query.</li>
+</ol></aside><aside class="special"><p><em>Bonus exercise</em>: Populate both tables using a single database transaction.</p>
+<p><em>Hint</em>: Read about the <a href="https://github.com/google/lovefield/blob/master/docs/spec/05_transaction.md#52-implicit-transaction">difference between&#160;implicit and&#160;explicit transactions</a>.</p></aside><h2>Verify tables are populated correctly</h2><p>Reload the app and verify in the developer tools that both tables have been correctly populated. If the schema you created at the previous step is incorrect (for example missing columns, or wrong types) it will not be detected until in later steps (where spurious errors will be thrown).</p><p>Verify that the <code>HistoricalData</code>&#160;table is populated correctly. Open the developer tools and <strong>inspect a random record from the HistoricalData&#160;table</strong>. It should look as&#160;it does&#160;in the following screenshot. Make sure that all the columns are present and that they have the correct types (also ensure that there are&#160;no undefined/null values).</p><p><img src="../img/lovefield/img-3.png" style="max-width: 624px"></p><p>Now verify&#160;the same for the <code>StockInfo</code>&#160;table by comparing with the following screenshot.</p><p><img src="../img/lovefield/img-4.png" style="max-width: 624px"></p><p>If the tables are not populated correctly, you will have to:</p><ol start="1">
+<li>Fix the schema at the previous step (see the answer provided in the previous step, after the last hint).</li>
+<li>Clear IndexedDB and rerun the application. In order to clear IndexedDB,&#160;you will have to select each of the tables and click on the &#8220;clear&#8221; icon next to the &#8220;round arrow&#8221; icon at the bottom of the developer tools window.</li>
+<li>Re-run the application and verify that the tables are populated correctly this time.</li>
+</ol><h2>SQL equivalent</h2><codelab-snippet>INSERT INTO HistoricalData (Close, Date, High, Low, Open, Stock, Volume)
+       VALUES (552.03, '30-Mar-15', 553.47, 548.17, 551.62, 'GOOG', 1281355),
+              (123.03, '30-Mar-15', 153.47,  48.17, 151.62, 'AAPL', 362124);</codelab-snippet><codelab-snippet>INSERT INTO StockInfo (Stock, CompanyName, Sector)
+       VALUES ('AAPL', 'Apple Inc.',             'Technology'),
+              ('GM',   'General Motors Company', 'Auto Manufacturers'),
+              ('GOOG', 'Google Inc.',            'Technology'),
+              ('MSFT', 'Microsoft Corporation',  'Technology'),
+              ('NKE',  'Nike Inc.',              'Consumer Goods'),
+              ('RL',   'Ralph Lauren Corp.',     'Consumer Goods'),
+              ('TM',   'Toyota Motor Corp.',     'Auto Manufacturers'),
+              ('TSLA', 'Tesla Motors Inc.',      'Auto Manufacturers'),
+              ('TWTR', 'Twitter Inc.',           'Technology'),
+              ('UA',   'Under Armour Inc.',      'Consumer Goods');</codelab-snippet><p>Next, you will implement SELECT queries and start populating the app&#8217;s user interface.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Step 3: Executing simple SELECT queries" 
+        duration="5:00">
+        
+          <h1></h1><p>In this step you are going to populate the sectors/stock drop-down list depending on the current &#8220;search mode&#8221;.</p><h2>Retrieving a list of all stocks</h2><p>You can find the list of stocks in the <code>StockInfo</code>&#160;table&#8217;s <code>Stock</code>&#160;column.</p><p>Implement the <code>LovefieldService#getStockList()</code>&#160;method by writing a select query that retrieves all rows from the <code>StockInfo</code>&#160;table and only keeps the <code>Stock</code>&#160;column. Review the <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#41-select-query-builder">SELECT Query Builder docs </a>for information on writing SELECT queries, and review the <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#411-filters">filters docs </a>for information on selecting only the columns you're interested in, in cases where you're unable to pass the column names in as a parameter.</p><aside class="special"><p><em>Hint</em>: You will need to pass the column to be kept as a parameter to the <code>db.select() </code>method.</p></aside><aside class="special"><p><em>Bonus exercise: </em>Modify the query to produce results in <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#414-limiters-and-order">sorted order</a>.</p></aside><p>To verify that your query works, reload the app, choose Stocks as the search mode, and click on the Select Stocks drop-down menu. It should be populated with stock codes as shown in the following screenshot.</p><p><img src="../img/lovefield/img-5.png" style="max-width: 391px"></p><h2>Retrieving a list of industry sectors</h2><p>Implement the <code>LovefieldService#getSectorList()</code>&#160;method by writing a query that retrieves all (distinct) industry sectors. This query is similar to the previous one as all the information resides in a single column of the <code>StockInfo</code>&#160;table. But you have to use <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#415-group-by-and-aggregators">an aggregation function</a>&#160;to ensure&#160;that each industry sector is included only once in the result.</p><p>Once done, verify that the query works by switching to &#8220;Sectors&#8221; search mode and clicking on the drop-down menu. It should be populated with three industry sectors as shown in the following screenshot.</p><p><img src="../img/lovefield/img-6.png" style="max-width: 480px"></p><h2>SQL equivalent</h2><codelab-snippet>SELECT Stock FROM StockInfo ORDER BY Stock ASC;
+SELECT DISTINCT Sector FROM StockInfo ORDER BY Sector ASC;</codelab-snippet>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Step 4: Executing complex SELECT queries" 
+        duration="5:00">
+        
+          <h1></h1><h2>Retrieving closing values for a stock within a time window</h2><p>In this step you are going to write a query to retrieve closing values for a given stock within a given time window sorted by date in ascending order. The information resides in the <code>HistoricalData</code>&#160;table&#8217;s <code>Close</code>&#160;and <code>Date</code>&#160;columns. Go ahead and implement <code>LovefieldService#getStockClosingPrices()</code>. This method receives three parameters. <code>start</code>/<code>end</code>&#160;indicate the time window of interest, <code>stock</code>&#160;indicates the stock to be analyzed. You will need to use all three parameters to properly build the query. Make sure to review theinformation on <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#413-search-conditions">how to construct predicates . </a></p><aside class="special"><p><em>Hints</em>:</p>
+<ol start="1">
+<li>The query will have to include a <code>where()</code>&#160;clause.</li>
+<li>You will need to combine multiple predicates using the <code>lf.op.and()</code>&#160;operator. </li>
+<li>Constructing a predicate is done by using methods already provided on a column object like <code>eq()</code>&#160;and <code>between()</code>, see example snippet below.</li>
+</ol></aside><codelab-snippet>var hd = db.getSchema().table(&#8216;HistoricalData&#8217;);
+db.select().
+    from(hd).
+    where(lf.op.and(
+        hd.Stock.eq(...),
+        hd.Date.between(...))).
+    exec();</codelab-snippet><p>Once done, verify that the query works. Reload the app, select &#8220;Stock&#8221; search mode, and then select any stock from the drop down menu. Select various time windows and the graph should update.</p><p>Voila! You can now start researching your next stock market moves!</p><h3>SQL equivalent</h3><codelab-snippet>SELECT *
+  FROM HistoricalData
+  WHERE (Date BETWEEN '27-Mar-15' AND '30-Mar-15')
+    AND Stock == 'GOOG'
+  ORDER BY Date ASC;</codelab-snippet><h2>Retrieving average closing values for an industry sector within a time window</h2><p>In this step you are going to write a query to retrieve average closing values for a given industry sector within a given time window. The&#160;information resides in two tables, which means that the query will have to join these two tables. The association between stocks and industry sectors resides in the <code>StockInfo</code>&#160;table, while the closing values for each stock resides in the <code>HistoricalData</code>&#160;table.&#160;Go ahead and implement <code>LovefieldService#getSectorClosingPrices()</code>. Create a query that returns the average closing value for each date, taking into account the closing values of all stocks that belong in the chosen sector, sorted by date in ascending order.</p><aside class="special"><p>Hint: You will have to use both <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#415-group-by-and-aggregators">grouping and aggregators</a>.</p></aside><p>Once done, verify that the query works. Reload the app, choose &#8220;Sectors&#8221; search mode, and select any sector from the drop-down menu.</p><h3>SQL equivalent</h3><codelab-snippet>SELECT AVG(hd.Close), si.Sector, hd.Date
+  FROM HistoricalData as hd, StockInfo as si
+  WHERE hd.Stock == si.Stock
+    AND (hd.Date BETWEEN '27-Mar-15' AND '30-Mar-15')
+    AND si.Sector == 'Technology'
+  GROUP BY si.Sector, hd.Date
+  ORDER BY hd.Date ASC;</codelab-snippet>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Step 5: Debugging and examining a query" 
+        duration="3:00">
+        
+          <h1></h1><p>It is very common that a query you wrote needs to be debugged because it either</p><ul>
+<li>returns unexpected results or</li>
+<li>takes too long time to execute</li>
+</ul><p>The <code>explain()</code>&#160;method allows the developer to get an insider look on how the query engine executes a given query, by returning the <strong>execution plan</strong>&#160;in a human readable format.&#160;The execution plan is a detailed list of steps that the database engine will execute in order to perform a given query.</p><p>For example, let&#8217;s examine the query performed by <code>getStockClosingPrices()</code>&#160;which was implemented in the previous step and see whether we can improve its execution plan. In order to do so, store the query in a local variable and print out the result of the <code>explain()</code>&#160;method before executing it.</p><p>As a hint, you might update the query like this:</p><codelab-snippet>var q = db.select(...).from(...).where(...);
+console.log(q.explain());
+return q.exec();</codelab-snippet><p>Reload the app, perform a stock search and observe the output in the console. It should look similar to the following.</p><codelab-snippet>project()
+-order_by(HistoricalData.Date ASC)
+--select(value_pred(HistoricalData.Date between &lt;value1&gt;, &lt;value2&gt;))
+---select(value_pred(HistoricalData.Stock eq GOOG))
+----table_access(HistoricalData)</codelab-snippet><p>The execution plan&#160;is basically a tree data structure. Each node in the tree is an operation. The plan is executed from the bottom up. In our example the following operations will take place.</p><ol start="1">
+<li>
+<strong>table_access</strong>: The entire <code>HistoricalData</code>&#160;table is brought into memory.</li>
+<li>
+<strong>select</strong>: Rows that don&#8217;t correspond to the GOOG stock are filtered out.</li>
+<li>
+<strong>select</strong>: Rows that don&#8217;t fall within the specified time window are filtered out.</li>
+<li>
+<strong>order_by</strong>: Remaining rows are sorted base on the <code>Date</code>&#160;field.</li>
+<li>
+<strong>project</strong>: Columns that are not requested by the user are filtered out. In our case we requested all columns (by passing no params to <code>select()</code>) and therefore no columns are dropped.</li>
+</ol><p>The execution plan described above can be improved (in terms of performance), by eliminating the need for a full table scan of the <code>HistoricalData</code>&#160;table. This can be done by modifying the schema to create an index on the <code>HistoricalData#Stock</code>&#160;column. Go ahead and modify the <code>LovefieldService#buildSchema_()</code>&#160;method by adding the proposed index. If you get stuck, you can take a look at <a href="https://github.com/google/lovefield/blob/master/docs/quick_start.md">Lovefield&#8217;s &#8220;Quick Start&#8221;</a>&#160;for an example schema definition that uses an index.</p><p>Once done,&#160;reload the app and re-examine the execution plan. It should now look as follows.</p><codelab-snippet>project()
+-order_by(HistoricalData.Date ASC)
+--select(value_pred(HistoricalData.Date between &lt;value1&gt;, &lt;value2&gt;))
+---table_access_by_row_id(HistoricalData)
+----index_range_scan(HistoricalData.idx_stock, [GOOG, GOOG], natural)</codelab-snippet><p>Notice how there is no <code>table_access</code>&#160;operation anymore and the first <code>select</code>&#160;is also missing. Instead, an <code>index_range_scan</code>&#160;operation has shown up. The database engine is utilizing the index we just added to retrieve only those <code>HistoricalData</code>&#160;rows that correspond to the GOOG stock, eliminating the need for a full table scan followed by a filtering of rows that don&#8217;t correspond to the given stock. Optimizations like this one can make a huge difference on a real-world application.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Step 6: Using parameterized queries" 
+        duration="3:00">
+        
+          <h1></h1><p>Parameterized queries are queries where placeholders are used for some values. Before such a query can be executed all placeholders must be assigned a value. Most modern database engines support this feature, although it might be advertised using a different name (for example &#8220;prepared statements&#8221; or &#8220;query templates&#8221;).</p><p>The advantage of this approach is that under the covers the database engine will <em>generate an execution plan only once and reuse it many times</em>. The overhead of generating an execution plan can be significant for queries that are executed multiple times.</p><p>In our application there are two queries that are executed multiple times with different values each time and therefore they could be parameterized. Specifically the queries that are executed in methods <code>getStockClosingPrices()</code>&#160;and <code>getSectorClosingPrices()</code>&#160;are receiving three parameters each. </p><p>Go ahead and </p><ol start="1">
+<li>Take a look at <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#45-parameterized-query">Lovefield&#8217;s parameterized query API</a>&#160;</li>
+<li>Modify those methods such that instead of creating a brand new query every on every invocation, they are using simply re-using an existing query template.</li>
+</ol><aside class="special"><p><em>Hints</em>:</p>
+<ol start="1">
+<li>Create the parametrized queries using the <code>lf.bind()</code>&#160;method to generate placeholders, within the <code>LovefieldService#onConnected_</code>&#160;method.</li>
+<li>Modify <code>getStockClosingPrices()</code>&#160;and <code>getSectorClosingPrices()</code>&#160;to refer to the parametrized queries you just created (see example snippet below).</li>
+</ol></aside><codelab-snippet>return this.myParameterizedQuery_.bind([value1, value2, ...]).exec();</codelab-snippet><p>Once done reload the app and ensure that it still works.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Step 7: Using query observers to update UI" 
+        duration="5:00">
+        
+          <h1></h1><h2>The basics</h2><p>A query observer is a function that gets called whenever the results of a given query are modified. Lovefield provides a very powerful DB observing mechanism via the <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#46-observers">db.observe()</a>&#160;method. In short, any <code>SELECT</code>&#160;query can be observed, such that every time the results of that query are modified, observers get notified with a detailed list of the changes that happened. The information that is passed to observers is inspired by the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe">Array.observe() API</a>.&#160;The <strong>two</strong>&#160;most common scenarios triggering observers are listed below.</p><h2>Observer triggered by data modification</h2><p>The database is modified by <code>UPDATE</code>, <code>INSERT</code>&#160;or <code>DELETE</code>&#160;queries. For example consider the following snippet</p><codelab-snippet>var si = db.getSchema().getTable(&#8216;StockInfo&#8217;);
+// Getting a list of all stocks (implemented at step 3 earlier).
+var q = db.select(si.Stock).from(si);
+db.observe(q, function(changes) { console.log(changes); });
+
+var stockInfoRow = si.createRow({
+  CompanyName: &#8216;Toyota Motor Corp&#8217;,
+  Sector: &#8216;Auto Manufacturers&#8217;,
+  Stock: &#8216;TM&#8217;
+});
+
+// Inserting a new row into the StockInfo table, which will trigger the observer registered above.
+db.insert().into(si).values([stockInfoRow]).exec();</codelab-snippet><p>It is worth noting that the observer is triggered <em>only</em>&#160;if the results of the observed query are modified. Also the <code>changes</code>&#160;object passed to the callback includes a detailed list of changes (additions/deletions).</p><h2>Observer triggered by parameterized query.</h2><p>DB observers can be combined with parameterizable queries as follows. </p><codelab-snippet>var si = db.getSchema().getTable(&#8216;StockInfo&#8217;);
+
+// Find the name of a company given its stock code (&#8216;GOOG&#8217;, &#8216;TSLA&#8217; etc).
+var q = db.
+  select(si.CompanyName).
+  from(si).
+  where(si.Stock.eq(lf.bind(0)));
+
+db.observe(q, function(changes) { console.log(changes); });
+
+q.bind([&#8216;GOOG&#8217;]).exec(); // Triggers the observer.
+q.bind([&#8216;TSLA&#8217;]).exec(); // Triggers the observer.</codelab-snippet><p>In the above example, even though no modification happened to the database, the observer gets triggered because a parameter of the observed query was bound to a different value (which causes the result of this query to be changed).</p><h2>Utilizing observers to update the UI</h2><p>In our example application we are already using two parameterized queries (implemented at step 6), but the app is currently not using observers to update the UI. In this exercise the app will be modified to use DB observers to update the UI as the user is making different selections in the available drop down lists. The instructions below will guide you through this process.&#160;Note that there will be no UI noticeable change by completing this exercise, just the underlying mechanism that updates the UI will be modified.</p><p>For this exercise two files need to be modified, <code>lovefield_service.js</code>&#160;and <code>query_builder_controller.js</code>&#160;(in <code>src/common/</code>).</p><ol start="1"><li>Implement the already provided stub methods &#160;<code>observeStockClosingPrices</code>&#160;and <code>observeSectorClosingPrices</code>&#160;in <code>lovefield_service.js</code>.<br>
+</li></ol><aside class="special"><p><em>Hint</em>: Use <code>db.observe()</code>&#160;method.</p></aside><ol start="2"><li>Implement the already provided stub method <code>startObserving_()</code>&#160;in <code>query_builder_controller.js</code>, such that it registers two observers (use the methods implemented at the previous instruction). Within each observer, call <code>updateStockGraph_</code>&#160;and <code>updateSectorGraph_</code>&#160;respectively.<br>
+</li></ol><aside class="special"><p><em>Hint</em>: Given that we will be redrawing the entire graph from scratch, there is no need to deal with additions/deletions in the <code>changes</code>&#160;parameter that is passed to the observers. </p>
+<p>Simply grab the final result as<br><code>var plotData = changes[0].object; // Similar to Array.observe.</code></p></aside><ol start="3">
+<li>Inspect the <code>search()</code>&#160;method in <code>query_builder_controller.js</code>. You will notice that it calls <code>getStockClosingPrices</code>&#160;and <code>getSectorClosingPrices</code>&#160;from the <code>LovefieldService</code>&#160;class and once the results are available it explicitly makes a call to update the UI. This is no longer necessary since our observers will perform this task, therefore delete both occurrences of promise callbacks <code>then(...)</code>.</li>
+<li>The final step is to call <code>startObserving_()</code>&#160;method in the constructor of <code>QueryBuilderController</code>. Place this call right before the call to <code>getStockList().</code>
+</li>
+</ol><p>Reload the app and start interacting with the UI. Everything should be working as before, only this time DB observers are utilized to update the UI.</p><aside class="warning"><p><em>Performance note</em>: Registering DB observers imposes a cost on the overall system, so in a real-world scenario, observers that are not needed anymore should be unregistered. For example, in our application we could unregister the &#8220;stock&#8221; observer when in &#8220;sector&#8221; search mode, and re-register it when the user switches back to &#8220;stock&#8221; mode.</p></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!">
+        
+          <h1></h1><p>Your sample web application is now successfully utilizing Lovefield as its data layer.</p><h3>What we've covered</h3><ol start="1">
+<li>Creating a database schema and opening a connection to the database.</li>
+<li>Executing <code>INSERT</code>&#160;queries, explicit/implicit transactions.</li>
+<li>Executing <code>SELECT</code>&#160;queries, specifying column filtering, simple and composite predicates, joining, grouping, sorting.</li>
+<li>Inspecting the execution plan of a query. Debugging slow queries.</li>
+<li>Parameterized queries&#160;(re-using queries by binding parameters to different values).</li>
+<li>Observing queries&#160;(getting notified every time the results of a given query change).</li>
+</ol><h3>Next Steps</h3><p>There are more useful Lovefield features that were not covered in this codelab. </p><ul>
+<li>Using <a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#416-column-aliases">aliases</a>&#160;for tables and columns.</li>
+<li>Using <code><a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#414-limiters-and-order">LIMIT</a></code><a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#414-limiters-and-order">&#160;and </a><code><a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#414-limiters-and-order">SKIP</a></code>&#160;to retrieve only a subset of the results.</li>
+<li>Declaring <a href="https://github.com/google/lovefield/blob/master/docs/spec/01_schema.md#132-constraints">constraints</a>&#160;(unique/non-unique, nullable/non-nullable).</li>
+<li>
+<a href="https://github.com/google/lovefield/blob/master/docs/spec/03_life_of_db.md#311-connect-options">Using </a><code><a href="https://github.com/google/lovefield/blob/master/docs/spec/03_life_of_db.md#311-connect-options">Memory</a></code>&#160;instead of <code>IndexedDb</code>&#160;as the backing store (useful for testing, but also for cases where data persistence is not desired).</li>
+<li>
+<a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#43-update-query-builder">Executing </a><code><a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#43-update-query-builder">UPDATE</a></code><a href="https://github.com/google/lovefield/blob/master/docs/spec/04_query.md#43-update-query-builder">&#160;queries</a>&#160;(updating specific columns while leaving other columns unaffected).</li>
+<li>
+<a href="https://github.com/google/lovefield/blob/master/docs/spec/03_life_of_db.md#33-database-upgrade">Performing schema upgrades</a>&#160;(adding tables/columns to existing databases).</li>
+</ul><p>If you would like to find out more about Lovefield please see the <a href="https://github.com/google/lovefield/tree/master/docs/spec">full developer documentation</a>. You can post questions/comments at our <a href="https://groups.google.com/forum/#!forum/lovefield-users">public discussion forum</a>&#160;and file bugs at our <a href="https://github.com/google/lovefield/issues">issue tracker</a>.</p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

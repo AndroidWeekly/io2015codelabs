@@ -1,0 +1,68 @@
+/* Colors */
+/* Typography */
+/* Breakpoints */
+/* Common styles */
+a,
+a:visited {
+  color: #0097A7; }
+
+paper-fab {
+  background: #00BCD4; }
+
+h2, h3, h4 {
+  font-weight: 400;
+  margin: 0; }
+
+h2 {
+  font-weight: 300;
+  line-height: 1em;
+  font-size: 1.4em; }
+
+.logo {
+  width: 50%;
+  margin: 0;
+  color: #fff; }
+  .logo img {
+    width: 126px; }
+  .logo h1 {
+    font-weight: 300;
+    font-size: 30px;
+    margin: 0; }
+
+.content {
+  margin: 60px 60px 0 0;
+  width: 75%; }
+
+core-toolbar {
+  background-color: #00BCD4; }
+
+[drawer] {
+  background-color: #ECEFF1; }
+
+.menu {
+  width: 50%;
+  float: right;
+  margin: 16px; }
+  .menu paper-item {
+    border-radius: 4px; }
+    .menu paper-item.last {
+      margin: 16px auto;
+      color: #8f8f8f; }
+
+/* ***** Reponsive ***** */
+@media (max-width: 767px) {
+  .logo {
+    height: 100%;
+    width: 100%; }
+    .logo img {
+      width: auto;
+      height: 60%;
+      margin: 0 16px; }
+    .logo h1 {
+      font-size: 24px; }
+  .menu {
+    width: 90%;
+    margin: 16px; }
+  .content {
+    margin: 0;
+    width: 100%; } }

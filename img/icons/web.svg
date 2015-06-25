@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 17.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="150px" height="150px" viewBox="0 0 150 150" enable-background="new 0 0 150 150" xml:space="preserve">
+<g>
+	<g>
+		<circle fill="#FFFFFF" cx="75" cy="75" r="75"/>
+	</g>
+	<g>
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="19.0538" y1="56.1878" x2="64.5083" y2="100.1272">
+			<stop offset="0.33" style="stop-color:#263238;stop-opacity:0.16"/>
+			<stop offset="1" style="stop-color:#263238;stop-opacity:0"/>
+		</linearGradient>
+		<polygon fill="url(#SVGID_1_)" points="78.423,86.052 49.891,114.584 18.055,82.747 46.586,54.216   "/>
+	</g>
+	<g>
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="109.4969" y1="78.8466" x2="143.5399" y2="111.7548">
+			<stop offset="0.33" style="stop-color:#263238;stop-opacity:0.16"/>
+			<stop offset="1" style="stop-color:#263238;stop-opacity:0"/>
+		</linearGradient>
+		<path fill="url(#SVGID_2_)" d="M128.318,127.734c10.769-10.888,18.225-25.053,20.739-40.869l-14.138-14.138l-30.804,30.804    L128.318,127.734z"/>
+	</g>
+	<g>
+		<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="62.9166" y1="69.1903" x2="112.9166" y2="118.4328">
+			<stop offset="0.33" style="stop-color:#263238;stop-opacity:0.16"/>
+			<stop offset="1" style="stop-color:#263238;stop-opacity:0"/>
+		</linearGradient>
+		<polygon fill="url(#SVGID_3_)" points="123.087,71.737 83.283,146.385 55.267,118.368 95.071,43.721   "/>
+	</g>
+	<polyline fill="none" stroke="#4285F4" stroke-width="8.5095" stroke-linejoin="bevel" stroke-miterlimit="10" points="   101.895,56.882 132.026,77.797 101.895,98.714  "/>
+	<polyline fill="none" stroke="#4285F4" stroke-width="8.5095" stroke-linejoin="bevel" stroke-miterlimit="10" points="   48.889,56.882 18.758,77.797 48.89,98.714  "/>
+	
+		<line fill="none" stroke="#4285F4" stroke-width="8.5095" stroke-linejoin="bevel" stroke-miterlimit="10" x1="90.959" y1="42.136" x2="59.041" y2="119.732"/>
+</g>
+<g>
+	
+		<radialGradient id="SVGID_4_" cx="-22.5632" cy="27.5377" r="134.194" gradientTransform="matrix(1.5152 0 0 1.5152 38.1708 -38.9799)" gradientUnits="userSpaceOnUse">
+		<stop offset="0" style="stop-color:#FFFFFF"/>
+		<stop offset="1" style="stop-color:#FFFFFF;stop-opacity:0"/>
+	</radialGradient>
+	<circle opacity="0.08" fill="url(#SVGID_4_)" cx="75" cy="75" r="75"/>
+</g>
+</svg>

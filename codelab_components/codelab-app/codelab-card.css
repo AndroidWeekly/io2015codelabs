@@ -1,0 +1,175 @@
+/* Colors */
+/* Typography */
+/* Breakpoints */
+/* Common styles */
+a,
+a:visited {
+  color: #0097A7; }
+
+paper-fab {
+  background: #00BCD4; }
+
+h2, h3, h4 {
+  font-weight: 400;
+  margin: 0; }
+
+h2 {
+  font-weight: 300;
+  line-height: 1em;
+  font-size: 1.4em; }
+
+.default-bg {
+  background-color: #BDBDBD; }
+
+.about-bg {
+  background-color: #4285f4; }
+
+.ads-bg {
+  background-color: #4caf50; }
+
+.analytics-bg {
+  background-color: #fb8c00; }
+
+.android-bg,
+.android-auto-bg,
+.android-wear-bg {
+  background-color: #a0bd3a; }
+
+.cloud-bg {
+  background-color: #0097A7; }
+
+.chrome-bg {
+  background-color: #4285f4; }
+
+.games-bg,
+.play-games-bg {
+  background-color: #F2531C; }
+
+.geo-bg {
+  background-color: #4285f4; }
+
+.search-bg {
+  background-color: #4285f4; }
+
+.unity-bg {
+  background-color: #222C36; }
+
+.web-bg {
+  background-color: #4285f4; }
+
+.about-icon {
+  background-image: url("../../img/icons/search.png"); }
+
+.ads-icon {
+  background-image: url("../../img/icons/ads.png"); }
+
+.analytics-icon {
+  background-image: url("../../img/icons/analytics.png"); }
+
+.android-icon,
+.android-auto-icon,
+.android-wear-icon {
+  background-image: url("../../img/icons/android.svg"); }
+
+.chrome-icon {
+  background-image: url("../../img/icons/chrome.svg"); }
+
+.cloud-icon {
+  background-image: url("../../img/icons/cloud.png"); }
+
+.games-icon,
+.play-games-icon,
+.virtual-reality-games-icon {
+  background-image: url("../../img/icons/cardboard.png"); }
+
+.geo-icon {
+  background-image: url("../../img/icons/geo.png"); }
+
+.search-icon {
+  background-image: url("../../img/icons/search.png"); }
+
+.unity-icon {
+  background-image: url("../../img/icons/unity.png"); }
+
+.web-icon {
+  background-image: url("../../img/icons/web.svg"); }
+
+:host {
+  position: relative;
+  display: block;
+  margin: 16px 0 16px 16px; }
+
+.card {
+  font-family: Roboto, 'Helvetica Neue', Helvetica, Arial;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333333;
+  border-radius: 4px;
+  background-color: #fff; }
+  .card paper-button {
+    color: #0097A7;
+    font-weight: 500; }
+  .card paper-button:hover {
+    background: #ECEFF1; }
+
+.title {
+  cursor: pointer; }
+
+.title, .description {
+  padding: 16px; }
+
+.level {
+  padding: 0 16px 16px 16px;
+  font-size: 14px;
+  line-height: 24px;
+  color: #8f8f8f; }
+
+.card-title {
+  font-weight: 300;
+  font-size: 1.4em;
+  line-height: 1em; }
+
+.title {
+  border-radius: 4px 4px 0 0; }
+  .title .card-title {
+    color: #fff;
+    margin: 0; }
+  .title .category-icon {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    background-size: 30px;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    margin: auto 16px auto 8px; }
+    .title .category-icon.ads-icon,
+    .title .category-icon.analytics-icon,
+    .title .category-icon.geo-icon,
+    .title .category-icon.search-icon {
+      background-size: 24px; }
+    .title .category-icon.games-icon,
+    .title .category-icon.play-games-icon,
+    .title .category-icon.virtual-reality-games-icon {
+      background-size: 40px; }
+
+.action {
+  border-top: 1px solid #E0E0E0;
+  color: #607D8B;
+  padding: 8px; }
+  .action core-icon {
+    color: #607D8B;
+    margin-left: 8px; }
+
+/* ***** Reponsive ***** */
+@media (max-width: 767px) {
+  :host {
+    margin: 0; }
+  .card {
+    border-bottom: 1px solid #BDBDBD; }
+    .card .title {
+      border-radius: 0; }
+      .card .title .category-icon {
+        margin: 0; } }

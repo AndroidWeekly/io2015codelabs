@@ -1,0 +1,511 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Add Project Tango to your Unity app"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Unity, Virtual Reality, Games"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="2:00">
+        
+          <h1></h1><p>This codelab will teach you how to extend an existing Unity game to use Project Tango's motion tracking functionality to control the camera.</p><p><img src="../img/project-tango/img-2.png" style="max-width: 303px"></p><h2 class="checklist">What you’ll learn</h2><ul class="checklist">
+<li>Development tools and configuration to build Unity projects targeted for Android.</li>
+<li>How to design a game that can be used with a Project Tango device.</li>
+<li>What the key motivations are to create games and apps for Project Tango.</li>
+<li>Links to information for developing and publishing great Project Tango applications.</li>
+</ul><h2>What you’ll need</h2><ul>
+<li>A Project Tango device with a micro USB cable</li>
+<li>Unity&#160;(for this codelab, we will use&#160;<a href="http://unity3d.com/get-unity/download/archive">Unity 4.6.4</a>)</li>
+<li>
+<a href="http://developer.android.com/sdk/index.html">Android SDK</a>&#160;with package levels 17-20 installed</li>
+<li><a href="http://developers.google.com/project-tango/downloads/">The Project Tango Unity SDK</a></li>
+<li>
+<a href="https://github.com/googlesamples/io2015-codelabs/tree/master/playgames-unity">Lollygagger Sample game</a>&#160;which we&#8217;ll be using in this codelab.</li>
+</ul><h2>Game Summary</h2><p>For this codelab, we'll be using a simple and entertaining game, called "Lollygagger". The main game play is to travel through a virtual playfield, shooting Lollipop "cannonballs" at the Androids that are lollygagging around. Key features of note are:</p><ul>
+<li>Two different Unity scenes, one for the main menu, and one for game play.</li>
+<li>Ability to play in 2D mode as well as in 3D mode using the Project Tango device to move around.</li>
+<li>Flinging lollipops at the targets while moving around in the virtual world.</li>
+<li>Super flexible and simple game level logic to allow infinite possibilities of hours of android-shooting fun!</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+    
+      
+      <codelab-step 
+        label="Configure Unity" 
+        duration="5:00">
+        
+          <h1></h1><ol start="1"><li>Start Unity. &#160;If you have not developed an Android application with Unity before, make sure you configure the Android SDK within Unity. &#160;In Unity, click <strong>Preferences &gt; External Tools &gt; Android SDK Location, </strong>then select the folder where you downloaded and unzipped the Android SDK.</li></ol><aside class="special"><p><strong>Note</strong>: The location of the Android SDK depends on your installation. &#160;For more information see: <a href="http://developer.android.com/sdk/index.html">http://developer.android.com/sdk/index.html</a>.</p></aside><ol start="2"><li>Click <strong>File &gt; New Project </strong>and create a new project named &#8216;Lollygagger_tango&#8217;. </li></ol>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Build the starter game" 
+        duration="5:00">
+        
+          <h1></h1><p>Let's build and run the non-Tango version of the game. &#160;From there, we'll add Project Tango support.</p><h2>Import the game assets</h2><p>Import the sample game scenes and assets into your project:</p><ul>
+<li>Click <strong>Assets &gt; Import Package &gt; Custom Package</strong>.</li>
+<li>Select the <code>lollygagger_step0.unitypackage</code>&#160;file you downloaded</li>
+<li>Click <strong>Import</strong>.</li>
+</ul><h2>Configure the Android player </h2><ol start="1"><li>Configure Unity to build an Android application:</li></ol><ul>
+<li>Click <strong>File &gt; Build Settings&#8230;</strong>&#160;to open the Build Settings window.</li>
+<li>Select Android in the platform list, if it isn&#8217;t selected already.</li>
+<li>Click the <strong>Switch Platform</strong>&#160;to make Android your default build target.</li>
+</ul><ol start="2"><li>Add the game scenes to the build:</li></ol><ul>
+<li>In the Project explorer, select the <strong>Assets</strong>&#160;folder.</li>
+<li>Drag and drop the <code>MainMenu.unity</code>&#160;scene to the <strong>Scenes In Build</strong>&#160;list within the Build Settings dialog.</li>
+<li>Then drag and drop the <code>GameScene.unity</code>&#160;scene into the list under <code>MainMenu.unity</code>. &#160;<code>MainMenu.unity</code>&#160;must be the first one on the list.</li>
+</ul><p><img src="../img/project-tango/img-4.png.gif" style="max-width: 347px"></p><ol start="6"><li>Configure the Unity player settings:</li></ol><ul>
+<li>Click the <strong>Player Settings&#8230;</strong>&#160;button in the Build Settings window. &#160;This opens the <strong>PlayerSettings</strong>&#160;Inspector panel back in the Unity Editor.</li>
+<li>Click on the <strong>Resolution and Presentation</strong>&#160;section to expand it.</li>
+<li>Find the <strong>Default Orientation </strong>drop-down and set it to Landscape Left. &#160;This is the correct orientation for applications on a Project Tango device.</li>
+</ul><p><img src="../img/project-tango/img-5.png" style="max-width: 343px"></p><ul>
+<li>Click on the <strong>Other Settings</strong>&#160;section to expand it.</li>
+<li>Find the <strong>Minimum API Level </strong>field and set it to <strong>Android 4.2 'Jelly Bean' (APK level 17) </strong>or higher.</li>
+<li>Find the <strong>Bundle Identifier</strong>&#160;field. &#160;Enter a valid package name for your application (such as <code>com.mycompany.tango.codelab</code>) that follows the naming rules for Java packages and/or .Net namespaces. &#160;Typically this is of the form: com.&lt;yourcompany&gt;.&lt;appname&gt;</li>
+</ul><aside class="special"><p><strong>Note</strong>: Each application needs to have a unique bundle identifier, so don't use the example name!</p></aside><p><img src="../img/project-tango/img-6.png" style="max-width: 400px"></p><ol start="7">
+<li>Save your project! &#160;Better safe than sorry&#160;:)</li>
+<li>Build and run the application on the device:</li>
+</ol><ul>
+<li>Connect your device to the computer using the USB cable.</li>
+<li>From the Build Settings window (<strong>File &gt; Build Settings</strong>&#160;if you do not still have it open) click <strong>Build and Run</strong>. This should open a &#8216;Save As&#8217; dialog. </li>
+<li>Save the application as <code>Lollygagger.apk</code>. </li>
+<li>Make sure the device is turned on, and accept any prompts that appear. This pushes the application named <code>Lollygagger</code>&#160;to your device and launches it.</li>
+</ul><p>Congratulations! If you can play the starter project game on your Android device, you should be ready to go!</p><p><img src="../img/project-tango/img-7.png" style="max-width: 400px"></p><h3>Troubleshooting</h3><p>Even the most simple things can have gotchas! &#160;Here are a couple and what to do about it. &#160;If you&#8217;re still having problems ask for help!</p><p><strong>Issue</strong></p><ul><li>I'm only seeing the Unity splash screen and then a blue screen with nothing happening</li></ul><p><strong>Solution</strong></p><ul><li>Make sure you have added the <code>MainMenu.unity</code>&#160;and <code>GameScene.unity</code>&#160;scenes, in that order, to &#8220;Scenes in Build&#8221; in the Build Settings.</li></ul><p><strong>Issue</strong></p><ul><li>When trying to run Lollygagger on my device, it says No Android Device Found!</li></ul><p><strong>Solution</strong></p><ul>
+<li>Make sure your device is turned on.</li>
+<li>If the device is on, you should see a notification&#160;in the notification tray on your device that says &#8216;USB Debugging Enabled&#8217;.&#160;If you don&#8217;t see this notification,&#160;follow Step 2 on <a href="http://developer.android.com/tools/device.html#setting-up">http://developer.android.com/tools/device.html#setting-up</a>&#160;to enable USB debugging on your device, then plug your device in again.</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add the Project Tango SDK">
+        
+          <h1></h1><p>Now that we&#8217;re able to run the game on the Project Tango device in 2D mode, let&#8217;s add the Project Tango motion tracking functionality so you can use the device to move around in the game world.</p><h2>Import and Add the Project Tango SDK</h2><p>If you haven't already, download the <a href="https://developers.google.com/project-tango/download-terms.html?f=TangoSDK_Unity_Nash.zip">Project Tango Unity SDK</a>&#160;from the Project Tango developer site.</p><ol start="1">
+<li>Click on <strong>Assets &gt; Import Package &gt; Custom Package.</strong>
+</li>
+<li>Select the Project Tango SDK unity package <code>TangoSDK_Nash.unitypackage</code>&#160;that you downloaded. </li>
+<li>This brings up the <strong>Importing package </strong>window in Unity. &#160;Make sure all files are selected and click the <strong>Import</strong>&#160;button.</li>
+<li>Verify&#160;that you see an <code>Assets/TangoSDK </code>folder in the <strong>Project</strong>&#160;tab.</li>
+</ol><h2>Configure the Tango prefab Gameobject</h2><ol start="1">
+<li>Open the GameScene scene by double clicking <code>Assets/GameScene.</code>
+</li>
+<li>Drag and drop the <strong>Tango Manager</strong>&#160;prefab (<code>Assets/TangoSDK/Core/Prefabs/Tango Manager</code>) into the root of the Hierarchy tab.</li>
+<li>Select the <strong>Tango Manager</strong>&#160;in the hierarchy, and in the Inspector tab check <strong>Enable UX Library</strong>. &#160;This enables the <a href="https://developers.google.com/project-tango/ux/ux-framework">UX Library Framework</a>, which shows some helpful screens to users while using the application.</li>
+</ol><h2>Disable touch based movement</h2><p>Movement in the virtual world will be controlled by movement in the real world via Project Tango. &#160;As a result, we can remove the code that manages the movement via touch.</p><ol start="1"><li>In the Hierarchy&#160;panel expand the <strong>Player</strong>&#160;object to show the <strong>Main Camera </strong>object. Select <strong>Main Camera</strong>, then in the Inspector panel find the <code>Mouse Looking</code>&#160;script and disable it by clearing the checkbox.</li></ol><p>Remove the motion controls associated with the project:</p><ol start="1">
+<li>Select <strong>Player</strong>&#160;in the Hierarchy panel.</li>
+<li>In the Inspector view, find the <strong>Movement</strong>&#160;script. &#160;Click on the gear icon and select <strong>Edit Script</strong>. This opens up the <code>Movement.cs</code>&#160;file in MonoDevelop.</li>
+<li>In MonoDevelop, remove the method <code>FixedUpdate()</code>.&#160; Save the file in MonoDevelop and come back to the Unity Editor. &#160;</li>
+</ol><aside class="special"><p><strong>Note: </strong>Once most of the code is removed from this method, there will be warnings about unreferenced variables. &#160;It is safe to ignore these warnings.</p></aside><p>You&#8217;ve just imported the Project Tango SDK, enabled the Tango Manager prefab which controls most of the Project Tango functionality for you, and removed the motion controls included with the project. &#160;We&#8217;re going to use Project Tango to control the player&#8217;s motion.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Creating the Pose Controller" 
+        duration="10:00">
+        
+          <h1></h1><h2>Create PoseController script</h2><ol start="1">
+<li>Select the <strong>Player</strong>&#160;object in the Hierarchy panel.</li>
+<li>Click the <strong>Add Component </strong>at the very bottom of the Inspector panel. </li>
+<li>Select <strong>New Script</strong>, enter <code>PoseController</code>&#160;as the name, make sure that the Language is set to CSharp, then click <strong>Create and Add</strong>. <br><img src="../img/project-tango/img-8.png" style="max-width: 231px">
+</li>
+</ol><h2>Add Skeleton code</h2><p>Open the PoseController script by double clicking on it in the Assets folder. &#160;Then replace the contents with the following code:</p><aside class="special"><p><strong>Pro Tip</strong>: when pasting code into the editor, the script editor sometimes gets out of sync with the Unity project. &#160;This is fixed by &#160;selecting Assets &gt; Sync MonoDevelop Project from the Unity main menu.</p></aside><codelab-snippet>using UnityEngine;
+using System.Collections;
+using Tango;
+using System;
+
+public class PoseController : MonoBehaviour , ITangoPose {
+    private TangoApplication m_tangoApplication; // Instance for Tango Client
+    private Vector3 m_tangoPosition; // Position from Pose Callback
+    private Quaternion m_tangoRotation; // Rotation from Pose Callback
+    private Vector3 m_startPosition; // Start Position of the camera
+    private Vector3 m_lastPosition; // last position returned in Unity coordinates.
+    
+    // Controls movement scale, use 1.0f to be metric accurate
+    // For the codelab, we adjust the scale so movement results in larger movements in the
+    // virtual world.
+    private float m_movementScale = 10.0f;
+
+    // Use this for initialization
+    void Start ()
+    {
+        // Initialize some variables
+        m_tangoRotation = Quaternion.identity;
+        m_tangoPosition = Vector3.zero;
+        m_lastPosition = Vector3.zero;
+        m_startPosition = transform.position;
+        m_tangoApplication = FindObjectOfType&lt;TangoApplication&gt;();
+        if(m_tangoApplication != null)
+        {
+            RequestPermissions();
+        }
+        else
+        {
+            Debug.Log("No Tango Manager found in scene.");
+        }
+    }
+
+
+    // Permissions callback
+    private void PermissionsCallback(bool success)
+    {
+        // TODO: Implement permissions callback
+    }
+
+    private void RequestPermissions()
+    {
+        //TODO: Register and request permissions callback
+    }
+
+
+
+    // Pose callbacks from Project Tango
+    public void OnTangoPoseAvailable(Tango.TangoPoseData pose)
+    {
+        
+        // TODO: Implement pose callback
+    }
+
+/// &lt;summary&gt;
+    /// Transforms the Tango pose which is in Start of Service to Device frame to Unity coordinate system.
+    /// &lt;/summary&gt;
+    /// &lt;returns&gt;The Tango Pose in unity coordinate system.&lt;/returns&gt;
+    /// &lt;param name="translation"&gt;Translation.&lt;/param&gt;
+    /// &lt;param name="rotation"&gt;Rotation.&lt;/param&gt;
+    /// &lt;param name="scale"&gt;Scale.&lt;/param&gt;
+    Matrix4x4 TransformTangoPoseToUnityCoordinateSystem(Vector3 translation,
+                 Quaternion rotation, Vector3 scale)
+    {
+        //TODO: Implement Transformation Helper method
+        return Matrix4x4.identity;
+    }
+
+
+    // FixedUpdate is called at a fixed rate
+    void FixedUpdate()
+    {
+           //TODO: Convert pose to Unity
+      
+      //TODO: Move the player
+    }
+}</codelab-snippet><aside class="special"><p><strong>Note: </strong>For most applications, <code>m_movementScale</code>&#160;should be set to <code>1.0</code>&#160;to remain metrically accurate. We've increased the scale for this codelab to make it easier to get around.</p></aside><p>You probably noticed&#160;that there are a lot of <code>//TODO: </code>comments in the starter code. Don't worry! In the next few sections we will be filling those in and explaining things on the way.</p><p>Save all the changes in MonoDevelop and switch to the Unity Editor. &#160;If there are compilation errors or other issues, they will appear in the Unity console log.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Set up permissions" 
+        duration="5:00">
+        
+          <h1></h1><h2>Goal</h2><p>Project Tango applications using motion tracking need to ask users for permission to use the motion tracking camera and handle their response. In this section, we'll define and add the permission callbacks for our application.</p><h2>Define the permissions callback</h2><p>First, we will define how we handle the Permissions. Find the comment <code>// TODO: Implement permissions callback</code>&#160;and replace it with the following function:</p><codelab-snippet>if(success)
+    {
+        m_tangoApplication.InitApplication(); // Initialize Tango Client
+        m_tangoApplication.InitProviders(string.Empty); // Initialize listeners
+        m_tangoApplication.ConnectToService(); // Connect to Tango Service
+    }
+    else
+    {
+        AndroidHelper.ShowAndroidToastMessage("Motion Tracking Permissions Needed", true);
+    }</codelab-snippet><p>If the permissions request was successful, we have some boilerplate to start the Project Tango framework. If the permissions request was unsuccessful (e.g. the user rejected a permission we require), we need to handle it. To keep things&#160;simple, we show a toast message in this example.</p><h2>Request permissions </h2><p>Now that we have a Permissions callback, we need to register it. Find the comment <code>//TODO: Register and request permissions callback</code>&#160;in the <code>RequestPermissions() </code>function and replace it with the following code:</p><codelab-snippet>// Request Tango permissions
+m_tangoApplication.RegisterPermissionsCallback(PermissionsCallback);
+m_tangoApplication.RequestNecessaryPermissionsAndConnect();
+m_tangoApplication.Register(this);</codelab-snippet><p>This registers a callback and triggers the Permissions request dialog.</p><h2>Run the app</h2><p>Make sure all the source code is saved in MonoDevelop by clicking <strong>File &gt; Save All</strong>. (If it is disabled, that means everything is ready!).</p><p>Switch back to the Unity editor and click <strong>File &gt; &#160;Build &amp; Run</strong>&#160;(or Cmd + B). &#160;If everything is ready, it will build the app and start it on your device.</p><p>Click Start in the game, and it should initialize the Tango environment by prompting for permission then initializing the motion tracking system.</p><p>Moving around still does not move the player in the game, so let's do that next!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Get poses" 
+        duration="10:00">
+        
+          <h1></h1><h2>Goal</h2><p>After all that setup, we're still not doing anything with motion tracking. Let's change that! In this section, we will define our callback to handle poses from Project Tango and translate the data from Project Tango to Unity coordinate systems.</p><h2>Define the pose callback</h2><p>We'll be getting pose data through a callback, which we need to define. Find the comment <code>// TODO: Implement pose callback</code>&#160;in the <code>OnTangoPoseAvailable</code>&#160;function and replace it with the following code:</p><codelab-snippet>
+// Do nothing if we don't get a pose
+if (pose == null) {
+ Debug.Log("TangoPoseData is null.");
+ return;
+}
+// The callback pose is for device with respect to start of service pose.
+if (pose.framePair.baseFrame == TangoEnums.TangoCoordinateFrameType.TANGO_COORDINATE_FRAME_START_OF_SERVICE &amp;&amp;
+    pose.framePair.targetFrame == TangoEnums.TangoCoordinateFrameType.TANGO_COORDINATE_FRAME_DEVICE)
+{
+    if (pose.status_code == TangoEnums.TangoPoseStatusType.TANGO_POSE_VALID)
+    {
+        // Cache the position and rotation to be set in the update function.
+        m_tangoPosition = new Vector3((float)pose.translation [0],
+                                      (float)pose.translation [1],
+                                      (float)pose.translation [2]);
+
+        m_tangoRotation = new Quaternion((float)pose.orientation [0],
+                                         (float)pose.orientation [1],
+                                         (float)pose.orientation [2],
+                                         (float)pose.orientation [3]);
+    }
+    else // if the current pose is not valid we set the pose to identity
+    {
+        m_tangoPosition = Vector3.zero;
+        m_tangoRotation = Quaternion.identity;
+    }
+}</codelab-snippet><p>There's a bit more going on here, so lets step through things.</p><p>First, if there is no pose data, let's just return from the method since there is no data process.</p><p>Next, we use the first if statement to define the base and target frames of reference that we're interested in. For motion tracking alone, you can consider this boilerplate since these are the only values we're interested in. If we were using area learning or depth perception, there would be other frames of reference we'd need to use. You can find more information on frames of reference in Project Tango at <a href="https://developers.google.com/project-tango/overview/frames-of-reference">https://developers.google.com/project-tango/overview/frames-of-reference</a>.</p><p>Finally, we check if the pose we got is valid. We can expect to get other pose statuses like initializing or, if we're unlucky, invalid, and don't want to do anything with those. If things look good, we grab the translation and orientation and save them in <code>tangoPosition</code>&#160;and <code>tangoRotation</code>, respectively. You can learn more about poses at <a href="https://developers.google.com/project-tango/overview/poses">https://developers.google.com/project-tango/overview/poses</a>.</p><aside class="special"><p>Note: We're intentionally not doing anything with the data here, since the callback doesn't happen on the main game thread. &#160;We'll manipulate the game in FixedUpdate().</p></aside><h2>Add a Transformation Helper method</h2><p>Since Tango's coordinate system is different than Unity's, we need to transform the tango pose position and rotation into Unity's coordinate system. &#160;Since we do it a lot, we can make a helper function. &#160;Find &#160;//TODO: Implement Transformation Helper method &#160;and remove the return statement. &#160;Then paste in this method:</p><codelab-snippet>
+        // Matrix for Tango coordinate frame to Unity coordinate frame conversion.
+        // Start of service frame with respect to Unity world frame.
+        Matrix4x4 m_uwTss;
+        // Unity camera frame with respect to device frame.
+        Matrix4x4 m_dTuc;
+
+        m_uwTss = new Matrix4x4();
+        m_uwTss.SetColumn (0, new Vector4 (1.0f, 0.0f, 0.0f, 0.0f));
+        m_uwTss.SetColumn (1, new Vector4 (0.0f, 0.0f, 1.0f, 0.0f));
+        m_uwTss.SetColumn (2, new Vector4 (0.0f, 1.0f, 0.0f, 0.0f));
+        m_uwTss.SetColumn (3, new Vector4 (0.0f, 0.0f, 0.0f, 1.0f));
+
+        m_dTuc = new Matrix4x4();
+        m_dTuc.SetColumn (0, new Vector4 (1.0f, 0.0f, 0.0f, 0.0f));
+        m_dTuc.SetColumn (1, new Vector4 (0.0f, 1.0f, 0.0f, 0.0f));
+        m_dTuc.SetColumn (2, new Vector4 (0.0f, 0.0f, -1.0f, 0.0f));
+        m_dTuc.SetColumn (3, new Vector4 (0.0f, 0.0f, 0.0f, 1.0f));
+
+        Matrix4x4 ssTd = Matrix4x4.TRS(translation, rotation, scale);
+        return m_uwTss * ssTd * m_dTuc;</codelab-snippet><h2>Transform the pose to the Unity coordinate system</h2><p>Find the comment <code>//TODO: Convert pose to Unity </code>&#160;in the function <code>FixedUpdate() </code>and replace it with the following code:</p><codelab-snippet>// Convert position and rotation from Tango's coordinate system to Unity's.
+Matrix4x4 uwTuc = TransformTangoPoseToUnityCoordinateSystem(m_tangoPosition,
+     m_tangoRotation, Vector3.one);
+Vector3 newPosition = (uwTuc.GetColumn(3))* m_movementScale;
+Quaternion newRotation = Quaternion.LookRotation(uwTuc.GetColumn(2),
+     uwTuc.GetColumn(1));</codelab-snippet><p>Project Tango poses use a different coordinate system convention than Unity. In the starter code, we included the function TransformTangoPoseToUnityCoordinateSystem to handle the conversion for you. </p><h2>Move the player</h2><p>Finally, we set the new position and rotation to the converted values. &#160;At the bottom of FixedUpdate(), replace the comment: //TODO: Move the player with the following code:</p><codelab-snippet>// Calculate the difference in the poses received.  This allows us
+// to recover when we hit something in the virtual world.
+Vector3 delta = newPosition - m_lastPosition;
+m_lastPosition = newPosition;
+        Vector3 destination = rigidbody.position + delta;
+        Vector3 vectorToTargetPosition = destination - transform.position;
+        // If there is motion, move the player around the scene.
+        if(vectorToTargetPosition.magnitude &gt; 0.1f)
+        {
+            vectorToTargetPosition.Normalize();
+            // Set the movement vector based on the axis input.
+            Vector3 movement = vectorToTargetPosition;
+            // Normalise the movement vector and make it proportional to the speed per second.
+            movement = movement.normalized * 5f * Time.deltaTime;
+    
+            // Move the player to it's current position plus the movement.
+            rigidbody.MovePosition (transform.position + movement);
+ }
+ else {
+    rigidbody.velocity = Vector3.zero;
+}
+// always rotate, even if we don't move.
+rigidbody.MoveRotation (newRotation);
+// finally, let the game manager know the position of the player.
+//GameManager.Instance.PlayerPosition = transform.position;</codelab-snippet><p>We're now done with <code>PoseController</code>, great job! Now save your file, go back to Unity, and select <strong>File &gt; Build &amp;&#160;Run&#160;</strong>to see your changes in action! Depending on your development environment, you might see a warning about line endings.&#160;You can safely convert or ignore. </p><p>After the app starts, you will be prompted to enable motion tracking. Make sure you pick <strong>Turn On Motion Tracking</strong>.</p><p><img src="../img/project-tango/img-9.png" style="max-width: 624px"></p><h2>Troubleshooting</h2><p>If your device gets stuck in initialization or something doesn't seem to be working right, try restarting your device and doing <strong>Build &amp; Run</strong>&#160;again.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Next steps">
+        
+          <h1></h1><p>Congratulations! You've just converted an existing game to use Project Tango motion tracking. Where do you go from here?</p><ul>
+<li>Our implementation here is pretty minimal. Add additional functionality or improve the usability of the game.</li>
+<li>Experiment with different scaling factors to map motion in the real world to the virtual world.</li>
+<li>Try porting a different project, especially one with a different camera and control scheme.</li>
+<li>Check out our <a href="https://github.com/googlesamples/tango-examples-unity">Unity samples</a>&#160;for examples of using our other functionality, like depth and area learning.</li>
+</ul><h2>Final scripts</h2><p>Here is what your final scripts should look like. If you had any issues following the codelab, compare your code against these models, or copy/paste the final versions into your project.</p><h3>Final PoseController.cs</h3><codelab-snippet>using UnityEngine;
+using System.Collections;
+using Tango;
+using System;
+
+public class PoseController : MonoBehaviour , ITangoPose {
+    private TangoApplication m_tangoApplication; // Instance for Tango Client
+    private Vector3 m_tangoPosition; // Position from Pose Callback
+    private Quaternion m_tangoRotation; // Rotation from Pose Callback
+    private Vector3 m_startPosition; // Start Position of the camera
+    private Vector3 m_lastPosition; // last position returned in Unity coordinates.
+    
+    // Controls movement scale, use 1.0f to be metric accurate
+    // For the codelab, we adjust the scale so movement results in larger movements in the
+    // virtual world.
+    private float m_movementScale = 10.0f;
+    
+    // Use this for initialization
+    void Start ()
+    {
+        // Initialize some variables
+        m_tangoRotation = Quaternion.identity;
+        m_tangoPosition = Vector3.zero;
+        m_lastPosition = Vector3.zero;
+        m_startPosition = transform.position;
+        m_tangoApplication = FindObjectOfType&lt;TangoApplication&gt;();
+        if(m_tangoApplication != null)
+        {
+            RequestPermissions();
+        }
+        else
+        {
+            Debug.Log("No Tango Manager found in scene.");
+        }
+    }
+    
+    // Permissions callback
+    private void PermissionsCallback(bool success)
+    {
+        if(success)
+        {
+            m_tangoApplication.InitApplication(); // Initialize Tango Client
+            m_tangoApplication.InitProviders(string.Empty); // Initialize listeners
+            m_tangoApplication.ConnectToService(); // Connect to Tango Service
+        }
+        else
+        {
+            AndroidHelper.ShowAndroidToastMessage("Motion Tracking Permissions Needed", true);
+        }
+
+    }
+    
+    private void RequestPermissions()
+    {
+        // Request Tango permissions
+        m_tangoApplication.RegisterPermissionsCallback(PermissionsCallback);
+        m_tangoApplication.RequestNecessaryPermissionsAndConnect();
+        m_tangoApplication.Register(this);
+    }
+    
+    // Pose callbacks from Project Tango
+    public void OnTangoPoseAvailable(Tango.TangoPoseData pose)
+    {
+        
+        
+        // Do nothing if we don't get a pose
+        if (pose == null) {
+            Debug.Log("TangoPoseData is null.");
+            return;
+        }
+        // The callback pose is for device with respect to start of service pose.
+        if (pose.framePair.baseFrame == TangoEnums.TangoCoordinateFrameType.TANGO_COORDINATE_FRAME_START_OF_SERVICE &amp;&amp;
+            pose.framePair.targetFrame == TangoEnums.TangoCoordinateFrameType.TANGO_COORDINATE_FRAME_DEVICE)
+        {
+            if (pose.status_code == TangoEnums.TangoPoseStatusType.TANGO_POSE_VALID)
+            {
+                // Cache the position and rotation to be set in the update function.
+                m_tangoPosition = new Vector3((float)pose.translation [0],
+                                              (float)pose.translation [1],
+                                              (float)pose.translation [2]);
+                
+                m_tangoRotation = new Quaternion((float)pose.orientation [0],
+                                                 (float)pose.orientation [1],
+                                                 (float)pose.orientation [2],
+                                                 (float)pose.orientation [3]);
+            }
+            else // if the current pose is not valid we set the pose to identity
+            {
+                m_tangoPosition = Vector3.zero;
+                m_tangoRotation = Quaternion.identity;
+            }
+        }
+    }
+    
+    /// &lt;summary&gt;
+    /// Transforms the Tango pose which is in Start of Service to Device frame to Unity coordinate system.
+    /// &lt;/summary&gt;
+    /// &lt;returns&gt;The Tango Pose in unity coordinate system.&lt;/returns&gt;
+    /// &lt;param name="translation"&gt;Translation.&lt;/param&gt;
+    /// &lt;param name="rotation"&gt;Rotation.&lt;/param&gt;
+    /// &lt;param name="scale"&gt;Scale.&lt;/param&gt;
+    Matrix4x4 TransformTangoPoseToUnityCoordinateSystem(Vector3 translation,
+                                                        Quaternion rotation, Vector3 scale)
+    {
+        
+        // Matrix for Tango coordinate frame to Unity coordinate frame conversion.
+        // Start of service frame with respect to Unity world frame.
+        Matrix4x4 m_uwTss;
+        // Unity camera frame with respect to device frame.
+        Matrix4x4 m_dTuc;
+        
+        m_uwTss = new Matrix4x4();
+        m_uwTss.SetColumn (0, new Vector4 (1.0f, 0.0f, 0.0f, 0.0f));
+        m_uwTss.SetColumn (1, new Vector4 (0.0f, 0.0f, 1.0f, 0.0f));
+        m_uwTss.SetColumn (2, new Vector4 (0.0f, 1.0f, 0.0f, 0.0f));
+        m_uwTss.SetColumn (3, new Vector4 (0.0f, 0.0f, 0.0f, 1.0f));
+        
+        m_dTuc = new Matrix4x4();
+        m_dTuc.SetColumn (0, new Vector4 (1.0f, 0.0f, 0.0f, 0.0f));
+        m_dTuc.SetColumn (1, new Vector4 (0.0f, 1.0f, 0.0f, 0.0f));
+        m_dTuc.SetColumn (2, new Vector4 (0.0f, 0.0f, -1.0f, 0.0f));
+        m_dTuc.SetColumn (3, new Vector4 (0.0f, 0.0f, 0.0f, 1.0f));
+        
+        Matrix4x4 ssTd = Matrix4x4.TRS(translation, rotation, scale);
+        return m_uwTss * ssTd * m_dTuc;
+    }
+    
+    
+    // FixedUpdate is called at a fixed rate
+    void FixedUpdate()
+    {
+        // Convert position and rotation from Tango's coordinate system to Unity's.
+        Matrix4x4 uwTuc = TransformTangoPoseToUnityCoordinateSystem(m_tangoPosition,
+                                                                    m_tangoRotation, Vector3.one);
+        Vector3 newPosition = (uwTuc.GetColumn(3))* m_movementScale;
+        Quaternion newRotation = Quaternion.LookRotation(uwTuc.GetColumn(2),
+                                                         uwTuc.GetColumn(1));
+
+        // Calculate the difference in the poses received.  This allows us
+        // to recover when we hit something in the virtual world.
+        Vector3 delta = newPosition - m_lastPosition;
+        m_lastPosition = newPosition;
+        Vector3 destination = rigidbody.position + delta;
+        Vector3 vectorToTargetPosition = destination - transform.position;
+        // If there is motion, move the player around the scene.
+        if(vectorToTargetPosition.magnitude &gt; 0.1f)
+        {
+            vectorToTargetPosition.Normalize();
+            // Set the movement vector based on the axis input.
+            Vector3 movement = vectorToTargetPosition;
+            // Normalise the movement vector and make it proportional to the speed per second.
+            movement = movement.normalized * 5f * Time.deltaTime;
+            
+            // Move the player to it's current position plus the movement.
+            rigidbody.MovePosition (transform.position + movement);
+        }
+        else {
+            rigidbody.velocity = Vector3.zero;
+        }
+        // always rotate, even if we don't move.
+        rigidbody.MoveRotation (newRotation);
+        // finally, let the game manager know the position of the player.
+        GameManager.Instance.PlayerPosition = transform.position;
+    }
+}</codelab-snippet>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

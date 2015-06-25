@@ -1,0 +1,334 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Unit and UI Testing in Android Studio"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Android"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="0:30">
+        
+          <h1></h1><p>In this codelab, you'll learn how to set up your project in Android Studio for testing, write a Unit Test and run it locally on your development machine and also how to do functional UI testing on the device. </p><h3 class="checklist">What you’ll learn</h3><ul class="checklist">
+<li>Updating the Gradle build files to include JUnit and the Android Testing Support Library</li>
+<li>Writing Unit Tests which run on the Java VM on your local machine</li>
+<li>Writing Espresso tests which run on the device or emulator</li>
+</ul><h3>What you’ll need</h3><ul>
+<li>
+<a href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>&#160;version 1.2+</li>
+<li>A test device with Android&#160;4.0+</li>
+</ul><codelab-survey><h4>How&#160;will you use this tutorial?</h4>
+<select><option>Read it through only</option>
+<option>Read it and complete the exercises</option></select><h4>How&#160;would you rate your experience with building Android apps?</h4>
+<select><option>Novice</option>
+<option>Intermediate</option>
+<option>Proficient</option></select><h4>Are you currently testing your apps with Unit Tests or functional UI tests?</h4>
+<select><option>Yes</option>
+<option>No</option></select></codelab-survey>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create a new Android Studio project" 
+        duration="1:30">
+        
+          <h1></h1><p>If you&#8217;re launching Android Studio for the first time, select &#8220;<strong>Start a new Android Studio project</strong>&#8221; from the Welcome screen. If there&#8217;s already a project open, go to <strong>File&#160;&gt; New&#160;&gt; New Project&#8230;</strong></p><p>The &#8220;<em>Create new project</em>&#8221; wizard will guide you through the process. On the first screen enter the following:</p><table>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1"><p>Setting</p></td>
+<td colspan="1" rowspan="1"><p>Value</p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><strong>Application name</strong></p></td>
+<td colspan="1" rowspan="1"><p><code>TestingExample</code></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1"><p><strong>Company domain</strong></p></td>
+<td colspan="1" rowspan="1"><p><code>testing.example.com</code></p></td>
+</tr>
+</tbody>
+<tbody></tbody>
+</table><p>This will ensure your code has consistent naming with the content presented throughout the codelab. You can leave all the other selections on their default setting and simply press Next until your project is created.</p><p>You can press the<img src="../img/android-studio-testing/img-1.png" style="max-width: 20px"><strong>Run</strong>&#160;button to check if the app runs correctly. You should either select and launch an Emulator from the list or make sure your device is properly attached via USB with <a href="http://developer.android.com/tools/device.html">debugging enabled</a>.</p><p>The app doesn&#8217;t do much right now, but you should see a screen showing &#8220;Hello world!&#8221; and the name of your app.</p><p><img src="../img/android-studio-testing/img-2.png" style="max-width: 488px"></p><h3 class="faq">Frequently Asked Questions</h3><ul class="faq">
+<li><a href="https://developer.android.com/sdk/installing/studio.html">How do I install Android Studio?</a></li>
+<li><a href="http://developer.android.com/tools/device.html">How do I enable USB debugging?</a></li>
+<li><a href="http://stackoverflow.com/a/16598454">Why doesn't Android Studio see my device?</a></li>
+<li><a href="http://stackoverflow.com/a/4786299">Android error: Failed to install *.apk on device *: timeout?</a></li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Configure your project for Unit test support" 
+        duration="3:00">
+        
+          <h1></h1><p>Before you start writing tests, let&#8217;s go through a short checklist to make sure that your project is configured correctly. </p><p>First, make sure you select &#8220;Unit Tests&#8221; under Test Artifact in the Build Variants pane.<br><br><img src="../img/android-studio-testing/img-3.png" style="max-width: 369px"><br></p><p>Next, create the folders <code>test</code>&#160;and <code>test/java</code>&#160;under your module&#8217;s <code>src</code>&#160;folder. Note that you cannot do this using the default <img src="../img/android-studio-testing/img-4.png" style="max-width: 20px"><code>Android</code>&#160;perspective. You can either use your system&#8217;s file explorer to create the necessary folders or switch to the <code>Project</code>&#160;perspective by using the drop down on the top-left of the Project pane. Your final project hierarchy should look like this:<br><br><img src="../img/android-studio-testing/img-5.png" style="max-width: 368px"><br>(you can go back to the <img src="../img/android-studio-testing/img-4.png" style="max-width: 20px"><code>Android</code>&#160;project perspective for the remainder of this codelab)<br></p><p>And lastly, open your module&#8217;s <code>build.gradle&#160;(Module:app)</code>&#160;file and add JUnit4 to your dependencies section, then click on the <img src="../img/android-studio-testing/img-6.png" style="max-width: 20px"><strong>Gradle sync&#160;</strong>button.</p><h3>build.gradle</h3><codelab-snippet>dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.1.1'
+    testCompile 'junit:junit:4.12'
+}</codelab-snippet><aside class="special"><p>You might need an Internet connection to download the JUnit dependency when syncing your Gradle configuration.</p></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create your first Unit Test" 
+        duration="3:00">
+        
+          <h1></h1><p>Now that everything is set up, it&#8217;s time to start writing your first test. But in order to do that, you will need some code that will be tested. For that purpose, let&#8217;s create a very simple Calculator class. This will be what is called our &#8220;class under test&#8221;.</p><p><img src="../img/android-studio-testing/img-7.png" style="max-width: 624px"></p><p>We&#8217;ll add methods for the most common arithmetic operations, like addition and subtraction. Copy and paste the following code into your editor. Don&#8217;t worry about the actual implementations yet, just let all methods return 0 (zero) for now.</p><h3>Calculator.java</h3><codelab-snippet>package com.example.testing.testingexample;
+
+public class Calculator {
+
+    public double sum(double a, double b){
+        return 0;
+    }
+
+    public double substract(double a, double b){
+        return 0;
+    }
+
+    public double divide(double a, double b){
+        return 0;
+    }
+
+    public double multiply(double a, double b){
+        return 0;
+    }
+}</codelab-snippet><p><br>Android Studio provides a quick way to create the actual test class for you. Just <strong>right click </strong>on the Calculator class declaration in your editor and select <strong>Go to &gt; Test</strong>, then &#8220;<strong>Create a new test&#8230;</strong>&#8221;</p><p><img src="../img/android-studio-testing/img-8.png" style="max-width: 624px"></p><p>In the dialog window that opens, choose <strong>JUnit 4</strong>&#160;and select the &#8220;<strong>setUp/@Before</strong>&#8221; option, as well as <strong>generate test methods </strong>for all of our calculator operations.</p><p><img src="../img/android-studio-testing/img-9.png" style="max-width: 619px"></p><p>This should generate a test class skeleton in the correct folder (<code>app/src/test/java/com/example/testing/testingexample</code>) with the test methods ready to fill in. Here is an example of how you might test the calculator operations:</p><h3>CalculatorTest.java</h3><codelab-snippet>package com.example.testing.testingexample;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class CalculatorTest {
+
+    private Calculator mCalculator;
+
+    @Before
+    public void setUp() throws Exception {
+        mCalculator = new Calculator();
+    }
+
+    @Test
+    public void testSum() throws Exception {
+        //expected: 6, sum of 1 and 5
+        assertEquals(6d, mCalculator.sum(1d, 5d), 0);
+    }
+
+    @Test
+    public void testSubstract() throws Exception {
+        assertEquals(1d, mCalculator.substract(5d, 4d), 0);
+    }
+
+    @Test
+    public void testDivide() throws Exception {
+        assertEquals(4d, mCalculator.divide(20d, 5d), 0);
+    }
+
+    @Test
+    public void testMultiply() throws Exception {
+        assertEquals(10d, mCalculator.multiply(2d, 5d), 0);
+    }
+}</codelab-snippet><p>Feel free to copy the code to your editor or write your own tests using assertions provided by the JUnit framework.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Running your tests" 
+        duration="4:00">
+        
+          <h1></h1><p>It&#8217;s finally time to run your test! <strong>Right click</strong>&#160;on the <code>CalculatorTest</code>&#160;class and select <strong>Run</strong>&#160;&gt; <strong>CalculatorTest</strong>. You can also run the test from the command line, by issuing the following command in your project&#8217;s directory:</p><pre>./gradlew test</pre><p>Regardless of how you run your tests, you should see the output, telling you that 4 out of 4 tests have failed. This is the expected result, as we haven&#8217;t implemented the arithmetic operations yet.</p><p><img src="../img/android-studio-testing/img-10.png" style="max-width: 624px"></p><p>Let&#8217;s modify the <code>sum(double a, double b)</code>&#160;method in the Calculator class to return a correct result and re-run the tests. You should see that only 3 out of 4 tests have failed.</p><h3>Calculator.java</h3><codelab-snippet>public double sum(double a, double b){
+    return a + b;
+}</codelab-snippet><p>As an exercise, you can implement the remaining methods to make all tests pass. </p><aside class="special"><p>You might have noticed that Android Studio never asked you to connect a device or launch an emulator to run the tests on. That&#8217;s because tests residing in the <code>src/tests</code>&#160;folder are local unit tests that run on the Java VM on your computer. This enables a really fast iteration flow where you write your tests, then implement the functionality to pass those tests, then add some more tests... This is called <strong>Test Driven Development</strong>.</p>
+<p>One thing to be aware of when running tests locally is that Gradle provides you with an&#160;android.jar in the classpath containing Android framework classes, but they are <strong>not fully functional </strong>(so you shouldn&#8217;t just call methods of <code>Activity</code>&#160;for example and expect them to work). You should use a mocking framework like <a href="http://mockito.org/">Mockito</a>&#160;to mock any Android method calls that you need to use. For tests that run on the device and make use of the full Android framework, continue to the next part of this codelab</p></aside>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Configure your project for instrumentation tests" 
+        duration="1:30">
+        
+          <h1></h1><p>Although there is support for running instrumentation tests in the Android framework, current development efforts are focused around the new <code>AndroidJUnitRunner</code>&#160;which is released as part of the <strong>Android Testing Support Library</strong>. The library also contains <em>Espresso</em>, a framework for running functional UI tests. Let&#8217;s add both to our project by editing the relevant sections in the module&#8217;s <code>build.gradle </code>file:</p><h3>build.gradle</h3><codelab-snippet>apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "com.example.testing.testingexample"
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+
+        //ADD THIS LINE:
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    //ADD THESE LINES:
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0' //&#8592; MAKE SURE IT&#8217;S 22.0.0
+    testCompile 'junit:junit:4.12'
+
+    //ADD THESE LINES:
+    androidTestCompile 'com.android.support.test:runner:0.2'
+    androidTestCompile 'com.android.support.test:rules:0.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
+}</codelab-snippet><aside class="warning"><p><strong>Important</strong>: Due to some dependency version conflicts, you might have to make sure that version <code>22.0.0</code>&#160;of the <code>com.android.support:appcompat-v7</code>&#160;library is being used, like in the snippet above.</p>
+<p>Also, Android Studio might notify you that Build Tools 22.0.1 is not installed. You should accept the proposed fix and Studio will install the appropriate Build Tools for you or change this line in build.gradle to point to a version you have installed on your machine.</p></aside><p>All that&#8217;s left is to switch to <strong>Android Instrumentation Tests </strong>in the <strong>Build Variants</strong>&#160;pane. Your project should sync automatically at this point. If it does not, press the<img src="../img/android-studio-testing/img-6.png" style="max-width: 20px"><strong>Gradle sync </strong>button.</p><p><img src="../img/android-studio-testing/img-11.png" style="max-width: 368px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add a simple interaction to your app" 
+        duration="2:00">
+        
+          <h1></h1><p><img src="../img/android-studio-testing/img-12.png" style="max-width: 488px"></p><p>Before we begin testing the UI with Espresso tests, let&#8217;s add some Views and a simple behavior to the app. We&#8217;ll use an EditText where the user can enter his name and a Button that greets the user using the TextView for output. Open <code>res/layout/activity_main.xml</code>&#160;and paste the following code:</p><h3>activity_main.xml</h3><codelab-snippet>&lt;RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"&gt;
+
+    &lt;TextView
+        android:id="@+id/textView"
+        android:text="@string/hello_world" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" /&gt;
+    &lt;EditText
+        android:hint="Enter your name here"
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView"/&gt;
+    &lt;Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Say hello!"
+        android:layout_below="@+id/editText"
+        android:onClick="sayHello"/&gt;
+&lt;/RelativeLayout&gt;</codelab-snippet><p>You&#8217;ll also need to add the onClick handler in <code>MainActivity.java</code>:</p><h3>MainActivity.java</h3><codelab-snippet>public void sayHello(View v){
+    TextView textView = (TextView) findViewById(R.id.textView);
+    EditText editText = (EditText) findViewById(R.id.editText);
+    textView.setText("Hello, " + editText.getText().toString() + "!");
+}</codelab-snippet><p>You can now run the app to see it in action and make sure everything works properly. Before you press the <img src="../img/android-studio-testing/img-1.png" style="max-width: 20px"><strong>Run</strong>&#160;button, make sure your Run Configuration is not set to run tests from the previous part of the codelab. Use the dropdown and select <strong>app.</strong>&#160;It should look like this: <img src="../img/android-studio-testing/img-13.png" style="max-width: 85px"></p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create and run an Espresso test" 
+        duration="3:00">
+        
+          <h1></h1><p><img src="../img/android-studio-testing/img-14.png" style="max-width: 624px"></p><p>In the project overview, find your package name ending with the <code>(androidTest)</code>&#160;suffix and create a new Java class there. You can name it <code>MainActivityInstrumentationTest</code>. Paste the following code as its contents:</p><h3>MainActivityInstrumentationTest.java</h3><codelab-snippet>package com.example.testing.testingexample;
+
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.action.ViewActions;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.LargeTest;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+public class MainActivityInstrumentationTest {
+
+    private static final String STRING_TO_BE_TYPED = "Peter";
+
+    @Rule
+    public ActivityTestRule&lt;MainActivity&gt; mActivityRule = new ActivityTestRule&lt;&gt;(
+            MainActivity.class);
+
+    @Test
+    public void sayHello(){
+        onView(withId(R.id.editText)).perform(typeText(STRING_TO_BE_TYPED), closeSoftKeyboard()); //line 1
+
+        onView(withText("Say hello!")).perform(click()); //line 2
+
+        String expectedText = "Hello, " + STRING_TO_BE_TYPED + "!";
+        onView(withId(R.id.textView)).check(matches(withText(expectedText))); //line 3
+    }
+
+}</codelab-snippet><p>The class will be run by the <strong>AndroidJUnitRunner</strong>&#160;and execute the test implemented in the <code>sayHello()</code>&#160;method. Here&#8217;s what the test does, line by line:</p><ol start="1">
+<li>First, it finds the view with the ID <code>editText</code>&#160;and types in the string <code>&#8220;Peter&#8221;</code>, then closes the on-screen keyboard.</li>
+<li>Next, the test performs a click on the View with text &#8220;<code>Say hello!</code>&#8221;. That&#8217;s our Button, for which we didn&#8217;t set an id in the layout XML, hence we refer to it by searching for its text.</li>
+<li>Finally, the text contents of the TextView are compared with the expected result and the test passes if they match.</li>
+</ol><p>You can run the test by <strong>right clicking </strong>on the class and selecting <strong>Run &gt; MainActivityInstrume&#8230; </strong>&#160;(the second one with the Android icon)</p><p><img src="../img/android-studio-testing/img-15.png" style="max-width: 624px"></p><p>This will run your test on the emulator or connected device and, if you watch the screen, you can see the actions (like typing into the EditText) being performed by the runner. See the output in Android Studio for a report on passed and failed tests.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Congratulations!" 
+        duration="0:00">
+        
+          <h1></h1><p>We hope you enjoyed the code lab and are excited to start testing your apps. What next?</p><ul>
+<li>Learn more about <a href="https://developer.android.com/training/testing/unit-testing/index.html">local unit tests vs instrumented unit tests</a>.</li>
+<li>Read about setting up the <a href="https://developer.android.com/tools/testing-support-library/index.html">Android Testing Support Library</a>
+</li>
+<li>Watch these great devbyte videos about Android Studio:</li>
+</ul><p>&#160; &#160; <a href="https://www.youtube.com/watch?v=K2dodTXARqc">Introduction to Android Studio</a></p><p>&#160; &#160; <a href="https://www.youtube.com/watch?v=cD7NPxuuXYY">Introducing Gradle (Ep 2, Android Studio)</a></p><p>&#160; &#160; <a href="http://www.youtube.com/watch?v=JLLnhwtDoHw">Layout Editor (Ep 3, Android Studio)</a></p><p>&#160; &#160; <a href="http://www.youtube.com/watch?v=2I6fuD20qlY">Debugging and testing in Android Studio (Ep 4, Android Studio)</a></p><ul><li>Check out our <a href="https://github.com/googlesamples/android-testing/">testing samples repository on Github</a>
+</li></ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

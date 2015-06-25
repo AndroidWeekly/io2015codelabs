@@ -1,0 +1,63 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
+
+<polymer-element name="glossary-of-terms" attributes="src format" constructor="Glossary">
+<template>
+	<content></content>
+	<core-ajax id="ajax"
+	    url="{{src}}"
+	    handleAs="{{format}}"></core-ajax>
+</template>
+<script>
+  Polymer('glossary-of-terms', {
+    src: null,
+    format: 'document',
+    terms: {},
+    indexTerm: function(term) {
+    	var key = term.term.toLowerCase();
+    	this.terms[key] = term;
+    },
+    ready: function() {
+		this.$.ajax.addEventListener("core-response", function (el) {
+		    return function(e) {
+              if (el.format == "json") {
+                  var terms = e.detail.response;
+    		      for (var i=0; i<terms.length; i++) {
+    		      	var term = terms[i];
+    		      	el.indexTerm(term);
+    		      }
+              } else if (el.format == "document") {
+                  var nodes = e.detail.response.querySelectorAll('dl dt, dl dd');
+                  var term = {}
+                  for (var i=0; i<nodes.length; i++) {
+                    var node = nodes[i];
+                    if (node.localName == "dt") {
+                        term = {'term': node.textContent}
+                    } else if (node.localName == "dd") {
+                        term['definition'] = node.textContent;
+                        el.indexTerm(term);
+                    }
+                  }
+              }
+		      el.annotateTerms();
+		    }
+		}(this));
+        this.$.ajax.go();
+    },
+    annotateTerms: function() {
+    	var glossary_terms = this.querySelectorAll('::shadow glossary-term').array();
+        for (var i=0; i<glossary_terms.length; i++) {
+            this.annotate(glossary_terms[i]);
+        }
+    },
+    annotate: function(glossary_term_element) {
+    	var glossary_term = glossary_term_element.term;
+    	if (this.terms[glossary_term]) {
+    		glossary_term_element.setAttribute('heading', this.terms[glossary_term].term);
+    		glossary_term_element.setAttribute('text', this.terms[glossary_term].definition);
+    	}
+    }
+  });
+</script>
+</polymer-element>

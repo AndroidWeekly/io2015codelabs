@@ -1,0 +1,298 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Create a watchface for Android Wear"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Android Wear"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Create your first watch face" 
+        duration="120:00">
+        
+          <h1></h1><p>This codelab will introduce you to the key concepts to creating your own watch face for Android Wear. It&#160;will then walk you through customising an analog watch face. There is also a bonus&#160;section on using the palette API to automatically choose a color for the watch face if you have the time. By the end of the codelab, you&#8217;ll have a customized watch face that you can call your own.</p><h2>Concepts and setup</h2><p>In this codelab, you&#8217;ll learn how to quickly create a watch face for Android Wear. At the end of the codelab, you can expect to have a watch face you can call your own.</p><h3>Concepts</h3><p>To start off let&#8217;s learn a little bit about Android Wear and its most prominent UI element&#160;- the watch face.</p><p><img src="../img/watchface/img-1.png.jpeg" style="max-width: 624px"></p><p>Android Wear is a wearable platform designed for small, powerful devices, worn on the body. It is designed to deliver useful information when you need it most, intelligent answers to spoken questions, and tools to help reach fitness goals.</p><p>Being such a personal device, style is a big part of it. Aside from offering a choice of manufacturers, customisable watch faces give users even more ways to express their personal style. This is what we are going to create today.</p><p>A watch face&#160;is&#160;essentially a native service that runs in the background on an&#160;Android Wear device. Within this service, there is an engine that renders each screen. You can think of this as an animator flipping through a book of moving cartoon drawings. Our code will fill each of these pages, making the watch face move.</p><p>So let&#8217;s get started!</p><h3></h3><p>For Google I/O 2015, you can find the sample code inside <code>io2015-codelabs</code>&#160;on the desktop, and then <code>wear/watchface</code>. Before you start, open that folder.</p><h3>Clone the starter project repo</h3><aside class="special"><p>This codelab uses Android Studio (version 1.2), an integrated development environment (IDE) for developing Android apps. In addition, it will require Android Wear SDK components to be downloaded. Please refer to <a href="http://goo.gl/0AtObp">this guide</a>&#160;for installing both the Android Studio and the required SDK components.</p></aside><p>To get you started as quickly as possible, we have prepared a starter project for you to build on. It contains some basic code and application settings necessary for building watch faces. If you have git installed (you can check by typing <code>git --version</code>&#160;in the terminal / command line and see if executes correctly).</p><pre> git clone https://github.com/googlesamples/android-codelab-watchface.git</pre><p>If you do not have git you can get the project as a zip file:</p><p><paper-button raised="" class="colored"><core-icon icon="file-download"></core-icon><a href="https://github.com/googlesamples/android-codelab-watchface/archive/master.zip">Download Zip</a></paper-button></p><h3>Import the project</h3><p>Start Android Studio, and select &#8220;Open an existing Android Studio project&#8221; from the Welcome screen, open the project&#160;directory and double click on the <code>build.gradle</code>&#160;file&#160;in the watchface directory:</p><p><img src="../img/watchface/img-2.png.jpeg" style="max-width: 624px"></p><p>Click OK on "Import Project from Gradle" screen without making any changes.</p><p><img src="../img/watchface/img-3.png" style="max-width: 358px"></p><p>In the upper left hand corner of the project window, you should see something like this:</p><p><img src="../img/watchface/img-4.png" style="max-width: 624px"></p><p>There are five folder icons. Each of them are known as a &#8220;module&#8221;.&#160;Please note that Android Studio might take several seconds to compile the project in the background for the first time. During this time you will see a spinner in the status bar at the bottom of Android Studio:</p><p><img src="../img/watchface/img-5.png" style="max-width: 624px"></p><p>We recommend that you wait until this has finished before making code changes. This will allow Android Studio to pull in all the necessary components. In addition, if you get a prompt saying "Reload for language changes to take effect?" or something similar, select &#8220;Yes&#8221;.</p><h3>Understand the starter project</h3><p>All right, you&#8217;re set up and ready to start creating your own watch face.&#160;We&#8217;ll set off using&#160;the <code>1-base</code>&#160;module, which is the starting point for the&#160;watch face that we'll be building upon. You will be adding code from each step to <code>1-base</code>.</p><p>Each of the following modules can be used as reference points to check your work or for reference if you encounter any issues. The number in front of the module name corresponds with the codelab step.</p><p>Overview of key components</p><ul>
+<li>
+<code>MyWatchFaceService</code>&#160;- Our watch face and it has&#160;a&#160;watch face engine&#160;called&#160;<code>MyWatchFaceService.Engine</code>&#160;-&#160;This file is located in the directory <code>1-base/java/com/android/example/watchface</code>. In Android Studio, this is located under <code>1-base/java/com.android.example.watchface</code>. Within the Engine class, we will mainly be working on three methods:</li>
+<li>
+<code>onCreate</code>&#160;- We will initiate new classes such as the bitmap image object for our background, etc. This code is run once when the Engine is first started.</li>
+<li>
+<code>onSurfaceChanged</code>&#160;- This is the first time when we have the dimension of the screen. Armed with this new information, we can resize any screen element required for drawing. This code is also expected to only be run once at the start.</li>
+<li>
+<code>onDraw</code>&#160;- The core of what we will be doing. It renders every frame on the watch face canvas. Since it runs on every frame, we will try to keep this as fast as possible - no image resizing or object creation here!</li>
+</ul><aside class="special"><p>To achieve a high frame rate, which results in smooth animations, no intense computations should happen in <code>onDraw</code>. We can load images and resize them before we start drawing in onCreate and onSurfaceChanged.</p></aside><ul><li>
+<code>res/drawable-nodpi/</code>&#160;- This is the directory where we will be placing&#160;some additional image files.</li></ul><h3>Emulator setup</h3><p>If you need help setting up an Android Wear emulator, please refer to the <a href="https://developer.android.com/training/wearables/apps/creating.html#SetupEmulator">&#8220;Set Up an Android Wear Emulator or Device&#8221;</a>&#160;section of the "Creating and Running a Wearable App" article.</p><h3>Run the starter project</h3><p>Let's run it on a watch.</p><ul>
+<li>Connect your Android Wear device&#160;or start an emulator.</li>
+<li>In the toolbar, select the &#8220;1-base&#8221;configuration from the drop down and click the green triangle run button next to it:</li>
+</ul><p><img src="../img/watchface/img-6.png" style="max-width: 624px"></p><ul><li>If the following dialog box comes up, select &#8220;Do not launch Activity&#8221; and then click Run. Activity is a program that users launch, since watch faces run in the background automatically, there is no activity to run.</li></ul><p><img src="../img/watchface/img-7.png" style="max-width: 267px"></p><ul>
+<li>Select your Android device or emulator and click OK. This will install the watch face on the Android Wear device or emulator.</li>
+<li>After a couple of seconds, your watch face is built and ready to deploy.&#160;You will see a spinner in the status bar at the bottom of Android Studio while this is happening:</li>
+</ul><p><img src="../img/watchface/img-8.png" style="max-width: 624px"></p><ul><li>If it is not already at the &#8220;4: Run&#8221; tab at the bottom left hand side of Android Studio, select that tab and you can see the installation progress. At the end of the installation process, you should see something similar to this:</li></ul><pre>Waiting for device.
+Target device: sony-smartwatch_3-XXXXXXXXXXXXXX
+Uploading file
+        local path: ~/Downloads/watchface/1-base/build/outputs/apk/1-base-debug.apk
+        remote path: /data/local/tmp/com.android.example.watchface
+Installing com.android.example.watchface
+DEVICE SHELL COMMAND: pm install -r "/data/local/tmp/com.android.example.watchface"
+pkg: /data/local/tmp/com.android.example.watchface
+Success</pre><ul>
+<li>Once that has happened, long tap&#160;on the watch face of your device or emulator.</li>
+<li>Scroll across until you see a watch face labelled&#160;&#8220;Analog Codelab Watchface&#8221;, select it.</li>
+<li>If you do not see this, try deploying the watch face again by pressing the green triangle button in the toolbar.</li>
+</ul><p>Here's what it should look like. Don&#8217;t worry if your emulator has a cloud with a strikethrough in place of the aeroplane icon. We will not need connection to a phone / internet for this code lab. Also note that the power button to the right might not appear - this is okay!</p><p><img src="../img/watchface/img-9.png" style="max-width: 303px"></p><h3>Additional background information - not necessary for code lab</h3><p>Since Android Studio 1.1, we have added watch face templates, which make it really simple to add watch faces to an existing application. To add watch faces to an existing project:</p><ul>
+<li>Open your existing project</li>
+<li>If it does not have an Android Wear module, add one by selecting, File &gt; New Module. Then select an Android Wear module. Fill in the module name, click next. Select &#8220;Add No Activity&#8221; and click Finish.</li>
+<li>Go to the Android Wear module, right click on the folder named &#8220;java&#8221;. Select New &gt; Wear &gt; Watch Face.</li>
+<li>Go through the wizard to add either an analog or digital watch face.</li>
+</ul><p>The resulting project will be very similar to &#8220;1-base&#8221; module&#160;in this code lab.</p><h3>Summary </h3><p>In this step you&#8217;ve learned about:</p><ul>
+<li>Android Wear and the concepts&#160;behind watch faces</li>
+<li>The basics of our starting point - 1-base</li>
+<li>How to connect to Android Wear device, deploy the watch face and run it!</li>
+</ul><h3>Next up </h3><p>Let&#8217;s start making this watch face our own by changing the background.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Change the background">
+        
+          <h1></h1><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/wear/watchface/2-background/src/main/java/com/android/example/watchface/MyWatchFaceService.java">Code step 2</a></h3><p>In this step, we will start making the watch face our&#160;own by giving it a background. If at any point you are confused by the concepts discussed here, please refer to the 2-background&#160;module and see how these steps may be implemented.</p><h3>Prepare your image</h3><p>The first step is to prepare the image. You can select any photograph of your choice, but note that some images with tiny details may not scale well on a small watch display. Crop it to a square shape and resize it to something like 600 x 600&#160;pixels. It can be in jpg or png format. The next step is to rename it to custom_background (Android needs underscore in place of space).</p><p>After you completed this, &#8220;right click&#8221; the <code>res/drawable</code>&#160;directory in Android Studio and select &#8220;Reveal in Finder&#8221; (for Mac) or&#160;&#8220;Show in Explorer&#8221;&#160;(for Windows). Copy your image file into the directory res/drawable-nodpi.</p><p>If you do not have an image, go to <code>res/drawable-nodpi</code>&#160;directory under <code>2-background</code>&#160;- copy the <code>custom_background.jpg</code>&#160;image to your res/drawable-nodpi under&#160;<code>1-base</code>.</p><h3>Create Bitmap and Paint objects</h3><p>Before we can display the bitmap, we need to load and instantiate the object. Since we only want to do this once and we don&#8217;t need the dimension of the screen, we can put this into the onCreate method.</p><aside class="special"><p>We will need to import additional classes from Android framework / Java&#160;packages&#160;to help us throughout this code lab. As you type out class names like Bitmap, Android Studio will display a drop down list. Using the up and down arrow keys, you can select the class that you are meaning to type (see below).</p>
+<p>When you get to the correct one and press enter, Android Studio will autocomplete the name for you as well as adding an import line at the top of the file which brings the functionality of that class into use.</p>
+<p><img src="../img/watchface/img-10.png" style="max-width: 506px"><br></p>
+<p>If you missed this, don&#8217;t worry. The class name will be underlined in red if the import statement is not added. At this point, you can take the cursor back to that class name and press <strong>Alt-Enter</strong>&#160;and the import will be magically inserted.</p></aside><ul>
+<li>Create a private Bitmap&#160;variable <code>mBackgroundBitmap</code>&#160;in the <code>MyWatchFaceService.Engine</code>&#160;class. This enables other methods to get hold of the Bitmap to resize it and draw later.</li>
+<li>In the <code>onCreate</code>&#160;method in <code>MyWatchFaceService.Engine</code>&#160;class, we will instantiate the bitmap:</li>
+<li>Load the background bitmap:</li>
+</ul><codelab-snippet>mBackgroundBitmap = BitmapFactory
+    .decodeResource(getResources(), R.drawable.custom_background);</codelab-snippet><h3>Resize the Bitmap object</h3><p>Next we are going to resize the background bitmap. Since dimensions are not available in onCreate, we resize the Bitmap in <code>onSurfaceChanged</code>:</p><ul><li>In&#160;onSurfaceChanged&#160;method, add code to resize the Bitmap object using the width of the screen (the third parameter of the <code>onSurfaceChanged</code>&#160;method) and the width of the background bitmap:</li></ul><codelab-snippet>mScale = ((float) width) / (float) mBackgroundBitmap.getWidth();</codelab-snippet><ul><li>Scale the background bitmap:</li></ul><codelab-snippet>mBackgroundBitmap = Bitmap.createScaledBitmap
+    (mBackgroundBitmap, (int)(mBackgroundBitmap.getWidth() * mScale),
+    (int)(mBackgroundBitmap.getHeight() * mScale), true);</codelab-snippet><h3>Draw the background</h3><p>Now that the bitmap is correctly sized - let&#8217;s draw it!</p><ul>
+<li>Delete&#160;the drawRect code in onDraw which draws a black square which wipes the frame clean.</li>
+<li>Add code to draw the background bitmap in <code>onDraw</code>. We suggest you place this code directly below the code we deleted in the last step.</li>
+</ul><codelab-snippet>canvas.drawBitmap(mBackgroundBitmap, 0, 0, mBackgroundPaint);</codelab-snippet><h3>Run the watch face again</h3><p>In the first step, you learned how to install the watch face to your device or emulator. Now it's time to do that again! Your watch face should look something like this:</p><p><img src="../img/watchface/img-11.png" style="max-width: 333px"></p><h3>Summary </h3><p>In this step you&#8217;ve learned about:</p><ul>
+<li>Loading a&#160;bitmap object</li>
+<li>Resizing&#160;it based on the screen dimensions</li>
+<li>Drawing&#160;it on the screen!</li>
+</ul><h3>Next up </h3><p>Let&#8217;s refine the watch arms!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Change the Watch Hands">
+        
+          <h1></h1><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/wear/watchface/3-hands/src/main/java/com/android/example/watchface/MyWatchFaceService.java">Code step 3</a></h3><p>While the current watch hands&#160;get the job done, we want to give the watch hands a more premium makeover. In this section, you will learn more about drawing on Android canvas.</p><h3>Prepare the paint objects</h3><p>Before an artist starts, they&#160;need to mix their&#160;color palette and ready their&#160;brush. This is what we will be doing:</p><ul>
+<li>Define a private static final float constant <code>HAND_END_CAP_RADIUS</code>&#160;within <code>MyWatchFaceService.Engine</code>&#160;and set it to&#160;4. Remember to put an &#8220;<code>f</code>&#8221; after the 4 to indicate that this is a float rather than an integer.</li>
+<li>Define a private static final float constant <code>SHADOW_RADIUS</code>&#160;under <code>MyWatchFaceService.Engine</code>&#160;and set it to 6. Remember the &#8220;<code>f</code>&#8221; </li>
+<li>Change the <code>mHandPaint</code>&#160;object with the following parameters&#160;in onCreate:</li>
+<li>setShadowLayer with the following parameters:</li>
+<li>radius: <code>SHADOW_RADIUS</code>&#160;</li>
+<li>x offset: <code>0</code>
+</li>
+<li>y offset: <code>0</code>
+</li>
+<li>color: <code>Color.BLACK</code>
+</li>
+<li>
+<code>setStyle</code>&#160;to <code>Paint.Style.STROKE</code>&#160;- this means we can draw an outline of shapes</li>
+</ul><h3>Calculate the length of the watch hands</h3><p>Different watches may have different size screens. Next to scaling the background, as we did in the last step, we also need to work out the watch hand lengths.&#160;Since screen dimensions&#160;do not change, we can insert the calculation code into the method <code>onSurfaceChanged</code>:</p><ul>
+<li>set hour hand length to be <code>0.5 * width / 2</code>
+</li>
+<li>set minute hand length to be <code>0.7 * width / 2</code>
+</li>
+<li>set second hand length to be <code>0.9 * width / 2</code>
+</li>
+</ul><aside class="special"><p>Remember to put &#8220;f&#8221; after the decimal number of 0.5, 0.7 and 0.9 or Java will complain that these are doubles rather than floats and refuse to compile.</p></aside><aside class="special"><p>Why do we set the length to be a proportion of the screen rather than half the width minus some fixed number? Proportion scales better for different size screens. Android Wear already has a number of different devices and more will come. This will make it more future&#160;proof.</p></aside><h3>Draw the watch hands</h3><p>Now that all the length calculation is done, it&#8217;s time to draw the watch hands.&#160;In this section,&#160;we will walk&#160;you through the code&#160;to rotate the watch hands using canvas.rotate rather than using sine and cosine.&#160;This simplifies the code tremendously reducing the chance for error, allows&#160;more complex layouts as we will see later and leaves&#160;the optimisation to Android.</p><p>First of all we will prepare the canvas for the first hand we draw - the hour hand. So in the <code>onDraw </code>method:</p><ul>
+<li>Remove the code which draws the &#160;current watch hands&#160;(simple lines)&#160;using <code>canvas.drawLine()</code>&#160;from the line <code>canvas.save() </code>to <code>canvas.restore()</code>. We will step you through putting in the new watch hand code in the following steps.</li>
+<li>Save the current rotational state of the canvas:</li>
+</ul><codelab-snippet>canvas.save();</codelab-snippet><ul><li>Rotate to draw the hour hand</li></ul><codelab-snippet>canvas.rotate(hoursRotation, mCenterX, mCenterY);</codelab-snippet><p>The rotate command above means that we have rotated the canvas counter-clockwise by the desired amount. This means we can just draw the hour hand in an upright direction rather than at an angle.</p><p>In addition, for our hour hand,&#160;instead of a line, we want to draw a hollow paper clip like shape for our watch hands. Before we begin, we need to think a little bit about our design:</p><ul><li>Hollow paper clip - It&#8217;s basically a rectangle with two ends where it&#8217;s completely round. For our design we have chosen 4px being the radius of the round corners:</li></ul><p><img src="../img/watchface/img-12.png.jpeg" style="max-width: 297px"></p><ul><li>Next is to think about the offset that we have to put in order for the watch hands to be centered correctly. Without this the watch hands will be centered to the bottom of the whole object rather than the center of the bottom round end. It should come as no surprise that this offset is equal to the radius. In our case, this will be 4 px.</li></ul><p><img src="../img/watchface/img-13.png.jpeg" style="max-width: 403px"></p><p>To draw the watch hands:</p><ul><li>Since we need to draw the hour hand and the minute hand in the same way, we create a new private method <code>drawHand.</code>&#160;This will help us only deal with the <code>drawRoundRect </code>code once. If there are any mistakes, we can fix it in one place rather than two. For this method we need both the canvas and the length of the hand:</li></ul><codelab-snippet>private void drawHand(Canvas canvas, float handLength) {
+    canvas.drawRoundRect(mCenterX - HAND_END_CAP_RADIUS,
+        mCenterY - handLength, mCenterX + HAND_END_CAP_RADIUS,
+        mCenterY + HAND_END_CAP_RADIUS, HAND_END_CAP_RADIUS,
+        HAND_END_CAP_RADIUS, mHandPaint);
+}</codelab-snippet><ul><li>Back to the onDraw method, we draw the hour hand:</li></ul><codelab-snippet>drawHand(canvas, mHourHandLength);</codelab-snippet><ul><li>Next, we rotate the canvas to draw the minute hand, taking into account of the rotation of the hour hand drawn before.</li></ul><codelab-snippet>canvas.rotate(minutesRotation - hoursRotation, mCenterX, mCenterY);
+drawHand(canvas, mMinuteHandLength);</codelab-snippet><ul>
+<li>Draw the minute hand in a similar way to how we draw the hour hand. Remember to feed in the correct hand length</li>
+<li>Rotate to draw the second hand,&#160;taking into account of the rotation of the minute hand. Do not worry about the rotation that we made for the minute&#160;hand. Remember the bit where we rotate <strong>minus</strong>&#160;the <code>minuteRotation</code>, with that we have &#8220;neutralised&#8221; the minute&#160;hand rotation and all we need to do in this step is to &#8220;neutralise&#8221; the hour hand rotation. Lastly, do not worry about the ambient mode code.&#160;We will add that in the next section.</li>
+<li>Draw the second hand in the center of the screen adjusting for the radius of the hour and minute watch hand. This means there should be a circular area in the center which is transparent:</li>
+</ul><codelab-snippet>canvas.drawLine(mCenterX, mCenterY - HAND_END_CAP_RADIUS, mCenterX,
+    mCenterY - mSecondHandLength, mHandPaint);</codelab-snippet><ul><li>Restore the canvas to upright position:</li></ul><h3></h3><codelab-snippet>canvas.restore();</codelab-snippet><h3>How to check your progress and debug</h3><p>If you run the watch face now, you should see something like this:</p><p><img src="../img/watchface/img-14.png" style="max-width: 358px"></p><p>Check that:</p><ul>
+<li>The time is accurate&#160;- if you are using the emulator and this is not paired with the phone, the time can be different to the time of your laptop. Check the watch face against another watch face or the time that is shown in the log window in Android Studio. If the logging does not appear, try checking four things:</li>
+<li>At the bottom left, the tab &#8220;6: Android&#8221; is selected.</li>
+<li>Under devices, the correct device is selected. In the example below, it is &#8220;Emulator Android_Wear_Round_API_21&#8221;.</li>
+<li>The &#8220;Log level&#8221; is set to &#8220;Verbose&#8221;.</li>
+<li>If nothing shows up, select &#8220;No Filters&#8221;.</li>
+</ul><p><img src="../img/watchface/img-15.png.jpeg" style="max-width: 624px"></p><ul><li>The second hand is moving and the minute hand increments at the 60 seconds mark</li></ul><p>It is easy to make mistakes in calculating the rotation angle or setting the center of rotation. If these look odd consider logging these variables and checking&#160;the calculation by using</p><codelab-snippet>Log.d("MyWatchFaceService", "variable_you_want_to_log: " + variable_you_want_to_log);</codelab-snippet><p>and checking&#160;that the value makes sense. For primitives such as int or float, these can be logged directly as shown. For objects such as mTime, you will need to log its String representation by logging mTime.toString() rather than logging mTime. Otherwise,the code will not compile as the method is looking for a String object rather than a Time object. </p><p>Before publishing your watch face, we recommend that developers test&#160;their design&#160;in their daily lives&#160;and see that it both works correctly technically and that the design works in all circumstances (indoor / outdoor / stationary / on-the-move).</p><h3>Perfect the center</h3><p>Coming back to the current design, you might notice that at the center the shadow of the second hand is on top of the hour hand,&#160;and it looks a little out of place. A solution is to add a hollow circle in the middle above the second hand to solve this:</p><codelab-snippet>canvas.drawCircle(mCenterX, mCenterY, HAND_END_CAP_RADIUS, 
+    mHandPaint);</codelab-snippet><p>If you run the watch face again, it should look something like this:</p><p><img src="../img/watchface/img-16.png" style="max-width: 365px"></p><h3>Change the preview image in the watch face selector</h3><p>In the watch face selector, you can see a preview of the watch face. This can be changed by replacing the preview image - preview_analog.png in the res/drawable-nodpi directory.</p><h3>Summary </h3><p>In this step you&#8217;ve learned about:</p><ul>
+<li>Setting up paint objects to draw hollow shapes</li>
+<li>Rotating watch arms into the correct position</li>
+<li>Drawing rounded rectangle shapes.</li>
+</ul><h3>Next up </h3><p>In addition to interactive mode, Android Wear watches also have an ambient mode which normally has&#160;a more discreet design and is only&#160;updated once a minute. In the next section, we will learn about how to deal with this.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Account for ambient mode">
+        
+          <h1></h1><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/wear/watchface/4-ambient/src/main/java/com/android/example/watchface/MyWatchFaceService.java">Code step 4</a></h3><p>Aside from the interactive mode, Android Wear also has an ambient mode. Ambient mode helps the device conserve power. We typically recommend developers use black, white, and grays in this mode. Developers&#160;may also use limited color but the design should clearly signal that the watch is in ambient mode.</p><p>Aside from color differences, another way that ambient mode is different is that the watch face will only be updated once a minute. As a result, screen elements which update more often such as animation or seconds hand should be removed in this mode.</p><h3>React to ambient mode</h3><p>Within the <code>MyWatchFace.Engine</code>&#160;class, there is a method called onAmbientModeChanged. This method will be called when the watch is going into or out of ambient mode. This gives you a chance to change the design.</p><p>For our watch face, we will do three things to the watch face if it does go into ambient mode:</p><ol start="1">
+<li>Change the background to be grayscale</li>
+<li>Remove anti-aliasing&#160;of the watch hand paints</li>
+<li>Remove the seconds hand</li>
+</ol><aside class="special"><p>Anti-aliasing is a technique which helps smooth out the edges of the shape that is being drawn. In ambient mode, we want to reduce the amount of processing done. As a result, we switch this off. </p></aside><p>For 1, we can do this by creating a copy of the bitmap and apply a grayscale filter to it:</p><ul>
+<li>Create a new Bitmap object called <code>mGrayBackgroundBitmap</code>&#160;in <code>MyWatchFaceService.Engine</code>.</li>
+<li>Make a copy of the background bitmap and apply a grayscale filter to it. We recommend doing this in a separate method for clarity sake. We will invoke&#160;this new method <code>initGrayBackgroundBitmap()</code>&#160;at the end of the method onSurfaceChanged.&#160;The method should do the following:</li>
+</ul><codelab-snippet>private void initGrayBackgroundBitmap() {
+    mGrayBackgroundBitmap = Bitmap.createBitmap(
+        mBackgroundBitmap.getWidth(),
+        mBackgroundBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(mGrayBackgroundBitmap);
+    Paint grayPaint = new Paint();
+    ColorMatrix colorMatrix = new ColorMatrix();
+    colorMatrix.setSaturation(0);
+    ColorMatrixColorFilter filter = new 
+    ColorMatrixColorFilter(colorMatrix);
+    grayPaint.setColorFilter(filter);
+    canvas.drawBitmap(mBackgroundBitmap, 0, 0, grayPaint);
+}</codelab-snippet><ul><li>In onDraw, replace the background image draw code with the following which takes into account of ambient modes:</li></ul><codelab-snippet>if (mAmbient) {
+    canvas.drawBitmap(mGrayBackgroundBitmap, 0, 0, mBackgroundPaint);
+} else {
+    canvas.drawBitmap(mBackgroundBitmap, 0, 0, mBackgroundPaint);
+}</codelab-snippet><p>For 2, we add the following code into onAmbientModeChanged to switch anti-aliasing on and off.</p><codelab-snippet>mAmbient = inAmbientMode;
+
+if (inAmbientMode) {
+    mHandPaint.setAntiAlias(false);
+} else {
+    mHandPaint.setAntiAlias(true);
+}
+
+invalidate();</codelab-snippet><p>For 3, we update the code in onDraw to put a condition to check if mAmbient is false&#160;around the code that rotates and draw the&#160;seconds hand.&#160;This ensures that the seconds hand is only drawn in interactive mode. This is because the watch face is usually only updated once a minute in ambient mode.</p><p>Run the watch face. If you have an emulator, press F7&#160;to toggle between interactive and ambient mode on your keyboard. If you have a physical device, cover the display with your hand. You should see that your watch face looks something like this:</p><p><img src="../img/watchface/img-17.png" style="max-width: 387px"></p><h3>Account for the peek card in ambient mode</h3><p>In the image above, you can see that there is a peek card saying &#8220;0 steps&#160;to&#8230;&#8221;. In this case, the interference with the watch face has not been too bad but in other cases, it may lead to misreading those messages. As a result, we recommend that developers at least put a black rectangle behind the peek card by adding the following:</p><ul>
+<li>Create a Rect variable in <code>MyWatchFaceService.Engine</code>&#160;called mCardBounds. Remember to initialise it with new Rect(). Otherwise, when the code first refers&#160;to it, it will be null and crash.</li>
+<li>Override <code>onPeekCardPositionUpdate</code>&#160;method in MyWatchFaceService.Engine:</li>
+</ul><codelab-snippet>@Override
+public void onPeekCardPositionUpdate(Rect rect) {
+    super.onPeekCardPositionUpdate(rect);
+    mCardBounds.set(rect);
+}</codelab-snippet><ul><li>Draw a black rectangle below the peek card by adding the following code at the end of the onDraw method:</li></ul><codelab-snippet>if (mAmbient) {
+    canvas.drawRect(mCardBounds, mBackgroundPaint);
+}</codelab-snippet><p>If you run the watch face now, it should look like this:</p><p><img src="../img/watchface/img-18.png" style="max-width: 391px"></p><p>More details (optional): The <code>onPeekCardPositionUpdate</code>&#160;actually works in both ambient mode and interactive mode. In interactive mode, the system software takes care of drawing a rectangle behind the card so no work is required. You might ask what is the use of <code>onPeekCardPositionUpdate</code>&#160;in interactive mode? With certain designs, by knowing the card boundary you can actually shrink the watch face to the top visible portion of the screen and eliminate all interference.</p><h3>Account for special screens</h3><p>In additional to LCD screens, some Android Wear watches support:</p><ul>
+<li>low bit mode - where pixels can only be switched on or off. Since each pixel consists&#160;of red, green and blue, it is possible to create some color in this mode but it will be very basic and may not look its best. We recommend developers&#160;think about black and white images which may work,&#160;or switch off the background altogether.</li>
+<li>burn-in protection mode - some screens&#160;such as OLED suffer burn in if the same image is displayed&#160;constantly. As a result, we recommend that no more than 5% of the screen should be lit in ambient mode for these watches. Any solid filled areas should be hollowed&#160;out. Lastly, for analog watch faces, the center of the watch arms should be hollow so as not to burn in the center pixels.</li>
+</ul><p>To keep things simple, we will switch off the background if either of these modes are detected:</p><ul>
+<li>We will create two&#160;boolean variables in <code>MyWatchFaceService.Engine</code>&#160;to keep tab of: 1)&#160;the low-bit screen mode: <code>mLowBitAmbient</code>&#160;and 2) the burn-in protection screen mode: <code>mBurnInProtection</code>.</li>
+<li>Add and override the method <code>onPropertiesChanged</code>&#160;in <code>MyWatchFaceService.Engine</code>&#160;like this:</li>
+</ul><codelab-snippet>@Override
+public void onPropertiesChanged(Bundle properties) {
+    super.onPropertiesChanged(properties);
+    mLowBitAmbient = properties.getBoolean(
+        PROPERTY_LOW_BIT_AMBIENT, false);
+    mBurnInProtection = properties.getBoolean(
+         PROPERTY_BURN_IN_PROTECTION, false);
+}</codelab-snippet><ul><li>Replace the background drawBitmap code in onDraw to the following conditional code which only draw the background if these two modes are not detected in ambient mode:</li></ul><codelab-snippet>if ((mAmbient &amp;&amp; mLowBitAmbient) || (mAmbient &amp;&amp; mBurnInProtection)){
+    canvas.drawColor(Color.BLACK);
+} else if (mAmbient) {
+    canvas.drawBitmap(mGrayBackgroundBitmap, 0, 0, mBackgroundPaint);
+} else {
+    canvas.drawBitmap(mBackgroundBitmap, 0, 0, mBackgroundPaint);
+}</codelab-snippet><ul><li>Also as a refinement to earlier code, we can put a condition into the <code>onSurfaceChanged()</code>&#160;method to only create the grayscale bitmap if the watch is not in low bit or burn in protection&#160;mode:</li></ul><p>If you run this code on a supported device&#160;(e.g. Sony Smartwatch 3 for low-bit ambient mode and LG G Watch R for burn-in protection mode), it should look like the following picture. For the purpose of this code lab, it is okay not to test this. For production, we recommend that you test against devices with these different screens. </p><p><img src="../img/watchface/img-19.png" style="max-width: 320px"></p><h3>Summary </h3><p>In this step you&#8217;ve learned about:</p><ul>
+<li>Taking ambient mode into account</li>
+<li>Making a peek card visible in ambient mode</li>
+<li>Building watch faces for special screens.</li>
+</ul><h3>Next up </h3><p>An optional activity to learn about how we can add automatic color selection into our code,&#160;so that the watch hand color will automatically work with the background.</p><p>If you still have time but don&#8217;t fancy having a go at the palette API, we encourage you to alter the different parameters of the screen elements, for example, stroke size, the radius of the watch arms, color of the various screen element, etc. Let&#8217;s see what you get!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Automatic color selection using Palette API">
+        
+          <h1></h1><h3><a href="https://github.com/googlesamples/io2015-codelabs/blob/master/wear/watchface/5-palette/src/main/java/com/android/example/watchface/MyWatchFaceService.java">Code step 5</a></h3><p>As part of the Android 5.0 Lollipop launch, we have added a <a href="https://chris.banes.me/2014/10/20/palette-v21/">Palette API</a>&#160;which helps automatically select the accent color of a bitmap. We will be using this API for automatically selecting the color of the watch hands. Outside of watch faces, you can use it to generate dynamic color schemes based on&#160;the&#160;user&#8217;s input and fulfil one of the creative visions&#160;of <a href="http://www.google.co.uk/design/spec/material-design/introduction.html">material design</a>&#160;- a new cross platform design language.</p><h3>Determine key colors of a bitmap</h3><p>We will need to initiate the Palette object, feed our background bitmap to it and get it to analyse the result:</p><ul>
+<li>Open &#8220;build.gradle (Module: 1-base)&#8221; file under Gradle Scripts:<br><img src="../img/watchface/img-20.png.jpeg" style="max-width: 307px">
+</li>
+<li>Add the following to&#160;the dependencies section towards the end of the &#8220;build.gradle (Module: 1-base)&#8221; file:</li>
+</ul><codelab-snippet>compile 'com.android.support:palette-v7:21.0.0'</codelab-snippet><ul><li>Press blue &#8220;Sync Now&#8221; at the top - this will trigger a rebuild and palette will be available for use.</li></ul><p><img src="../img/watchface/img-21.png" style="max-width: 624px"></p><ul>
+<li>Create two int variable mWatchHandColor&#160;and <code>mWatchHandShadowColor</code>&#160;in <code>CanvasWatchFaceService.Engine</code>&#160;to store the colors. Initiate them with <code>Color.WHITE</code>&#160;and <code>Color.BLACK</code>&#160;respectively.</li>
+<li>Instantiate a&#160;Palette&#160;in <code>onCreate</code>&#160;after the <code>mBackgroundBitmap</code>&#160;has been loaded:</li>
+</ul><codelab-snippet>Palette.generateAsync(mBackgroundBitmap,
+    new Palette.PaletteAsyncListener() {
+    @Override
+    public void onGenerated(Palette palette) {
+        if (null != palette){
+            Log.d("onGenerated", palette.toString());
+            mWatchHandColor = palette.getVibrantColor(Color.WHITE);
+            mWatchHandShadowColor =
+                palette.getDarkMutedColor(Color.BLACK);
+            setWatchHandColor();
+        }
+    }
+});</codelab-snippet><ul><li>Add a new private method in <code>MyWatchFaceService.Engine</code>&#160;to set the color of the watch hands</li></ul><codelab-snippet>private void setWatchHandColor(){
+    if (mAmbient){
+        mHandPaint.setColor(Color.WHITE);
+        mHandPaint.setShadowLayer(SHADOW_RADIUS, 0, 0, Color.BLACK);
+    } else {
+        mHandPaint.setColor(mWatchHandColor);
+        mHandPaint.setShadowLayer(SHADOW_RADIUS, 0, 0, mWatchHandShadowColor);
+    }
+}</codelab-snippet><ul><li>Call the <code>setWatchHandColor()</code>&#160;method&#160;before invalidating the frame in <code>onAmbientModeChanged</code>
+</li></ul><h3>Run the watch face again</h3><p>Your watch face should look something like this:</p><p><img src="../img/watchface/img-22.png" style="max-width: 375px"></p><p>If you copy over the custom_background2 image from the module &#8220;5-palette&#8221; to &#8220;1-base&#8221; and change the <code>backgroundResId</code>&#160;to <code>custom_background2</code>, you should see a watch face similar to this:</p><p><img src="../img/watchface/img-23.png" style="max-width: 383px"></p><h3>Summary </h3><p>In this step you&#8217;ve learned about:</p><ul>
+<li>How to select color schemes automatically using the Palette API</li>
+<li>Setting&#160;the screen elements color accordingly</li>
+</ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Next Steps">
+        
+          <h1></h1><p>For more details about developing Android Wear notification and apps:</p><p><a href="https://developer.android.com/training/building-wearables.html">https://developer.android.com/training/building-wearables.html</a></p><p>For more details about developering Android Wear watch faces, visit <a href="https://developer.android.com/training/wearables/watch-faces/index.html">https://developer.android.com/training/wearables/watch-faces/index.html</a>&#160;</p><p>Here are some of the common customisation steps for watch faces:</p><ul>
+<li>Positioning status icons, the charging icon (the lighting bolt), &#8220;Ok Google&#8221;, etc:</li>
+<li>Refer to the <a href="https://developer.android.com/reference/android/support/wearable/watchface/WatchFaceStyle.Builder.html">WatchFaceStyle.Builder</a>&#160;documentation for various options from setting gravity to making a semi-transparent background so that they are readable against the watch face.</li>
+<li>Putting the watch face on the Google Play Store</li>
+<li>First, get <a href="https://developer.android.com/distribute/googleplay/start.html">set up</a>&#160;on the Google Play Store if you don&#8217;t have an account already.</li>
+<li>Second, <a href="https://developer.android.com/training/wearables/apps/packaging.html">package the watch face with a mobile app</a>.</li>
+<li>Third, <a href="https://developer.android.com/distribute/googleplay/developer-console.html">upload to the Play Store</a>.</li>
+</ul><aside class="special"><p>The permissions required for the watch face will need to be copied over to the mobile app.</p></aside><ul>
+<li>What about digital watch faces?</li>
+<li>Use the Android Wear watch face template in Android Studio. Please note that this will require Android Studio version 1.1 or above. This will help you get the skeleton code:</li>
+<li>Start a new project or open your existing project</li>
+<li>Create a new Android Wear module with no activity if your project does&#160;not already have it.</li>
+<li>Right-click on the module name on the left hand side. Select New &gt; Wear &gt; Watch Face</li>
+</ul><p><img src="../img/watchface/img-24.png" style="max-width: 624px"></p><ul><li>Select the digital watch template.</li></ul>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Learn More">
+        
+          <h1></h1><ul><li>Watch these great videos:</li></ul><p>&#160; &#160; &#160; &#160; &#160; &#160; <a href="https://www.youtube.com/watch?v=VkvHKtmsvYA">DevBytes: Developing an Android Wear Watch Face</a></p><p>&#160; &#160; &#160; &#160; &#160; &#160; <a href="https://www.youtube.com/watch?v=AK38PJZmIW8">DevBytes: Watch Faces for Android Wear</a></p><ul><li>Take the <a href="https://www.udacity.com/course/android-ubiquitous-computing--ud875">Ubiquitous Computing Online course</a>
+</li></ul>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>
