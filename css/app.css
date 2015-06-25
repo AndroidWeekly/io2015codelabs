@@ -1,4 +1,4 @@
-/* @import url('https://fonts.useso.com/css?family=Roboto:100,200,400,300,300italic,700,500%7CSource+Code+Pro:400,700'); */
+/* @import url('https://fonts.googleapis.com/css?family=Roboto:100,200,400,300,300italic,700,500%7CSource+Code+Pro:400,700'); */
 @import url("roboto-font-face.css");
 
 html, body {
@@ -65,29 +65,4 @@ html /deep/ paper-dialog /deep/ h1 {
 
 [main] {
   background-color: #eee;
-}
-
-footer {
-    position: relative;
-    background-color: #fafafa;
-    padding: 100px 0;
-    padding-left: 64px;
-}
-
-footer .links {
-    margin-bottom: 56px;
-}
-
-footer paper-button {
-    margin-right: 30px;
-    color: #666666;
-}
-
-footer #copyright {
-    color: #757575;
-    font-size: 14px;
-}
-
-footer #copyright a {
-    color: #666666;
 }

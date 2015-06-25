@@ -1,0 +1,475 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../js/menu.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../codelab_components/codelab-codelab/codelab-codelab.html">
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/shadowdom-shim.css" shim-shadowdom>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+</head>
+<body unresolved>
+
+  <codelab-codelab label="Get Started with Android Pay"
+      feedback_link="https://github.com/googlesamples/io2015-codelabs/issues"
+        category="Android"
+    
+    
+        environment="web"
+    >
+    
+      
+      <codelab-step 
+        label="Overview" 
+        duration="1">
+        
+          <h1></h1><p>Welcome to the Android Pay codelab! &#160;In this codelab you will learn how to set up your Android app to collect payment information from users with just a few clicks. &#160;No more flaky credit card forms, this is how your users should be shopping in your application.</p><p><strong>Note</strong>: the Android Pay app has not launched yet, so the visual assets are not finalized. &#160;You are getting an early preview of the API that will be available when Android Pay launches to the public in a few weeks. &#160;As you proceed through this codelab you will notice Google Wallet branding. &#160;When Android Pay launches, those Google Wallet assets will be seamlessly replaced with Android Pay assets with no code changes required. &#160;For more information, visit <a href="http://developers.google.com/android-pay">developers.google.com/android-pay</a>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create your Project" 
+        duration="1:00">
+        
+          <h1></h1><h2>Create an Android Studio Project</h2><p>Open Android Studio and create a new project. &#160;Enter your <strong>Application Name</strong>&#160;and <strong>Company Domain</strong>. &#160;You can enter any value in these fields for the purposes of this codelab.</p><p><img src="../img/android-pay/img-1.png" style="max-width: 624px"></p><p>After picking a location to save your project, click <strong>Next</strong>. &#160;The next screen will ask you to select form factors and SDKs, just click <strong>Next</strong>&#160;again to accept the default setting.</p><p>On the <strong>Add Activity</strong>&#160;screen, select <strong>Blank Activity</strong>&#160;and click <strong>Next</strong>. &#160;The next screen will ask for an activity name, layout name, and more. &#160;Leave the default values and select <strong>Finish</strong>.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Configure your Gradle Build File" 
+        duration="2:00">
+        
+          <h1></h1><h2>Add Dependencies</h2><p>The Android Pay API is part of Google Play Services, so let&#8217;s add a dependency on Google Play Services to the project:</p><p>Open the <code>build.gradle</code>&#160;file in the <code>app</code>&#160;module and add the following to the dependencies block:</p><codelab-snippet>dependencies {  
+    compile 'com.google.android.gms:play-services:7.5+'
+    compile 'com.android.support:support-v4:+'
+    compile 'com.android.support:appcompat-v7:+'
+}</codelab-snippet><p>Next, click the &#8220;Gradle sync&#8221; button&#160;in the top toolbar. &#160;If this button is grayed out, wait for Android studio to finish loading the project (you can see progress in the lower right):</p><p><img src="../img/android-pay/img-2.png" style="max-width: 31px"></p><p>to download the dependencies you just added.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Configure the Android Manifest" 
+        duration="2:00">
+        
+          <h1></h1><h2>Add the Google Play Services Tag</h2><p>In the &#8216;Android&#8217; project view, open <strong>app &gt; manifests &gt; AndroidManifest.xml</strong>:</p><p><img src="../img/android-pay/img-3.png" style="max-width: 288px"></p><p>Inside the <code>&lt;application&gt;</code>&#160;tag, add the following <code>&lt;meta-data&gt;</code>&#160;tag to enable Google Play Services in your app:</p><codelab-snippet>&lt;application
+
+   &lt;!-- Existing content here ... &#8594;
+
+   &lt;meta-data
+        android:name="com.google.android.gms.version"
+        android:value="@integer/google_play_services_version" /&gt;
+
+&lt;/application&gt;</codelab-snippet><h2>Add the Android Pay Tag</h2><p>In the same way you added the Google Play Services tag, add a tag to enable the Android Pay API in your app:</p><codelab-snippet>&lt;application
+
+   &lt;!-- Existing content here ... --&gt;
+   &lt;meta-data
+        android:name="com.google.android.gms.wallet.api.enabled"
+        android:value="true" /&gt;
+
+&lt;/application&gt;</codelab-snippet><p>Congrats, you've finished setup! &#160;Next up, let's create the Buy with Google Button and Masked Wallet Request.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Update the Layout" 
+        duration="2:00">
+        
+          <h1></h1><h2>Add a FrameLayout to hold the Android Pay Button</h2><p>In this step you will modify the layout created by Android Studio and add a placeholder where you will add the Android Pay button.</p><p>Open the file <code>activity_main.xml</code>&#160;file in the Android view:</p><p><img src="../img/android-pay/img-4.png" style="max-width: 246px"></p><p>This will open into the &#8216;Design&#8217; view where you can see a preview of your layout. &#160;At the bottom of the screen, click <strong>Text</strong>&#160;to open the text view where you can edit hr XML directly. &#160;Replace the content of the file with the following code:</p><codelab-snippet>    &lt;LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity"&gt;
+
+       &lt;!-- We will add more here --&gt;
+
+    &lt;/LinearLayout&gt;</codelab-snippet><p>Add a <code>FrameLayout</code>&#160;inside the <code>LinearLayout</code>. &#160;This will hold the Android Pay button. &#160;We'll make it 200dp x 48dp with 10dp margins:</p><codelab-snippet>&lt;LinearLayout
+    ...
+
+    &lt;FrameLayout
+        android:id="@+id/wallet_button_holder"
+        android:layout_height="48dp"
+        android:layout_width="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" /&gt;
+&lt;/LinearLayout&gt;</codelab-snippet><p>That&#8217;s all the layout editing we need to do for now. &#160;It&#8217;s time to get into the code!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create a Masked Wallet Request" 
+        duration="5:00">
+        
+          <h1></h1><h2>The Transaction Flow</h2><p>From here on you will begin implementing the steps of the transaction flow. &#160;Getting payment information through Android Pay takes place in a four steps:</p><ol start="1">
+<li>
+<strong>Request a Masked Wallet object</strong>:&#160;this is where you will define the details of the charge you would like to make and the information you will require (address, phone number, etc).</li>
+<li>
+<strong>Get a Masked Wallet object</strong>:&#160;this happens after the user has clicked the Buy button and provided all the information you asked for. &#160;At this point the user should be done entering information and you should display a confirmation screen.</li>
+<li>
+<strong>Request a Full Wallet object</strong>: once you have used the Masked Wallet object to display a confirmation screen, you can request a full wallet object. &#160;This confirms the details of the Masked Wallet request and asks for the actual information you will need to make the charge (credit card number, payment processor token, etc)</li>
+<li>
+<strong>Get a Full Wallet object</strong>: at this point you are ready to make the charge. &#160;The Full Wallet object contains either a credit card number or processor token that you can use to charge the user for the transaction.</li>
+</ol><h2>Create a MaskedWalletRequest Helper Function</h2><p>Now you'll create the Masked Wallet request which defines the information that we're requesting from the user and some estimated information about their purchase.</p><p>Open the <code>MainActivity.java</code>&#160;file from the Android view:</p><p><img src="../img/android-pay/img-5.png" style="max-width: 244px"></p><p>Inside the <code>MainActivity</code>&#160;class, define a helper function to create the Masked Wallet Request. &#160;The Masked Wallet Request defines the information about the order and what you're requesting from the customer:</p><codelab-snippet>    private MaskedWalletRequest generateMaskedWalletRequest(){
+      // We will implement this in the next step
+      return null;
+    }</codelab-snippet><p>Instead of `return null;` let's replace it with a <code>MaskedWalletRequest</code>&#160;which we can create using the Builder pattern. &#160;Here we're defining that we want the user's phone number, shipping address and that they're purchasing a Google I/O sticker for approximately $15 (including tax and shipping):</p><codelab-snippet>private MaskedWalletRequest generateMaskedWalletRequest() {
+      MaskedWalletRequest maskedWalletRequest =
+          MaskedWalletRequest.newBuilder()
+              .setMerchantName("Google I/O Codelab")
+              .setPhoneNumberRequired(true)
+              .setShippingAddressRequired(true)
+              .setCurrencyCode("USD")
+              .setCart(Cart.newBuilder()
+                  .setCurrencyCode("USD")
+                  .setTotalPrice("10.00")
+                  .addLineItem(LineItem.newBuilder()
+                      .setCurrencyCode("USD")
+                      .setDescription("Google I/O Sticker")
+                      .setQuantity("1")
+                      .setUnitPrice("10.00")
+                      .setTotalPrice("10.00")
+                      .build())
+                  .build())
+              .setEstimatedTotalPrice("15.00")
+              .build();
+      return maskedWalletRequest;
+    }</codelab-snippet><p><strong>Note:</strong>&#160;Android Studio will underline classes in red when imports are not met. &#160;You can import classes by placing the cursor over the class and hitting the alt + enter buttons.</p><p>Now you have created a request describing what your user would like to buy in this app. &#160;In the next steps we will configure the Android Pay button to execute this request and learn how to actually get the user&#8217;s payment information.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Configure the WalletFragment" 
+        duration="5:00">
+        
+          <h1></h1><h2>Add the WalletFragment</h2><p>We will create the Android Pay button using the <code>WalletFragment</code>&#160;class, which is essential to showing this button and other standard UI elements.</p><p>In <code>MainActivity</code>, add a <code>SupportWalletFragment</code>&#160;instance variable and a request code constant so that we can use them later:</p><codelab-snippet>    private SupportWalletFragment mWalletFragment;
+    public static final int MASKED_WALLET_REQUEST_CODE = 888;</codelab-snippet><p>In the <code>onCreate</code>&#160;method define the style the <code>WalletFragment</code>&#160;will have:</p><codelab-snippet>    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        // Wallet fragment style
+        WalletFragmentStyle walletFragmentStyle = new WalletFragmentStyle()
+                .setBuyButtonText(BuyButtonText.BUY_NOW)
+                .setBuyButtonWidth(Dimension.MATCH_PARENT);
+    }</codelab-snippet><p>Also in <code>onCreate</code>, define the <code>WalletFragmentOptions</code>&#160;that will control the <code>WalletFragment</code>:</p><codelab-snippet>    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+       
+        // ...
+
+        // Wallet fragment options
+        WalletFragmentOptions walletFragmentOptions = WalletFragmentOptions.newBuilder()
+                .setEnvironment(WalletConstants.ENVIRONMENT_SANDBOX)
+                .setFragmentStyle(walletFragmentStyle)
+                .setTheme(WalletConstants.THEME_LIGHT)
+                .setMode(WalletFragmentMode.BUY_BUTTON)
+                .build();
+    }</codelab-snippet><p>Finally, still in <code>onCreate</code>, instantiate and initialize the <code>WalletFragment</code>:</p><codelab-snippet>@Override
+protected void onCreate(Bundle savedInstanceState) {
+
+   // ...
+
+   // Instantiate the WalletFragment
+   mWalletFragment = SupportWalletFragment.newInstance(walletFragmentOptions);
+
+   // Initialize the WalletFragment
+   WalletFragmentInitParams.Builder startParamsBuilder =
+           WalletFragmentInitParams.newBuilder()
+                   .setMaskedWalletRequest(generateMaskedWalletRequest())
+                   .setMaskedWalletRequestCode(MASKED_WALLET_REQUEST_CODE)
+                   .setAccountName("Google I/O Codelab");
+   mWalletFragment.initialize(startParamsBuilder.build());
+}</codelab-snippet><p>Now the <code>WalletFragment</code>&#160;object is fully instantiated. &#160;In the next step we will add it to the UI so that your app can display the Android Pay buy button.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Add WalletFragment to the UI" 
+        duration="5:00">
+        
+          <h1></h1><h2>Insert the Fragment into the UI</h2><p>In <code>MainActivity</code>, create a class constant to contain the <code>WalletFragment</code>&#8217;s tag:</p><codelab-snippet>  public static final String WALLET_FRAGMENT_ID = "wallet_fragment";</codelab-snippet><p>Next, initialize the <code>FrameLayout</code>&#160;we added earlier with the <code>WalletFragment</code>&#160;in the <code>onCreate</code>&#160;method:</p><codelab-snippet>    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+       
+        // ...
+
+        // Add the WalletFragment to the UI
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.wallet_button_holder, mWalletFragment, WALLET_FRAGMENT_ID)
+            .commit();
+    }</codelab-snippet><p>We don&#8217;t want to add <code>WalletFragment </code>twice, so we should surround all of the initialization code we have written so far with a check to see if it already exists in the <code>Activity</code>. &#160;Your <code>onCreate</code>&#160;should now look like this:</p><codelab-snippet>@Override
+protected void onCreate(Bundle savedInstanceState) {
+   super.onCreate(savedInstanceState);
+   setContentView(R.layout.activity_main);
+
+   // Check if WalletFragment exists
+   mWalletFragment = (SupportWalletFragment) getSupportFragmentManager()
+           .findFragmentByTag(WALLET_FRAGMENT_ID);
+
+   // It does not, add it
+   if(mWalletFragment == null) {
+       // Wallet fragment style
+       WalletFragmentStyle walletFragmentStyle = new WalletFragmentStyle()
+               .setBuyButtonText(BuyButtonText.BUY_NOW)
+               .setBuyButtonWidth(Dimension.MATCH_PARENT);
+
+       // Wallet fragment options
+       WalletFragmentOptions walletFragmentOptions = WalletFragmentOptions.newBuilder()
+               .setEnvironment(WalletConstants.ENVIRONMENT_SANDBOX)
+               .setFragmentStyle(walletFragmentStyle)
+               .setTheme(WalletConstants.THEME_LIGHT)
+               .setMode(WalletFragmentMode.BUY_BUTTON)
+               .build();
+
+
+       // Instantiate the WalletFragment
+       mWalletFragment = SupportWalletFragment.newInstance(walletFragmentOptions);
+
+       // Initialize the WalletFragment
+       WalletFragmentInitParams.Builder startParamsBuilder =
+               WalletFragmentInitParams.newBuilder()
+                       .setMaskedWalletRequest(generateMaskedWalletRequest())
+                       .setMaskedWalletRequestCode(MASKED_WALLET_REQUEST_CODE)
+                       .setAccountName("Google I/O Codelab");
+       mWalletFragment.initialize(startParamsBuilder.build());
+
+       // Add the fragment to the UI
+       getSupportFragmentManager().beginTransaction()
+               .replace(R.id.wallet_button_holder, mWalletFragment, WALLET_FRAGMENT_ID)
+               .commit();
+   }
+}</codelab-snippet><p>Now your Android Pay buy button will be added to the UI at the right time and with the correct style!</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Handle Intents" 
+        duration="3:00">
+        
+          <h1></h1><h2>Handling Masked Wallet Request Intents</h2><p>When you click the Android Pay button, you will kick off a request for a Masked Wallet. &#160;In this section you will learn how to handle the result of that request.</p><p>Add the following instance variable to <code>MainActivity</code>&#160;to store the <code>MaskedWallet</code>:</p><codelab-snippet>    private MaskedWallet mMaskedWallet;</codelab-snippet><p>Then, add the following function to override <code>onActivityResult</code>:</p><codelab-snippet>    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+      super.onActivityResult(requestCode, resultCode, data);
+    }</codelab-snippet><p>In <code>onActivityResult</code>, check to see if the request code is for your Masked Wallet request and store the resulting response:</p><codelab-snippet>    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case MASKED_WALLET_REQUEST_CODE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        mMaskedWallet =  data
+                                .getParcelableExtra(WalletConstants.EXTRA_MASKED_WALLET);
+                        Toast.makeText(this, "Got Masked Wallet", Toast.LENGTH_SHORT).show();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // The user canceled the operation
+                        break;
+                    case WalletConstants.RESULT_ERROR:
+                        Toast.makeText(this, "An Error Occurred", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                break;
+        }
+    }</codelab-snippet><p>With that code in place, you will be able to receive the result of a MaskedWallet request. &#160;Now is a good time to <strong>run your app</strong>&#160;and make sure everything is working well. &#160;</p><p>You should see a Buy button. &#160;Clicking the button will bring up a payment method screen where you can select a credit card and billing address. &#160;Don&#8217;t worry, we are using the sandbox environment so no charges you make in this codelab will be real. &#160;If you want to enter a credit card, use the following information:</p><p><strong>Card Type</strong>: Visa</p><p><strong>Card Number</strong>: 4111 1111 1111 1111</p><p><strong>CVC</strong>: any three digits</p><p><strong>Expiration</strong>: any date in the future</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create a Full Wallet Request Button" 
+        duration="1:00">
+        
+          <h1></h1><h2>Initiate the Full Wallet Request</h2><p>In the last step you got Masked Wallet information representing the user&#8217;s desired purchase. &#160;When you request a Full Wallet, you get a one-time card from Google and the user&#8217;s full billing and shipping information. &#160;This card is backed by the user&#8217;s secured payment credentials.</p><p>First, re-open the <code>activity_main.xml</code>&#160;file. &#160;We will add a button inside the <code>LinearLayout</code>&#160;(below the <code>FrameLayout</code>). &#160;When clicked, this button will call the <code>requestFullWallet</code>&#160;function which we will create later:</p><codelab-snippet>    &lt;Button
+        android:layout_width="200dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Confirm"
+        android:onClick="requestFullWallet" /&gt;</codelab-snippet><p>That&#8217;s enough layout work for now, we will make this button do something in the next few steps.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Create a Full Wallet Request" 
+        duration="1:00">
+        
+          <h1></h1><h2>Requesting the Full Wallet</h2><p>Just like with Masked Wallet, you need to create a request object to get a Full Wallet. &#160;Open <code>MainActivity.java</code>&#160;again. &#160;Create a helper function to generate the Full Wallet Request. &#160;It should take the Google Transaction ID as a parameter. &#160;The Google Transaction ID can be found in the Masked Wallet Response. &#160;You'll also want to add information about the purchase including the exact amount you will be charging for. &#160;Here we have a $10.00 sticker with $0.10 tax:</p><codelab-snippet>    private FullWalletRequest generateFullWalletRequest(String googleTransactionId) {
+      FullWalletRequest fullWalletRequest = FullWalletRequest.newBuilder()
+          .setGoogleTransactionId(googleTransactionId)
+          .setCart(Cart.newBuilder()
+              .setCurrencyCode("USD")
+              .setTotalPrice("10.10")
+              .addLineItem(LineItem.newBuilder()
+                  .setCurrencyCode("USD")
+                  .setDescription("Google I/O Sticker")
+                  .setQuantity("1")
+                  .setUnitPrice("10.00")
+                  .setTotalPrice("10.00")
+                  .build())
+              .addLineItem(LineItem.newBuilder()
+                  .setCurrencyCode("USD")
+                  .setDescription("Tax")
+                  .setRole(LineItem.Role.TAX)
+                  .setTotalPrice(".10")
+                  .build())
+              .build())
+          .build();
+      return fullWalletRequest;
+    }</codelab-snippet><p>You can see that this is very similar to the Masked Wallet request, except that we now have a transaction ID. &#160;In the next steps we will use this request to get the Full Wallet object which will enable us to actually get chargeable payment information.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Initialize the GoogleApiClient" 
+        duration="5:00">
+        
+          <h1></h1><h2>Managing a GoogleApiClient</h2><p>If you have ever used a Google API in your Android app, you may be familiar with <code>GoogleApiClient</code>. &#160;<code>GoogleApiClient </code>is your key to accessing Google Play Services from your Android application. &#160;In this step we will configure a <code>GoogleApiClient</code>, which we will need before we can continue.</p><p>First, add the following class variable to <code>MainActivity</code>:</p><codelab-snippet>    private GoogleApiClient mGoogleApiClient;</codelab-snippet><p>At the end of the <code>onCreate</code>&#160;method, add the following code to build the client:</p><codelab-snippet>    mGoogleApiClient = new GoogleApiClient.Builder(this)
+        .addConnectionCallbacks(this)
+        .addOnConnectionFailedListener(this)
+        .addApi(Wallet.API, new Wallet.WalletOptions.Builder()
+            .setEnvironment(WalletConstants.ENVIRONMENT_SANDBOX)
+            .setTheme(WalletConstants.THEME_LIGHT)
+            .build())
+        .build();</codelab-snippet><p>Then change the class definition of MainActivity to implement these two interfaces. &#160;After you do this Android Studio will complain that we have not implemented the required methods. &#160;We will do that next:</p><codelab-snippet>public class MainActivity extends ActionBarActivity implements 
+        GoogleApiClient.ConnectionCallbacks, 
+        GoogleApiClient.OnConnectionFailedListener {
+
+    // ....
+
+}</codelab-snippet><p>Add the following code to your activity to implement the required methods for <code>GoogleApiClient</code>:</p><codelab-snippet>   @Override
+   public void onStart() {
+      mGoogleApiClient.connect();
+      super.onStart();
+    }
+
+   @Override
+   public void onStop() {
+      mGoogleApiClient.disconnect();
+      super.onStop();
+    }
+
+   @Override
+   public void onConnected(Bundle bundle) {
+      // GoogleApiClient is connected, we don't need to do anything here
+    }
+
+   @Override
+   public void onConnectionSuspended(int cause) {
+      // GoogleApiClient is temporarily disconnected, no action needed
+    }
+
+   @Override
+   public void onConnectionFailed(ConnectionResult result) {
+      // GoogleApiClient failed to connect, we should log the error and retry
+    }</codelab-snippet><p>Now you have the basic setup for <code>GoogleApiClient</code>, and we can use it to request the Full Wallet.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Request the Full Wallet" 
+        duration="3:00">
+        
+          <h1></h1><h2>Add a Function to Request the Full Wallet</h2><p>Here we'll create a function that handles the button click, calls our helper function and requests the Full Wallet.</p><p>Define a class constant request code for the Full Wallet Request and an instance variable to store the Full Wallet response. &#160;This should look familiar as it is similar to what we did for Masked Wallet:</p><codelab-snippet>    public static final int FULL_WALLET_REQUEST_CODE = 889;
+    private FullWallet mFullWallet;</codelab-snippet><p>Define a function to generate the Full Wallet Request using the function we defined earlier and make the request to load the Full Wallet. &#160;This function is defined by the button we defined a few steps ago:</p><codelab-snippet>    public void requestFullWallet(View view) {
+      if (mMaskedWallet == null) {
+        Toast.makeText(this, "No masked wallet, can't confirm", Toast.LENGTH_SHORT).show();
+        return;
+      } 
+      Wallet.Payments.loadFullWallet(mGoogleApiClient,
+          generateFullWalletRequest(mMaskedWallet.getGoogleTransactionId()),
+          FULL_WALLET_REQUEST_CODE);
+    }</codelab-snippet><p>Add a case to <code>onActivityResult</code>&#160;to handle the Full Wallet response:</p><codelab-snippet>    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case MASKED_WALLET_REQUEST_CODE:
+                // ...
+            case FULL_WALLET_REQUEST_CODE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        mFullWallet = data
+                                .getParcelableExtra(WalletConstants.EXTRA_FULL_WALLET);
+                        // Show the credit card number
+                        Toast.makeText(this,
+                                mFullWallet.getProxyCard().getPan().toString(),
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case WalletConstants.RESULT_ERROR:
+                        Toast.makeText(this, "An Error Occurred", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                break;
+        }
+    }</codelab-snippet><p>Once you have the Full Wallet object, you have the one-time payment credentials. &#160;You can access the credit card number with the following call:</p><codelab-snippet>    mFullWallet.getProxyCard().getPan();</codelab-snippet><p>In this app we added a Toast to display the credit card number. &#160;We would not normally do this in a real application for security reasons, but it is a good way to demonstrate that the request succeeded in this codelab.</p><p>Now that you have the Full Wallet you are almost done! &#160;You have a credit card number which you can use to process the transaction. &#160;Now we just have to finish by keeping track of transaction status.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Update Transaction Status" 
+        duration="2:00">
+        
+          <h1></h1><h2>Create and Send the Notify Transaction Status Object</h2><p>Once we have successfully completed the transaction, we need to send a Notify Transaction Status object to tell Android Pay whether or not the card successfully charged. &#160;There could be instances where the user's card is expired or their billing address has changed. &#160;For this app, we'll just send a success to demonstrate.</p><p>Create a helper function to generate the Notify Transaction Status Request:</p><codelab-snippet>    public static NotifyTransactionStatusRequest generateNotifyTransactionStatusRequest(
+        String googleTransactionId, int status) {
+      return NotifyTransactionStatusRequest.newBuilder()
+          .setGoogleTransactionId(googleTransactionId)
+          .setStatus(status)
+          .build();
+    }</codelab-snippet><p>In <code>onActivityResult</code>&#160;in the Full Wallet request case, call <code>notifyTransactionStatus</code>:</p><codelab-snippet>    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            
+           // ...
+
+            case FULL_WALLET_REQUEST_CODE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // ...
+                        
+                        // Update transaction status
+                        Wallet.Payments.notifyTransactionStatus(mGoogleApiClient,                                                      
+                            generateNotifyTransactionStatusRequest(
+                                mFullWallet.getGoogleTransactionId(),
+                                NotifyTransactionStatusRequest.Status.SUCCESS));
+                        
+                       // ...</codelab-snippet><p>Now pat yourself on the back, you just did a complete integration with Android Pay! &#160;It&#8217;s time to run your app again and see how it went.</p>
+        
+      </codelab-step>
+      
+    
+      
+      <codelab-step 
+        label="Run the App" 
+        duration="2:00">
+        
+          <h1></h1><p>That's it, you've integrated Android Pay in 30 minutes! &#160;Run your app again, it should look like this:</p><p><img src="../img/android-pay/img-6.png" style="max-width: 333px"></p><p>Tap the Buy button and enter the fake Visa credit card from before. &#160;Feel free to enter any valid shipping/billing address, this is all sandboxed.</p><p>Once you've selected your payment credentials, click the Confirm button. &#160;The Toast displays the Full Wallet Response one time card number.</p><p>You can take the payment information and then pass it to your payment processor and process it like a regular credit card.</p><p>Now that you have a credit card you will want to integrate with a payment processor. &#160;Android Pay integrates easily with <a href="https://stripe.com/android-pay">Stripe</a>&#160;and <a href="https://www.braintreepayments.com/features/android-pay">Braintree</a>, visit their websites to learn more.</p>
+        
+      </codelab-step>
+      
+    
+  </codelab-codelab>
+</body>
+</html>

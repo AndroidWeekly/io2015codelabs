@@ -176,7 +176,7 @@ footer {
   ::content .faq a.webmaster_tools {
     background-image: url("img/webmaster-tools.png"); }
   ::content .faq a.google_support {
-    background-image: url("http://io2015codelabs.appspot.com/codelab_components/codelab-step/img/google.png");
+    background-image: url("https://io2015codelabs.appspot.com/codelab_components/codelab-step/img/google.png");
     background-size: 16px;
     background-position: 4px 2px; }
   ::content .faq a.android_developer {
